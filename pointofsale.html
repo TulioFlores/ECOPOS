@@ -9,30 +9,36 @@
 <body>
     <!-- Encabezado de la pagina -->
     <header>
-        <img width="50px" src="Logos/LogoNegro.svg" alt="EcoPos">
+        <img width="50px" src="Logos/LogoBlanco.svg" alt="EcoPos">
         <button><img src="Iconos/user.svg" alt="Mi cuenta">Mi cuenta</button>
     </header>
     <!-- Formulario para escanear el producto -->
     <form action="">
         Producto: <input type="number" name="producto" id="producto">
-        <img src="Iconos/lupa.svg" alt="Buscar"><br>
+        <img width="15px" src="Iconos/lupa.svg" alt="Buscar"><br>
         Cantidad: <input type="number" name="cantidad" id="cantidad">
     </form>
     <!-- Tabla para mostrar los productos -->
     <table>
-        <tr>
-            <th>Clave</th>
-            <th>Descripcion</th>
-            <th>Cantidad</th>
-            <th>Precio</th>
-        </tr>
-        <tr>
-            <td></td>
-            <td></td>
-            <td></td>
-            <td></td>
-        </tr>
-       
+        <thead>
+            <tr>
+                <th>Clave</th>
+                <th>Descripcion</th>
+                <th>Cantidad</th>
+                <th>Precio</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Aqui se mostraran los productos -->
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>Subtotal</td>
+                <td>Descuento</td>
+                <td>Total neto</td>
+            </tr>
+        </tfoot>
+        
     </table>
     <button><img src="" alt="">Eliminar Producto</button>
     <button><img src="" alt="">Aplicar venta</button>
