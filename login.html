@@ -4,28 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio de Sesión</title>
-    <link rel="stylesheet" href="Estilos Edgar.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="Estilos-Edgar.css">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="cajalogin">
-        <img src="logo.png" class="logo">
-        <h2>ECOPOS</h2>
-        <h3>Iniciar Sesión</h3>
-        <label for="email">Correo electrónico</label>
-        <input type="email" id="email" placeholder="Correo electrónico">
-        <button class="email-btn">Continuar con correo electrónico</button>
+<body class="d-flex align-items-center min-vh-100">
+    <div class="container-fluid">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6 col-xl-4">
+                <div class="card shadow p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <img src="/Logos/LogoECOPOSC.svg" class="logo img-fluid mb-3" style="max-width: 150px;">
+                        <h2 class="mb-0">Iniciar Sesión</h2>
+                    </div>
 
-        <div class="separator">
-            <span class="dot"></span>
+                    <form>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Correo electrónico</label>
+                            <input type="email" class="form-control" id="email" placeholder="Correo electrónico" required>
+                        </div>
+                        
+                        <button class="btn btn-primary w-100 mb-3">Continuar con correo electrónico</button>
+
+                        <div class="d-flex align-items-center my-4">
+                            <hr class="flex-grow-1">
+                            <span class="px-3 small">o</span>
+                            <hr class="flex-grow-1">
+                        </div>
+
+                        <div class="d-flex justify-content-center gap-3 mb-4">
+                            <button type="button" class="btn btn-outline-secondary rounded-circle p-2">
+                                <img src="./images/facebook.svg" alt="Facebook" style="width: 24px; height: 24px;">
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary rounded-circle p-2">
+                                <img src="./images/apple.svg" alt="Apple" style="width: 24px; height: 24px;">
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary rounded-circle p-2">
+                                <img src="./images/google.svg" alt="Google" style="width: 24px; height: 24px;">
+                            </button>
+                        </div>
+
+                        <p class="text-center mt-3">¿Eres nuevo en ECOPOS? <a href="register.html" class="text-decoration-none">Comenzar →</a></p>
+                    </form>
+                </div>
+            </div>
         </div>
-
-        <div class="social-login">
-            <div class="social-btn"><img src="./images/facebook.png" alt="Facebook"></div>
-            <div class="social-btn"><img src="./images/apple.png" alt="Apple"></div>
-            <div class="social-btn"><img src="./images/google.png" alt="Google"></div>
-        </div>
-
-        <p class="register">¿Eres nuevo en ECOPOS? <a href="register.html">Comenzar---></a></p>
     </div>
+
 </body>
 </html>
