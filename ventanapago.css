@@ -4,11 +4,9 @@
 }
 
 
-
-
 /* Contenedor pago */
 .contenedor-pago{
-    width: 600px;
+    max-width: 800px;
     background-color:rgb(92, 231, 115);
     border-radius: 10px;
 }
@@ -19,6 +17,7 @@
 }
 .b-derecha button, .b-derecha p{
     background-color: #5db282;
+    width: 100%;
     padding: 20px;
     margin: 10px;
     border-radius: 5px;
@@ -38,6 +37,7 @@ thead .row{
     background-color: #b1b2b5;
     border-radius: 10px;
     margin: 5px 10px 5px 10px;
+    text-align: center;
 }
 tbody{
     border: 5px solid black;
@@ -45,8 +45,7 @@ tbody{
     border-radius: 10px;
     margin: 10px;
     display: block;
-}
-tr td{
+    background-color: white;
     text-align: center;
 }
 
