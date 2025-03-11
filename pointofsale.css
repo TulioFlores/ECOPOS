@@ -9,16 +9,25 @@ nav div img{
 nav{
     background-color: black;
 }
-nav div i{
+.hover i{
     color: white;
     font-size: 50px;
 }
-nav a{
+.hover a{
     color: white;
     font-size: 15px;
     text-decoration: none;
 }
-
+.hover:hover i, .hover:hover a, .hover:hover {
+    background-color: white;
+    color:black;
+}
+.hover{
+    all:unset;
+    display: flex;
+    align-items: center;
+    padding:3px;
+}
 
 /* Estilos para el punto de venta */
 
@@ -27,6 +36,7 @@ nav a{
     padding: 20px;
     border-radius: 20px;
     margin: 10px;
+    font-weight: bold;
 }
 form input{
     height: 40px;
@@ -58,6 +68,9 @@ tfoot .row{
     padding: 15px;
     border-radius: 10px;
 }
+.boton-venta:hover{
+    background-color: #96979a;
+}
 
 .icono-x{
     color: red;
@@ -74,6 +87,11 @@ tfoot .row{
     border-radius: 20px;
     border: 2px solid black;
     text-align: center;
+
+}
+.botones button:hover{
+    
+    background-color: #5db282;
 }
 .botones i{
     font-size: 25px;
