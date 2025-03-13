@@ -40,7 +40,7 @@
                     <p class="col-3 mb-0" >Producto: </p>
                     <input class="col-6" type="number" name="producto" id="producto">
                     <i class="bi bi-search col-1" style="font-size: 30px;"></i>
-                    <button  type="submit" class="btn btn-primary">Enter</button>
+                    <button  type="submit" class="enter col-2">Enter</button>
                 </div>
                 <div class="row d-flex align-items-center">
                     <p class="col-3 mb-0">Cantidad: </p>
@@ -51,25 +51,26 @@
             <table class="container-fluid">
                 <thead>
                     <tr class="row">
-                        <th class="col-3">Clave</th>
-                        <th class="col-3">Descripcion</th>
-                        <th class="col-3">Cantidad</th>
-                        <th class="col-3">Precio</th>
+                        <th class="col-3 text-center">Clave</th>
+                        <th class="col-3 text-center">Descripcion</th>
+                        <th class="col-3 text-center">Cantidad</th>
+                        <th class="col-3 text-center">Precio</th>
                     </tr>
                 </thead>
-                <tbody class="border border-black " id="productos-body">
+                <tbody class="border border-black overflow-y-scroll overflow-x-hidden" id="productos-body">
                     <!-- Aqui se mostraran los productos -->
                 </tbody>
-                <tfoot>
+                <tfoot >
                     <tr class="row">
                         <td class="col-4">Subtotal</td>
                         <td class="col-4">Descuento</td>
-                        <td class="col-4">Total neto</td>
+                        <td class="col-4">Total neto <p id="total-neto"></p></td>
                     </tr>
+                    
                 </tfoot>
             </table>
             <div class="row d-flex align-content-center  flex-nowrap container-fluid">
-                <button class="col-6 boton-venta" style="margin-left: 10px;"><i class="icono-x bi bi-x-lg"></i>Eliminar Producto</button>
+                <button class="col-6 boton-venta " id="btn-eliminar" style="margin-left: 10px;"><i class="icono-x bi bi-x-lg "></i>Eliminar Producto</button>
                 <button class="col-6 boton-venta" style="margin-right: 10px;"><i class="bi bi-cart"></i>Aplicar venta</button>    
             </div>  
         </div>

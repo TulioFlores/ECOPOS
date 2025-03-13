@@ -2,6 +2,11 @@
     margin: 0;
     padding: 0;
 }
+.seleccionado {
+    background-color: #ffcccb; /* Color rojo claro */
+    cursor: pointer;
+}
+
 /* Barra de navegacion */
 nav div img{
     height: 80px;
@@ -30,7 +35,9 @@ nav{
 }
 
 /* Estilos para el punto de venta */
-
+.enter{
+    border-radius: 5px;
+}
 .form-escaneo{
     background-color: #5db282;
     padding: 20px;
@@ -48,13 +55,11 @@ thead .row{
 }
 tbody{
     border: 5px solid black;
+    height: 250px;
     min-height: 250px;
     border-radius: 10px;
     margin: 10px;
     display: block;
-}
-tr td{
-    text-align: center;
 }
 tfoot .row{
     height: 100px;
