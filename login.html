@@ -18,14 +18,15 @@
                         <h2 class="mb-0">Iniciar Sesión</h2>
                     </div>
 
-                    <form>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Correo electrónico</label>
-                            <input type="email" class="form-control" id="email" placeholder="Correo electrónico" required>
+                    <form id="loginForm" onsubmit="return validateForm()"> <!--valida correo -->
+                        <div>
+                            <label for="email">Correo electrónico</label>
+                            <input type="email" id="email" name="email" required placeholder="Ingrese su correo electrónico" required>
                         </div>
                         
-                        <button class="btn btn-primary w-100 mb-3">Continuar con correo electrónico</button>
-
+                        <button type="submit" class="btn btn-primary w-100 mb-3">Continuar con correo electrónico</button>
+                                                                 
+                            
                         <div class="d-flex align-items-center my-4">
                             <hr class="flex-grow-1">
                             <span class="px-3 small">o</span>
@@ -46,6 +47,20 @@
 
                         <p class="text-center mt-3">¿Eres nuevo en ECOPOS? <a href="register.html" class="text-decoration-none">Comenzar →</a></p>
                     </form>
+                    <script>
+                        function validateForm() {
+                            var email = document.getElementById("email").value;
+                            
+                            if (email === "") {
+                                alert("Por favor ingrese su correo electrónico.");
+                                return false; // No permite que el formulario se envíe
+                            }
+                            
+                            // Si el correo está ingresado, redirige a la siguiente página
+                            window.location.href = "login-password.html";
+                            return false; // Evita que el formulario se envíe de la forma tradicional
+                        }
+                    </script>
                 </div>
             </div>
         </div>
