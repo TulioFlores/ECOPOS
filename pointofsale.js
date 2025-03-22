@@ -91,3 +91,19 @@ document.getElementById('form-escaneo').addEventListener('submit', function (e) 
       }
   });
 });
+
+// Obtener elementos del DOM
+const modal = document.querySelector(".contenedor-pago");
+const btnAbrir = document.getElementById("aplicar-venta");
+const btnCerrar = document.getElementById("cancelar-venta");
+const btnConfirmar = document.getElementById("boton-confirmar");
+
+// Abrir el modal
+btnAbrir.addEventListener("click", () => {
+    modal.style.display = "flex";
+});
+
+// Cerrar el modal al hacer clic en la "X"
+btnCerrar.addEventListener("click", () => {
+    modal.style.display = "none";
+});

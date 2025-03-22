@@ -6,18 +6,24 @@
 
 /* Contenedor pago */
 .contenedor-pago{
-    max-width: 800px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    z-index: 1000;
+    max-width: 600px;
     background-color:rgb(92, 231, 115);
     border-radius: 10px;
-    border: 5px solid black;
-    
-    box-shadow: 10px 10px 5px 10px rgba(0, 0, 0, 0.3);
-    min-height: 700px;
+    border: 3px solid black;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+    min-height: 500px;
 }
 .contenedor-pago form{
     background-color: lightgray;
     border-radius: 5px;
-    min-height: 490px;
+    min-height: 300px;
 }
 .b-derecha button, .b-derecha p{
     background-color: #5db282;
@@ -25,24 +31,29 @@
     padding: 20px;
     margin: 10px;
     border-radius: 5px;
+    
 }
-
+.b-derecha button:hover{
+    transition: 0.7s;
+    background-color: #81f598;
+}
 /*Tabla de tipos de pago*/
-.form-escaneo{
-    background-color: #5db282;
-    padding: 20px;
-    border-radius: 20px;
-    margin: 10px;
-}
 
-thead .row{
+.contenedor-pago table{
+    width: 100%;
+    margin-top: 10px;
+}
+.contenedor-pago thead th{
+    text-align: center;
+}
+.contenedor-pago > thead .row{
     background-color: #b1b2b5;
     border-radius: 10px;
     margin: 5px 10px 5px 10px;
     text-align: center;
-}
-tbody{
-    border: 5px solid black;
+} 
+.contenedor-pago tbody{
+    border: 3px solid black;
     min-height: 100%;
     border-radius: 10px;
     margin: 10px;
@@ -57,7 +68,14 @@ tbody{
     padding: 5px;
 }
 .datos p{
-    text-align: center;
-    padding: 5px;
+    all: unset;
+    padding: 10px;
     width: 50%;
+    font-weight: bold;
+}
+.datos input{
+    all: unset;
+    border-radius: 5px;
+    margin: 5px;
+    background-color:rgb(170, 170, 170) ;
 }

@@ -18,16 +18,16 @@
         <!-- Fila pago -->
          <div class="row container-fluid ">
             <form class="col-9 container-fluid datos" action="" >
-                <div class="row flex-nowrap align-items-center "><p class="col-6 " >Importe: </p><input class="col-6" type="number" name="importe" id="importe"></div><br>
-                <div class="row flex-nowrap align-items-center"><p class="col-6" >$Pagado: </p><input class="col-6" type="number" name="pagado" id="pagado"></div><br>
-                <div class="row flex-nowrap align-items-center"><p class="col-6" >$Por Pagar: </p><input class="col-6" type="number" name="porpagar" id="porpagar"></div><br>
-                <div class="row flex-nowrap align-items-center"><p class="col-6" >Cambio: </p><input class="col-6" type="number" name="cambio" id="cambio"></div><br>
+                <div class="row flex-nowrap align-items-center"><p class="col-6 " >Importe: </p><p class="col-6" type="number" name="importe" id="importe"></p></div><br>
+                <div class="row flex-nowrap align-items-center"><p class="col-6" >$Pagado: </p><p class="col-6" type="number" name="pagado" id="pagado"></p></div><br>
+                <div class="row flex-nowrap align-items-center"><p class="col-6" >$Por Pagar: </p><p class="col-6" type="number" name="porpagar" id="porpagar"></p></div><br>
+                <div class="row flex-nowrap align-items-center"><p style="color:red" class="col-6" >Cambio: </p><p class="col-6" type="number" name="cambio" id="cambio"></p></div><br>
                 <div class="row flex-nowrap align-items-center"><p class="col-6" >Efectivo: </p><input class="col-6" type="number" name="efectivo" id="efectivo"></div><br>
             </form>
             <div class="col-3 container-fluid b-derecha">
                 <div > 
-                    <button>Aplicar Venta</button>
-                    <button>Cancelar</button>
+                    <button  id="boton-confirmar">Aplicar Venta</button>
+                    <button id="cancelar-venta" >Cancelar</button>
                 </div>
                 <div >
                     <p>Fecha</p>
@@ -66,11 +66,6 @@
                 </tbody>
             </table>
          </div>
-        
-
-
-
-
     </div>
     
     
