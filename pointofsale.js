@@ -38,14 +38,14 @@ function agregarProductoATabla(producto, cantidad) {
     document.getElementById('btn-eliminar').addEventListener('click', function () {
         const filaSeleccionada = document.querySelector('.seleccionado');
 
-    if (filaSeleccionada) {
-        // Obtener el monto desde la cuarta columna (índice 3)
-        const montoTexto = filaSeleccionada.cells[3].innerText.replace('$', '');
-        const monto = parseFloat(montoTexto) || 0; // Asegurar que es un número válido
+        if (filaSeleccionada) {
+            // Obtener el monto desde la cuarta columna (índice 3)
+            const montoTexto = filaSeleccionada.cells[3].innerText.replace('$', '');
+            const monto = parseFloat(montoTexto) || 0; // Asegurar que es un número válido
 
-        filaSeleccionada.remove(); // Elimina la fila de la tabla
-        actualizarTotal(-monto); // Resta el monto al total
-    } 
+            filaSeleccionada.remove(); // Elimina la fila de la tabla
+            actualizarTotal(-monto); // Resta el monto al total
+        } 
     });
   // Actualizar el total
   actualizarTotal(producto.precio * cantidad);
@@ -65,34 +65,35 @@ function actualizarTotal(monto) {
 }
 
 // Evento del formulario para escanear el producto
-document.getElementById('form-escaneo').addEventListener('submit', function (e) {
-  e.preventDefault();
 
-  const productoInput = document.getElementById('producto');
-  const cantidadInput = document.getElementById('cantidad');
-
-  const idProducto = parseInt(productoInput.value);
-  const cantidad = parseInt(cantidadInput.value) || 1; // Por defecto, 1 si no hay cantidad
-
-  // Validar que el ID del producto es un número válido
-  if (isNaN(idProducto)) {
-      alert("Ingresa un ID de producto válido.");
-      return;
-  }
-
-  // Llamar al backend para obtener el producto
-  obtenerProductoPorId(idProducto, (err, producto) => {
-      if (err) {
-          console.log("Producto no encontrado.");
-      } else {
-          agregarProductoATabla(producto, cantidad);
-          productoInput.value = '';
-          cantidadInput.value = '1';
-      }
+const botonEnter = document.getElementById('enter');
+botonEnter.addEventListener('click', () => {
+  
+    const productoInput = document.getElementById('producto');
+    const cantidadInput = document.getElementById('cantidad');
+  
+    const idProducto = parseInt(productoInput.value);
+    const cantidad = parseInt(cantidadInput.value) || 1; // Por defecto, 1 si no hay cantidad
+  
+    // Validar que el ID del producto es un número válido
+    if (isNaN(idProducto)) {
+        alert("Ingresa un ID de producto válido.");
+        return;
+    }
+  
+    // Llamar al backend para obtener el producto
+    obtenerProductoPorId(idProducto, (err, producto) => {
+        if (err) {
+            console.log("Producto no encontrado.");
+        } else {
+            agregarProductoATabla(producto, cantidad);
+            productoInput.value = '';
+            cantidadInput.value = '1';
+        }
+    });
   });
-});
 
-// Obtener elementos del DOM
+// Modal para confirmar la venta
 const modal = document.querySelector(".contenedor-pago");
 const btnAbrir = document.getElementById("aplicar-venta");
 const btnCerrar = document.getElementById("cancelar-venta");
@@ -106,4 +107,22 @@ btnAbrir.addEventListener("click", () => {
 // Cerrar el modal al hacer clic en la "X"
 btnCerrar.addEventListener("click", () => {
     modal.style.display = "none";
+});
+
+
+//Modal para ingresar un nuevo cliente
+
+const modalCliente = document.querySelector(".nuevo-cliente");
+const btnAbrirCliente = document.getElementById("nuevocliente");
+const btnCancelarCliente = document.getElementById("btn-cancelar-cliente");
+const btnConfirmarCliente = document.getElementById("btn-confirmar-cliente");
+
+// Abrir el modal
+btnAbrirCliente.addEventListener("click", () => {
+    modalCliente.style.display = "flex";
+});
+
+// Cerrar el modal al hacer clic en la "X"
+btnCancelarCliente.addEventListener("click", () => {
+    modalCliente.style.display = "none";
 });

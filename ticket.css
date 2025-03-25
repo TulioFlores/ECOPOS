@@ -1,0 +1,33 @@
+@media print {
+    body {
+        font-family: Arial, sans-serif;
+        font-size: 12px;
+        width: 80mm; /* O 58mm si tu impresora es más pequeña */
+    }
+
+    .ticket {
+        text-align: center;
+        width: 100%;
+    }
+
+    .detalle-producto {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .detalle-producto th, .detalle-producto td {
+        border-bottom: 1px solid black;
+        padding: 5px;
+        text-align: left;
+    }
+
+    .total {
+        font-size: 14px;
+        font-weight: bold;
+    }
+
+    /* Ocultar elementos que no deben imprimirse */
+    .no-imprimir {
+        display: none;
+    }
+}

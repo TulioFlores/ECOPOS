@@ -41,12 +41,17 @@
                     <p class="col-3 mb-0" >Producto: </p>
                     <input class="col-6" type="number" name="producto" id="producto">
                     <i class="bi bi-search col-1" style="font-size: 30px;"></i>
-                    <button  type="submit" class="enter col-2">Enter</button>
+                    <button id="enter" class="enter col-2">Enter</button>
                 </div>
                 <div class="row d-flex align-items-center">
-                    <p class="col-3 mb-0">Cantidad: </p>
+                    <p class="col-3 mb-0 " >Cantidad: </p>
                     <input class="col-6" type="number" name="cantidad" id="cantidad" value="1" min="1">
                 </div>
+                <div class=" row flex-nowrap d-flex align-items-center ">
+                    <p class="col-3 mb-0">Cliente: </p>
+                    <input class="col-6" type="number" name="importe" id="importe" placeholder="ID">
+                    <button class="col-3" id="nuevocliente">Nuevo</button>
+                </div><br>
             </form>
             <!-- Tabla para mostrar los productos -->
             <table class="container-fluid tabla-principal">
@@ -121,6 +126,11 @@
     </div>
     <!--Ventana modal para confirmacion de pago-->
     <div class="contenedor-pago container-fluid p-3">
+        <div class="cliente row flex-nowrap align-items-center justify-content-center">
+            <p class="col-4 " style="all:unset; width: 30%" >Cliente: </p>
+            <input class="col-4" type="number" name="importe" id="importe" placeholder="ID">
+            <button class="col-4" id="">Nuevo</button>
+        </div><br>
         <!-- Fila pago -->
          <div class="row container-fluid ">
             <form class="col-9 container-fluid datos" action="" >
@@ -172,6 +182,21 @@
                 </tbody>
             </table>
          </div>
+    </div>
+    <!-- Ventana modal para ingresar datos nuevo cliente -->
+    <div class="nuevo-cliente">
+        <div class="row d-flex align-items-center">
+            <p class="col-6 mb-0">Nombre: </p><input class="col-6" type="text" name="nombre" id="nombre">
+        </div>
+        <div class="row d-flex align-items-center">
+            <p class="col-6 mb-0">Telefono: </p><input class="col-6" type="number" name="telefono" id="telefono">
+        </div>
+        <div class="row d-flex align-items-center">
+            <p class="col-6 mb-0">Correo: </p><input class="col-6" type="email" name="correo" id="correo">
+        </div><br>
+        <div class="row d-flex align-items-center justify-content-center flex-nowrap">
+            <button id="btn-cancelar-cliente" class="col-6">Cancelar</button><button id="btn-confirmar-cliente" class="col-6">Confirmar</button>
+        </div>
     </div>
     
     <!-- Script Bootstrap -->
