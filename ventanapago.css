@@ -60,7 +60,7 @@
     margin: 5px 10px 5px 10px;
     text-align: center;
 } 
-.contenedor-pago .tbody{
+.contenedor-pago tbody{
     border: 3px solid black;
     min-height: 100%;
     border-radius: 10px;
