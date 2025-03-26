@@ -50,6 +50,32 @@ app.get('/producto/:id', (req, res) => {
     });
 });
 
+app.get('/buscar/:nombre', (req, res) => {
+    const nombreBuscado = req.params.nombre;
+    const query = 'CALL sp_buscarProductos(?)';
+
+    connection.query(query, [nombreBuscado], (err, results) => {
+        if (err) {
+            console.error('Error al llamar al Stored Procedure:', err);
+            res.status(500).json({ error: 'Error al buscar productos' });
+            return;
+        }
+
+        if (results[0].length > 0) {
+            // Formatear la respuesta
+            const productos = results[0].map(producto => ({
+                id: producto.id_producto,
+                descripcion: producto.nombre,
+                stock: producto.stock,
+                precio: producto.precio
+            }));
+            res.json(productos);
+        } else {
+            res.status(404).json({ error: 'No se encontraron productos' });
+        }
+    });
+});
+
 // Iniciar el servidor
 app.listen(port, () => {
     console.log(`Servidor corriendo en http://localhost:${port}`);

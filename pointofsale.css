@@ -96,7 +96,9 @@ tr, td{
     color: red;
     font-weight: bold;
 }
-
+#buscar:hover{
+    cursor: pointer;
+}
 
 /* Diseno para los botones de la derecha */
 .botones button, .botones form{

@@ -110,6 +110,22 @@ btnCerrar.addEventListener("click", () => {
 });
 
 
+//Modal para buscar productos
+const modalBuscar = document.querySelector(".buscar-producto");
+const btnAbrirPrd = document.getElementById("buscar");
+const btnCerrarPrd = document.getElementById("cerrar-busqueda");
+
+// Abrir el modal
+btnAbrirPrd.addEventListener("click", () => {
+    modalBuscar.style.display = "flex";
+});
+
+// Cerrar el modal al hacer clic en la "X"
+btnCerrarPrd.addEventListener("click", () => {
+    modalBuscar.style.display = "none";
+});
+
+
 //Modal para ingresar un nuevo cliente
 
 const modalCliente = document.querySelector(".nuevo-cliente");
@@ -126,3 +142,78 @@ btnAbrirCliente.addEventListener("click", () => {
 btnCancelarCliente.addEventListener("click", () => {
     modalCliente.style.display = "none";
 });
+
+
+/////////////////////////////
+////////////////////////////
+//Codigo para la busqueda de productos
+
+document.getElementById('busqueda-producto').addEventListener('keypress', async (event) => {
+    // Detectamos si la tecla presionada es "Enter"
+    if (event.key === 'Enter') {
+        // Obtener el valor del input
+        const nombreBuscado = document.getElementById('busqueda-producto').value;
+        
+        // Verificar si el input no está vacío
+        if (nombreBuscado.trim() === '') {
+            alert('Por favor ingresa un nombre para buscar');
+            return;
+        }
+        
+        try {
+            // Realizar la solicitud fetch con el nombre ingresado
+            const response = await fetch(`http://localhost:3000/buscar/${nombreBuscado}`);
+            
+            // Verificar si la respuesta fue exitosa
+            if (!response.ok) {
+                throw new Error('Error en la solicitud');
+            }
+
+            // Obtener la respuesta en formato JSON
+            const data = await response.json();
+            
+            // Mostrar la respuesta en consola (puedes hacer lo que necesites con los datos)
+            console.log(data);
+
+            // Llamamos a la función para mostrar los resultados
+            mostrarResultados(data);
+        } catch (error) {
+            console.error('Hubo un problema con la solicitud:', error);
+        }
+    }
+});
+
+function mostrarResultados(productos) {
+    
+    if (productos.length === 0) {
+        resultadosDiv.innerHTML = '<p>No se encontraron productos</p>';
+        return;
+    }
+
+    // Obtener el cuerpo de la tabla (tbody) para agregar las filas
+    const tbody = document.getElementById('tabla-busqueda'); // Asegúrate de que #tabla-busqueda es correcto
+    tbody.innerHTML = ''; // Limpiar cualquier contenido previo en el tbody
+
+    productos.forEach(producto => {
+        // Crear una fila para cada producto
+        const fila = document.createElement('tr');
+        fila.classList.add('row');
+        // Agregar un td para cada propiedad del producto
+        fila.innerHTML = `
+            <td class="col-3 text-center">${producto.id}</td>
+            <td class="col-3 text-center">${producto.descripcion}</td>
+            <td class="col-3 text-center">${producto.stock}</td>
+            <td class="col-3 text-center">$${producto.precio}</td>
+        `;
+    
+        // Agregar la fila al cuerpo de la tabla
+        tbody.appendChild(fila);
+    });
+}
+
+
+
+
+
+// // Escuchar el evento de búsqueda
+// document.getElementById('buscar-producto').addEventListener('input', buscarProductos);
