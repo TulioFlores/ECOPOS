@@ -11,77 +11,79 @@
 </head>
 <body>
     <div id="alta-empleado" class="d-flex flex-column align-items-center justify-content-center">
-        <h1>Alta Empleado</h1>
+        <h1>Alta de Empleado</h1>
         <h2>Fecha</h2>
-        <form action="" class="container">
-            <div class="row d-flex flex-nowrap">
-                <div class="col-6">
-                    <label for="nombre" class="form-label">Primer nombre</label>
-                    <input type="text" class="form-control" id="primer-nombre" name="nombre">
-                </div>
-                <div class="col-6">
-                    <label for="nombre" class="form-label">Segundo nombre</label>
-                    <input type="text" class="form-control" id="segundo-nombre" name="nombre">
-                </div>
-            </div>
-
+        <form action="" class="">
             <div class="row">
                 <div class="col-6">
-                    <label for="apellido" class="form-label">Primer apellido</label>
-                    <input type="text" class="form-control" id="primer-apellido" name="apellido">
+                    <label for="primer-nombre" class="form-label">Primer Nombre</label>
+                    <input type="text" class="form-control" id="primer-nombre" name="primer_nombre" required>
                 </div>
                 <div class="col-6">
-                    <label for="apellido" class="form-label">Segundo apellido</label>
-                    <input type="text" class="form-control" id="segundo-apellido" name="apellido">
+                    <label for="segundo-nombre" class="form-label">Segundo Nombre</label>
+                    <input type="text" class="form-control" id="segundo-nombre" name="segundo_nombre">
                 </div>
             </div>
-            
+    
+            <div class="row">
+                <div class="col-6">
+                    <label for="primer-apellido" class="form-label">Primer Apellido</label>
+                    <input type="text" class="form-control" id="primer-apellido" name="primer_apellido" required>
+                </div>
+                <div class="col-6">
+                    <label for="segundo-apellido" class="form-label">Segundo Apellido</label>
+                    <input type="text" class="form-control" id="segundo-apellido" name="segundo_apellido">
+                </div>
+            </div>
+    
             <div class="row">
                 <div class="col-6">
                     <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email">
+                    <input type="email" class="form-control" id="email" name="email" required>
                 </div>
                 <div class="col-6">
-                    <label for="telefono" class="form-label">Telefono</label>
-                    <input type="text" class="form-control" id="telefono" name="telefono">
+                    <label for="telefono" class="form-label">Teléfono</label>
+                    <input type="tel" class="form-control" id="telefono" name="telefono" pattern="[0-9]{10}" required>
                 </div>
             </div>
-            
+    
             <div class="row">
-                
                 <div class="col-6">
                     <label for="puesto" class="form-label">Puesto</label>
-                    <input type="text" class="form-control" id="puesto" name="puesto">
+                    <input type="text" class="form-control" id="puesto" name="puesto" required>
                 </div>
             </div>
+    
             <div class="row">
                 <div class="col-6">
-                    <label for="email" class="form-label">Contraseña</label>
-                    <input type="email" class="form-control" id="email" name="email">
+                    <label for="contrasena" class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" id="contrasena" name="contrasena" required>
                 </div>
                 <div class="col-6">
-                    <label for="puesto" class="form-label">Confirme contraseña</label>
-                    <input type="text" class="form-control" id="puesto" name="puesto">
+                    <label for="confirmar-contrasena" class="form-label">Confirmar Contraseña</label>
+                    <input type="password" class="form-control" id="confirmar-contrasena" name="confirmar_contrasena" required>
                 </div>
             </div>
+    
             <div class="row">
                 <h4>Ingrese ID y contraseña del responsable</h4>
                 <div class="col-6">
-                    <label for="email" class="form-label">ID</label>
-                    <input type="email" class="form-control" id="email" name="email">
+                    <label for="id-responsable" class="form-label">ID</label>
+                    <input type="text" class="form-control" id="id-responsable" name="id_responsable" required>
                 </div>
                 <div class="col-6">
-                    <label for="puesto" class="form-label">Contraseña</label>
-                    <input type="text" class="form-control" id="puesto" name="puesto">
+                    <label for="contrasena-responsable" class="form-label">Contraseña</label>
+                    <input type="password" class="form-control" id="contrasena-responsable" name="contrasena_responsable" required>
                 </div>
             </div>
-
+    
             <div class="row d-flex justify-content-end">
-                <button type="submit" class="col-6" id="btn-cancelar-empleado">Cancelar</button>
-                <button type="submit" class="col-6 " id="btn-confirmar-empleado">Dar de alta</button>
+                <button type="button" class="col-5 btn-cancelar" id="btn-cancelar-empleado">Cancelar</button>
+                <button type="submit" class="col-5 btn-confirmar" id="btn-confirmar-empleado">Dar de alta</button>
             </div>
         </form>
     </div>
+    
      <!-- Script Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <!-- Javascript -->

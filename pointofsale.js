@@ -115,12 +115,10 @@ const modalBuscar = document.querySelector(".buscar-producto");
 const btnAbrirPrd = document.getElementById("buscar");
 const btnCerrarPrd = document.getElementById("cerrar-busqueda");
 
-// Abrir el modal
 btnAbrirPrd.addEventListener("click", () => {
     modalBuscar.style.display = "flex";
 });
 
-// Cerrar el modal al hacer clic en la "X"
 btnCerrarPrd.addEventListener("click", () => {
     modalBuscar.style.display = "none";
 });
@@ -133,16 +131,29 @@ const btnAbrirCliente = document.getElementById("nuevocliente");
 const btnCancelarCliente = document.getElementById("btn-cancelar-cliente");
 const btnConfirmarCliente = document.getElementById("btn-confirmar-cliente");
 
-// Abrir el modal
 btnAbrirCliente.addEventListener("click", () => {
     modalCliente.style.display = "flex";
 });
 
-// Cerrar el modal al hacer clic en la "X"
 btnCancelarCliente.addEventListener("click", () => {
     modalCliente.style.display = "none";
 });
 
+
+//Modal para registrar un empleado
+
+const modalEmpleado = document.getElementById("alta-empleado");
+const btnAbrirEmpleado = document.getElementById("abrir-empleado");
+const btnCancelarEmpleado = document.getElementById("btn-cancelar-empleado");
+const btnConfirmarEmpleado = document.getElementById("btn-confirmar-empleado");
+
+btnAbrirEmpleado.addEventListener("click", () => {
+    modalEmpleado.style.display = "flex";
+});
+
+btnCancelarEmpleado.addEventListener("click", () => {
+    modalEmpleado.style.display = "none";
+});
 
 /////////////////////////////
 ////////////////////////////

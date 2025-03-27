@@ -12,7 +12,7 @@
     flex-direction: column;
     z-index: 1000;
     min-width: 800px;
-    background-color:rgb(92, 231, 115);
+    background-color: #5db282;
     border-radius: 10px;
     border: 3px solid black;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
