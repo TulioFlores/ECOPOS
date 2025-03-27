@@ -1,8 +1,36 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.ticket {
+    top: 50%;
+    left: 50%;
+    position: translate(-50%, -50%);
+    text-align: center;
+    width: 30vw;
+}
+.detalle-producto {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.detalle-producto th, .detalle-producto td {
+    border-bottom: 1px solid black;
+    padding: 10px;
+}
+
+.total {
+    font-size: 14px;
+    font-weight: bold;
+}
 @media print {
     body {
         font-family: Arial, sans-serif;
         font-size: 12px;
-        width: 80mm; /* O 58mm si tu impresora es más pequeña */
+        /* width: 80mm; O 58mm si tu impresora es más pequeña */
+        
     }
 
     .ticket {
@@ -17,8 +45,7 @@
 
     .detalle-producto th, .detalle-producto td {
         border-bottom: 1px solid black;
-        padding: 5px;
-        text-align: left;
+        padding: 10px;
     }
 
     .total {
@@ -26,8 +53,8 @@
         font-weight: bold;
     }
 
-    /* Ocultar elementos que no deben imprimirse */
+    /* /* Ocultar elementos que no deben imprimirse */
     .no-imprimir {
         display: none;
-    }
-}
+    } 
+}      

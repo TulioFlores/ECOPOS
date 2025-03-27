@@ -12,6 +12,10 @@
     padding: 2px;
     height: 40px;
 }
+#nuevocliente:hover{
+    background-color: #3f805b;
+    transition: 0.3s;
+}
 /* Contenedor pago */
 .contenedor-pago{
     top: 50%;

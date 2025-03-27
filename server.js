@@ -76,6 +76,8 @@ app.get('/buscar/:nombre', (req, res) => {
     });
 });
 
+
+
 // Iniciar el servidor
 app.listen(port, () => {
     console.log(`Servidor corriendo en http://localhost:${port}`);

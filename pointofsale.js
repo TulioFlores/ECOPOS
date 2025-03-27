@@ -148,15 +148,15 @@ btnCancelarCliente.addEventListener("click", () => {
 ////////////////////////////
 //Codigo para la busqueda de productos
 
-document.getElementById('busqueda-producto').addEventListener('keypress', async (event) => {
+document.getElementById('busqueda-producto').addEventListener('input', async (event) => {
     // Detectamos si la tecla presionada es "Enter"
-    if (event.key === 'Enter') {
+    // if (event.key === 'Enter') {
         // Obtener el valor del input
         const nombreBuscado = document.getElementById('busqueda-producto').value;
         
         // Verificar si el input no está vacío
         if (nombreBuscado.trim() === '') {
-            alert('Por favor ingresa un nombre para buscar');
+            console.log('Por favor ingresa un nombre para buscar');
             return;
         }
         
@@ -180,8 +180,10 @@ document.getElementById('busqueda-producto').addEventListener('keypress', async 
         } catch (error) {
             console.error('Hubo un problema con la solicitud:', error);
         }
-    }
+    // }
 });
+
+
 
 function mostrarResultados(productos) {
     

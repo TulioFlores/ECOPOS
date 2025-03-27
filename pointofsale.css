@@ -153,6 +153,14 @@ tr, td{
     padding: 5px;
     width: 100px;
 }
+#btn-cancelar-cliente:hover{
+    background-color: rgb(160, 8, 8);
+    transition: 0.3s;
+}
+#btn-confirmar-cliente:hover{
+    background-color: rgb(2, 83, 2);
+    transition: 0.3s;
+}
 
 
 /* Ventana modal alta de empleado */
