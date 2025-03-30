@@ -16,28 +16,38 @@ nav{
     background-color: black;
 }
 .hover i{
-    color: white;
     font-size: 50px;
+    
 }
 .hover a{
-    color: white;
     font-size: 15px;
     text-decoration: none;
+    color: white;
 }
-.hover:hover i, .hover:hover a, .hover:hover {
+.hover:hover i, .hover:hover a {
     background-color: white;
     color:black;
+    transition: 0.3s;
 }
 .hover{
     all:unset;
     display: flex;
     align-items: center;
     padding:3px;
+    transition: 0.3s;
+    color: white;
+}
+.hover:hover{
+    background-color: white;
+    color:black;
+    transition: 0.1s;
 }
 
 /* Estilos para el punto de venta */
 .enter{
     border-radius: 5px;
+    padding: 5px;
+    font-weight: bold;
 
 }
 .enter:hover{
@@ -93,19 +103,20 @@ tr, td{
     text-align: center;
 }
 .icono-x{
-    color: red;
+    color: #F34C3F;
     font-weight: bold;
 }
 #buscar:hover{
     cursor: pointer;
 }
 
+
 /* Diseno para los botones de la derecha */
 .botones button, .botones form{
     width: 300px;
     padding: 30px;
     margin: 10px;
-    background-color: #81f598;
+    background-color: #5db282;
     border-radius: 20px;
     border: 2px solid black;
     text-align: center;
@@ -138,7 +149,7 @@ tr, td{
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
 }
 #btn-cancelar-cliente{
-    background-color: red;
+    background-color: #F34C3F;
     color: white;
     border-radius: 5px;
     border: none;
@@ -155,7 +166,7 @@ tr, td{
     width: 100px;
 }
 #btn-cancelar-cliente:hover{
-    background-color: rgb(160, 8, 8);
+    background-color: #97010E;
     transition: 0.3s;
 }
 #btn-confirmar-cliente:hover{
@@ -180,8 +191,7 @@ tr, td{
     box-shadow: 0 0 15px 15px rgba(0, 0, 0, 0.7);
     padding: 20px;
     overflow: hidden;
-    overflow-y:scroll ;
-    scrollbar-gutter: stable;
+    overflow-y: auto;
     flex-direction: column;
     justify-items: center;
     align-items: center;
@@ -221,7 +231,7 @@ form .row {
 }
 
 .btn-cancelar {
-    background-color: red;
+    background-color: #F34C3F;
     color: white;
     border-radius: 5px;
     border: none;
@@ -241,3 +251,17 @@ form .row {
     width: 120px;
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.7);
 }
+@media screen and  (max-width: 980px) {
+    #alta-empleado{
+        height: 85vh;
+        width: 90vw;
+        
+    }
+  }
+  @media screen and  (max-width: 400px) {
+    #alta-empleado{
+        height: 85vh;
+        width: 90vw;
+        
+    }
+  }

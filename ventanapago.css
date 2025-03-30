@@ -5,17 +5,18 @@
 #nuevocliente{
     margin-left: 5px;
     font-weight: bold;
-    background-color: green;
-    color: white;
+    background-color: #ffffff;
+    color: rgb(0, 0, 0);
     border-radius: 5px;
     border: none;
     padding: 2px;
     height: 40px;
-    
+    border: 2px solid black ;    
 }
 #nuevocliente:hover{
-    background-color: #3f805b;
+    background-color: #000000;
     transition: 0.3s;
+    color: white;
 }
 /* Contenedor pago */
 .contenedor-pago{
@@ -23,34 +24,40 @@
     left: 50%;
     transform: translate(-50%, -50%);
     height: 85vh;
-    width: 50vw;
+    width: 40vw;
     position: fixed;
     display: none;
     flex-direction: column;
     z-index: 1000;
-    background-color:rgb(92, 231, 115);
+    background-color:#5db282;
     border-radius: 10px;
     border: 3px solid black;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
-    overflow-y: scroll;
     overflow-x: hidden;
+    overflow-y: auto;
 }
 .contenedor-pago form{
     background-color: lightgray;
     border-radius: 5px;
     min-height: 300px;
+    
 }
 .b-derecha button, .b-derecha p{
-    background-color: #5db282;
+    background-color: #ffffff;
     width: 100%;
     padding: 20px;
     margin: 10px;
     border-radius: 5px;
+    color: rgb(0, 0, 0);
     
 }
 .b-derecha button:hover{
-    transition: 0.7s;
-    background-color: #81f598;
+    transition: 0.3s;
+    background-color: #97010E;
+    color: rgb(255, 255, 255);
+}
+#boton-confirmar:hover{
+    background-color:#478763 ;
 }
 /*Tabla de tipos de pago*/
 
@@ -76,6 +83,9 @@
     background-color: white;
     text-align: center;
 }
+.datos>div{
+    flex-wrap: nowrap;
+}
 
 .datos div input{
     width: 50%;
@@ -99,6 +109,16 @@
         height: 85vh;
         width: 90vw;
         
+    }
+  }
+  @media screen and  (max-width: 400px) {
+    .contenedor-pago{
+        height: 85vh;
+        width: 90vw;
+        
+    }
+    .datos>div{
+        flex-wrap: wrap;
     }
   }
 

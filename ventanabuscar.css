@@ -37,9 +37,17 @@
     background-color: white;
     text-align: center;
 }
+#cerrar-busqueda{
+    font-size: 30px;
+    color:#F34C3F;
+}
 #cerrar-busqueda:hover{
     cursor: pointer ;
+    color:#97010E;
+    transition: .2s;
 }
 #tabla-busqueda{
     text-align: center;
 }
+
+
