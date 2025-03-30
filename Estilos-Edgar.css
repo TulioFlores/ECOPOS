@@ -42,7 +42,7 @@ input {
     padding: 10px;
     margin: 10px 0;
     border: 1px solid #ccc;
-    border-radius: 25px;
+    border-radius: 0.5rem;
 }
 
 /*Botón continuar con correo*/
@@ -74,7 +74,7 @@ input {
     width: 100%; /* el ancho para todos los inputs */
     padding: 8px;
     border: 2px solid black;
-    border-radius: 25px;
+    border-radius: 50px;
     outline: none;
 }
 
@@ -108,7 +108,7 @@ input {
     align-items: center;
     justify-content: center;
     cursor: pointer; /*Hacer clickeable */
-    transition: background 0.3s ease-in-out; 
+    transition: background 0.3s ease-in-out;
 }
 
 .social-btn img {
@@ -138,11 +138,11 @@ input {
 }
 /* Para que los inputs ocupen el mismo espacio */
 .cajanombre div {
-    flex: 1; 
+    flex: 1;
 }
 /* Para que los inputs de nombre y apellidos sean del mismo tamaño */
 .cajanombre input {
-    width: 100%; 
+    width: 100%;
 }
 
 
