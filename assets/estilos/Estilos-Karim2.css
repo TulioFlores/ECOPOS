@@ -1,0 +1,54 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+.cuadro {
+    background-color: #6e87e6;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 300px; /* Máximo tamaño en pantallas grandes */
+}
+
+.horario {
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    text-align: center;
+}
+
+.botones button {
+    padding: 10px;
+    font-size: 14px;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.image-section img {
+    width: 100%;
+    max-width: 250px; /* Ajusta el tamaño de la imagen */
+    border-radius: 10px;
+}
+
+/* 🔹 RESPONSIVE: Ajusta el diseño en móviles */
+@media (max-width: 768px) {
+    .cuadro {
+        padding: 15px;
+        width: 90%; /* Reduce el ancho */
+        max-width: 100%;
+    }
+
+    .horario {
+        width: 100%;
+    }
+
+    .image-section {
+        display: none; /* Oculta la imagen en móviles */
+    }
+}
