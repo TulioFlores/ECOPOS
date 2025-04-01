@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cierre Del Día</title>
+    <link rel="stylesheet" href="./assets/estilos/Estilos-Karim2.css">
+    <link rel="shortcut icon" href="./material/LogoColor.svg" type="image/x-icon">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        function actualizarReloj() {
+            const ahora = new Date();
+            const fecha = ahora.toLocaleDateString("es-ES");
+            const hora = ahora.toLocaleTimeString("es-ES");
+            document.getElementById("fecha").textContent = fecha;
+            document.getElementById("hora").textContent = hora;
+        }
+        setInterval(actualizarReloj, 1000);
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="logo"> <img src="./material/LogoBlanco.svg" alt="logo"></div>
+        <div class="usuario"> <img src="./material/avatar.png" alt="usuario">  Mi cuenta</div>
+    </header>
+    <main class="container d-flex justify-content-center align-items-center vh-100">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-10 col-lg-8 col-xl-6"> 
+                <div class="cuadro p-4">
+                    <h1 class="text-center">Cierre Del Día</h1>
+                    <div class="horario text-center">
+                        <span id="fecha"></span>
+                        <span id="hora"></span>
+                    </div>
+                    <div class="cierre">
+                        <label for="ventabruta">Venta Bruta</label>
+                        <input type="text" id="ventabrutaID" class="form-control">
+                        <label for="devoluciones">Devoluciones</label>
+                        <input type="text" id="devolucionesID" class="form-control">
+                        <label for="gastos">Gastos</label>
+                        <input type="text" id="gastosID" class="form-control">
+                        <label for="ventaneta">Venta Neta</label>
+                        <input type="text" id="ventanetaID" class="form-control">
+                    </div>
+                    <h1 class="text-center mt-3">Desgloce Tipos De Cobro</h1>
+                    <div class="tiposdecobro">
+                        <label for="efectivo">Efectivo</label>
+                        <input type="number" id="efectivoID" class="form-control">
+                        <label for="tarjeta">Tarjeta</label>
+                        <input type="number" id="tarjetaID" class="form-control">
+                        <label for="otrasformas">Otras Formas De Pago</label>
+                        <input type="number" id="otrasformasID" class="form-control">
+                        <label for="efectivocomplementario">Efectivo Complementario</label>
+                        <input type="number" id="efectivocomplementarioID" class="form-control">
+                    </div>
+                    <div class="botones text-center mt-3">
+                        <button id="guardar" class="btn btn-success w-100 mb-2">Guardar</button>
+                        <button id="cancelar" class="btn btn-danger w-100">Cancelar</button>
+                    </div>
+                    <div class="image-section text-center d-none d-md-block mt-3">
+                        <img src="./material/LogoECOPOSN.svg" alt="Imagen de referencia" class="img-fluid">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    
+</body>
+</html>
