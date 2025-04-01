@@ -154,6 +154,49 @@ btnAbrirEmpleado.addEventListener("click", () => {
 btnCancelarEmpleado.addEventListener("click", () => {
     modalEmpleado.style.display = "none";
 });
+//Modal para ingresar un nuevo cliente
+
+const modalRetiro = document.getElementById("retiro");
+const btnAbrirRetiro = document.getElementById("boton-retiro");
+const btnCancelarRetiro = document.getElementById("btn-cancelar-retiro");
+const btnConfirmarRetiro = document.getElementById("btn-confirmar-retiro");
+
+btnAbrirRetiro.addEventListener("click", () => {
+    modalRetiro.style.display = "flex";
+});
+
+btnCancelarRetiro.addEventListener("click", () => {
+    modalRetiro.style.display = "none";
+});
+
+//Modal para ver las existencias
+
+const modalExistencias = document.getElementById("existencias");
+const btnAbrirExistencias= document.getElementById("boton-existencias");
+const btnCerrarExistencias = document.getElementById("btn-cancelar-existencias");
+
+btnAbrirExistencias.addEventListener("click", () => {
+    modalExistencias.style.display = "flex";
+});
+
+btnCerrarExistencias.addEventListener("click", () => {
+    modalExistencias.style.display = "none";
+});
+
+
+//Modal para ver la venta por dia
+
+const modalVentaPorDia = document.getElementById("venta-por-dia");
+const btnAbrirVentaPorDia= document.getElementById("boton-venta-por-dia");
+const btnCerrarVentaPorDia = document.getElementById("cerrar-venta-por-dia");
+
+btnAbrirVentaPorDia.addEventListener("click", () => {
+    modalVentaPorDia.style.display = "flex";
+});
+
+btnCerrarVentaPorDia.addEventListener("click", () => {
+    modalVentaPorDia.style.display = "none";
+});
 
 /////////////////////////////
 ////////////////////////////

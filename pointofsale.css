@@ -251,6 +251,134 @@ form .row {
     width: 120px;
     box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.7);
 }
+
+
+/*Estilos para la ventana de retiro*/
+#retiro{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: fixed;
+    display: none;
+    z-index: 1000;
+    padding: 20px;
+    width: 400px;
+    height: 300px;
+    background-color: #5db282;
+    border-radius: 10px;
+    font-weight: bold;
+    flex-direction: column;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+    text-align: center;
+}
+#btn-cancelar-retiro{
+    background-color: #F34C3F;
+    color: white;
+    border-radius: 5px;
+    border: none;
+    padding: 5px;
+    margin: 5px;
+    width: 100px;
+}
+#btn-confirmar-retiro{
+    background-color: green;
+    color: white;
+    border-radius: 5px;
+    border: none;
+    padding: 5px;
+    width: 100px;
+}
+#btn-cancelar-retiro:hover{
+    background-color: #97010E;
+    transition: 0.3s;
+}
+#btn-confirmar-retiro:hover{
+    background-color: rgb(2, 83, 2);
+    transition: 0.3s;
+}
+
+/*Ventana modal para ver exitencias*/
+
+#existencias{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: fixed;
+    display: none;
+    flex-direction: column;
+    height: 70vh;
+    width: 50vw;
+    z-index: 1000;
+    background-color: #5db282;
+    border-radius: 10px;
+    border: 3px solid black;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+}
+
+#existencias table{
+    width: 100%;
+    margin-top: 10px;
+}
+#existencias tbody{
+    border: 3px solid black;
+    min-height: 40vh;
+    border-radius: 10px;
+    margin: 10px;
+    display: block;
+    background-color: white;
+    text-align: center;
+}
+#btn-cancelar-existencias{
+    background-color: #F34C3F;
+    color: white;
+    border-radius: 5px;
+    border: none;
+    padding: 5px;
+    margin: 5px;
+    width: 100px;
+}
+#btn-imprimir-existencias{
+    background-color: green;
+    color: white;
+    border-radius: 5px;
+    border: none;
+    padding: 5px;
+    width: 100px;
+}
+#btn-cancelar-existencias:hover{
+    background-color: #97010E;
+    transition: 0.3s;
+}
+#btn-imprimir-existencias:hover{
+    background-color: rgb(2, 83, 2);
+    transition: 0.3s;
+}
+
+/*Venta por dia*/
+
+#venta-por-dia{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: fixed;
+    display: none;
+    z-index: 1000;
+    padding: 20px;
+    width:500px;
+    height: 250px;
+    background-color: #5db282;
+    border-radius: 10px;
+    font-weight: bold;
+    flex-direction: column;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+}
+#cerrar-venta-por-dia{
+    font-size: 30px;
+    color:#F34C3F;
+}
+#cerrar-venta-por-dia:hover{
+    cursor: pointer;
+}
 @media screen and  (max-width: 980px) {
     #alta-empleado{
         height: 85vh;
@@ -265,3 +393,28 @@ form .row {
         
     }
   }
+/* xs: Menos de 576px */
+@media (max-width: 575.98px) { 
+    .form-escaneo, .tabla-principal{
+        font-size: 10px;
+        padding: 0px;
+    }
+    .boton-venta{
+        font-size: 20px;
+    }
+}
+
+/* sm: 576px a 767px */
+@media (min-width: 576px) and (max-width: 767.98px) { }
+
+/* md: 768px a 991px */
+@media (min-width: 768px) and (max-width: 991.98px) { }
+
+/* lg: 992px a 1199px */
+@media (min-width: 992px) and (max-width: 1199.98px) { }
+
+/* xl: 1200px a 1399px */
+@media (min-width: 1200px) and (max-width: 1399.98px) { }
+
+/* xxl: 1400px en adelante */
+@media (min-width: 1400px) { }
