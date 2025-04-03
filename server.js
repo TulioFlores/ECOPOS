@@ -29,14 +29,12 @@ connection.connect(err => {
 app.get('/producto/:id', (req, res) => {
     const idProducto = req.params.id;
     const query = 'CALL sp_obtenerProductos(?)';
-
     connection.query(query, [idProducto], (err, results) => {
         if (err) {
             console.error('Error al llamar al Stored Procedure:', err);
             res.status(500).json({ error: 'Error al obtener el producto' });
             return;
         }
-
         if (results[0].length > 0) {
             const producto = {
                 id: results[0][0].id_producto,
@@ -53,7 +51,6 @@ app.get('/producto/:id', (req, res) => {
 app.get('/buscar/:nombre', (req, res) => {
     const nombreBuscado = req.params.nombre;
     const query = 'CALL sp_buscarProductos(?)';
-
     connection.query(query, [nombreBuscado], (err, results) => {
         if (err) {
             console.error('Error al llamar al Stored Procedure:', err);
@@ -77,6 +74,51 @@ app.get('/buscar/:nombre', (req, res) => {
 });
 
 
+
+app.get('/empleado/:id', (req, res) => {
+    const idEmpleado = req.params.id;
+    const query = 'CALL sp_obtenerNombre(?)';
+    connection.query(query, [idEmpleado], (err, results) => {
+        if (err) {
+            console.error('Error al llamar al Stored Procedure:', err);
+            res.status(500).json({ error: 'Error al obtener el empleado' });
+            return;
+        }
+        
+        if (results[0].length > 0) {
+            // Aquí asumimos que el nombre está en la primera fila y columna
+            const empleado = {
+                nombre: results[0][0].nombre_completo
+            };
+            res.json(empleado);
+        } else {
+            res.status(404).json({ error: 'Empleado no encontrado' });
+        }
+    });
+});
+
+// Endpoint para obtener un cliente por numero de telefono
+app.get('/cliente/:telefono', (req, res) => {
+    const telefono = req.params.telefono;
+    const query = 'CALL sp_obtenerTelefono(?)';
+    connection.query(query, [telefono], (err, results) => {
+        if (err) {
+            console.error('Error al llamar al Stored Procedure:', err);
+            res.status(500).json({ error: 'Error al obtener el cliente' });
+            return;
+        }
+        if (results[0].length > 0) {
+            const cliente = {
+                nombre: results[0][0].nombre_completo,
+                telefono: results[0][0].telefono
+            };
+            console.log(cliente)
+            res.json(cliente);
+        } else {
+            res.status(404).json({ error: 'Producto no encontrado' });
+        }
+    });
+});
 
 // Iniciar el servidor
 app.listen(port, () => {

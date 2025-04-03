@@ -379,6 +379,33 @@ form .row {
 #cerrar-venta-por-dia:hover{
     cursor: pointer;
 }
+
+
+/*Venta por empleado*/
+#venta-por-empleado{
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    position: fixed;
+    display: none;
+    z-index: 1000;
+    padding: 20px;
+    width:500px;
+    height: 250px;
+    background-color: #5db282;
+    border-radius: 10px;
+    font-weight: bold;
+    flex-direction: column;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+}
+#cerrar-venta-por-empleado{
+    font-size: 30px;
+    color:#F34C3F;
+}
+#cerrar-venta-por-empleado:hover{
+    cursor: pointer;
+}
+
 @media screen and  (max-width: 980px) {
     #alta-empleado{
         height: 85vh;

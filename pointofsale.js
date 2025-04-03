@@ -198,6 +198,20 @@ btnCerrarVentaPorDia.addEventListener("click", () => {
     modalVentaPorDia.style.display = "none";
 });
 
+//Modal para ver la venta por dia
+
+const modalVentaPorEmpleado = document.getElementById("venta-por-empleado");
+const btnAbrirVentaPorEmpleado = document.getElementById("boton-venta-por-empleado");
+const btnCerrarVentaPorEmpleado = document.getElementById("cerrar-venta-por-empleado");
+
+btnAbrirVentaPorEmpleado.addEventListener("click", () => {
+    modalVentaPorEmpleado.style.display = "flex";
+});
+
+btnCerrarVentaPorEmpleado.addEventListener("click", () => {
+    modalVentaPorEmpleado.style.display = "none";
+});
+
 /////////////////////////////
 ////////////////////////////
 //Codigo para la busqueda de productos
@@ -225,7 +239,6 @@ document.getElementById('busqueda-producto').addEventListener('input', async (ev
 
             // Obtener la respuesta en formato JSON
             const data = await response.json();
-            
             // Mostrar la respuesta en consola (puedes hacer lo que necesites con los datos)
             console.log(data);
 
@@ -267,9 +280,94 @@ function mostrarResultados(productos) {
     });
 }
 
+document.getElementById('cajero').addEventListener('keypress', async (event) => {
+    // Detectamos si la tecla presionada es "Enter"
+    console.log("cajero1 ");
+    if (event.key === 'Enter') {
+        // Obtener el valor del input
+        console.log("hola");
+        const idBuscado = document.getElementById('cajero').value;
+        
+        // Verificar si el input no está vacío
+        if (idBuscado.trim() === '') {
+            console.log('Por favor ingresa un nombre para buscar');
+            return;
+        }
+        
+        try {
+            // Realizar la solicitud fetch con el nombre ingresado
+            const response = await fetch(`http://localhost:3000/empleado/${idBuscado}`);
+            
+            // Verificar si la respuesta fue exitosa
+            if (!response.ok) {
+                throw new Error('Error en la solicitud');
+            }
+
+            
+            const data = await response.json(); 
+
+            console.log('Datos recibidos desde el servidor:', data);
+            // Mostrar la respuesta en consola (puedes hacer lo que necesites con los datos)
+            console.log(data);
+
+            // Llamamos a la función para mostrar los resultados
+            mostrarEmpleado(data);
+        } catch (error) {
+            console.error('Hubo un problema con la solicitud:', error);
+        }
+    }
+});
+
+function mostrarEmpleado(empleado){
+    const nombreEmpleado = document.getElementById("nombre-empleado");
+    console.log(nombreEmpleado.value);
+    nombreEmpleado.value = empleado.nombre;
+
+}
 
 
+document.getElementById('cliente').addEventListener('keypress', async (event) => {
+    // Detectamos si la tecla presionada es "Enter"
+    console.log("holacliente1");
+    if (event.key === 'Enter') {
+        // Obtener el valor del input
+        console.log("hola cliente");
+        const telefono = document.getElementById('cliente').value;
+        
+        // Verificar si el input no está vacío
+        if (telefono.trim() === '') {
+            console.log('Por favor ingresa un nombre para buscar');
+            return;
+        }
+        
+        try {
+            // Realizar la solicitud fetch con el nombre ingresado
+            const response = await fetch(`http://localhost:3000/cliente/${telefono}`);
+            
+            // Verificar si la respuesta fue exitosa
+            if (!response.ok) {
+                throw new Error('Error en la solicitud');
+            }
 
+            
+            const data = await response.json(); 
 
-// // Escuchar el evento de búsqueda
-// document.getElementById('buscar-producto').addEventListener('input', buscarProductos);
+            console.log('Datos recibidos desde el servidor:', data);
+            // Mostrar la respuesta en consola (puedes hacer lo que necesites con los datos)
+            console.log(data);
+
+            // Llamamos a la función para mostrar los resultados
+            mostrarCliente(data);
+        } catch (error) {
+            console.error('Hubo un problema con la solicitud:', error);
+        }
+    }
+});
+function mostrarCliente(cliente){
+    const telefono = document.getElementById("cliente");
+    telefono.value = cliente.telefono;
+
+    const nombre = document.getElementById("nombre-cliente");
+    nombre.innerText = cliente.nombre;
+
+}
