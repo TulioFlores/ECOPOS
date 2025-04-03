@@ -1,11 +1,110 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Eco Punto</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 </head>
 <body>
+    <header>
+        <div class="header-left">
+            <img src="LogoBlanco.svg" alt="Logo de Eco Punto" class="logo slide-in">
+        </div>
+        <div class="header-center">
+            <h1 class="fade-in">Eco Pos</h1>
+            <p class="fade-in">Reduciendo dispositivos y ayudando al medio ambiente</p>
+            <div class="header-buttons">
+                <button onclick="location.href='login.html'" class="btn bounce">Inicio de sesión</button>
+                <button onclick="location.href='start.html'" class="btn bounce">Comenzar</button>
+            </div>
+        </div>
+    </header>
+    <main>
+        <section class="fade-in">
+            <h2>Optimiza tus procesos de venta</h2>
+            <p>En Ecopunto, transformamos la manera en que gestionas tu negocio. 🚀 Nuestra plataforma de punto de venta móvil no solo simplifica y optimiza tus procesos de venta, <br>
+                sino que también te ayuda a reducir costos y a operar de manera más eficiente.<br>
+
+                🔹 Accede desde cualquier dispositivo – Olvídate de hardware costoso, con Ecopunto puedes gestionar tu negocio desde tu computadora, tablet o smartphone.<br>
+                
+                🔹 Ahorra tiempo y mejora la productividad – Automatizamos tareas repetitivas y centralizamos tu inventario, ventas y reportes en un solo lugar.<br>
+                
+                🔹 Eco-Friendly y sostenible 🌱 – Di adiós al exceso de papel y reduce tu impacto ambiental con nuestra solución 100% digital.<br>
+                
+                Con Ecopunto, vender nunca había sido tan fácil, eficiente y ecológico. 🌍✨</p>
+        </section>
+        <section class="fade-in">
+            <h2>Beneficios</h2>
+            <ul>
+                <li onclick="mostrarExplicacion('reduccion')">Reducción de dispositivos</li>
+                <li onclick="mostrarExplicacion('optimizacion')">Optimización de procesos</li>
+                <li onclick="mostrarExplicacion('contribucion')">Contribución al medio ambiente</li>
+            </ul>
+        </section>
+        <section class="stats-container">
+            <h2 class="fade-in">Interactividad</h2>
+            <div class="stats">
+                <div class="stat zoom-in">
+                    <h3>Usuarios Registrados</h3>
+                    <p id="usuarios-registrados">0</p>
+                </div>
+                <div class="stat zoom-in">
+                    <h3>Procesos Optimizados</h3>
+                    <p>200+</p>
+                </div>
+                <div class="stat zoom-in">
+                    <h3>Equipos Reducidos</h3>
+                    <p>150+</p>
+                </div>
+            </div>
+        </section>
+        <section class="fade-in">
+            <h2>¿Por qué elegirnos?</h2>
+            <p class="slide-in">Eco Punto no solo es un punto de venta, es una solución integral para negocios modernos y ecológicos. Con nuestra plataforma, obtienes:</p>
+            <ul>
+                <li>✅ Reportes en tiempo real</li>
+                <li>✅ Seguridad en tus transacciones</li>
+                <li>✅ Soporte 24/7</li>
+                <li>✅ Facilidad de integración</li>
+            </ul>
+        </section>
+    </main>
     
+    <!-- Ventanas emergentes -->
+    <div id="ventana-reduccion" class="ventana-emergente">
+        <div class="ventana-contenido">
+            <span class="cerrar" onclick="cerrarVentana('ventana-reduccion')">&times;</span>
+            <h2>Reducción de dispositivos</h2>
+            <p>En Eco Punto, reducimos la cantidad de dispositivos necesarios para tus operaciones, lo que disminuye los costos y el impacto ambiental.</p>
+        </div>
+    </div>
+    <div id="ventana-optimizacion" class="ventana-emergente">
+        <div class="ventana-contenido">
+            <span class="cerrar" onclick="cerrarVentana('ventana-optimizacion')">&times;</span>
+            <h2>Optimización de procesos</h2>
+            <p>Nuestros sistemas están diseñados para optimizar cada paso de tus procesos de venta, mejorando la eficiencia y reduciendo el tiempo de operación.</p>
+        </div>
+    </div>
+    <div id="ventana-contribucion" class="ventana-emergente">
+        <div class="ventana-contenido">
+            <span class="cerrar" onclick="cerrarVentana('ventana-contribucion')">&times;</span>
+            <h2>Contribución al medio ambiente</h2>
+            <p>Al reducir el uso de dispositivos y optimizar los procesos, contribuimos significativamente a la reducción de residuos electrónicos y al ahorro de energía.</p>
+        </div>
+    </div>
+    </div>
+    
+    <script src="script1.js"></script>
+    <script>
+        gsap.from(".fade-in", {opacity: 0, duration: 1, y: -20, stagger: 0.3});
+        gsap.from(".slide-in", {x: -50, opacity: 0, duration: 1, stagger: 0.3});
+        gsap.from(".zoom-in", {scale: 0.8, opacity: 0, duration: 1, stagger: 0.3, scrollTrigger: {trigger: ".zoom-in", start: "top 80%"}});
+        gsap.from(".bounce", {y: -10, repeat: -1, yoyo: true, duration: 0.5, ease: "power1.inOut"});
+        gsap.from(".scale-in", {scale: 0, duration: 0.5, ease: "back.out(1.7)", opacity: 0});
+    </script>
 </body>
 </html>
