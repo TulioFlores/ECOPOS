@@ -1,23 +1,20 @@
-function mostrarExplicacion(tipo) {
-    document.getElementById('ventana-' + tipo).style.display = 'block';
-}
-
-function cerrarVentana(id) {
-    document.getElementById(id).style.display = 'none';
-}
-
-// Cerrar la ventana emergente si el usuario hace clic fuera de ella
-window.onclick = function(event) {
-    const ventanas = document.getElementsByClassName('ventana-emergente');
-    for (let i = 0; i < ventanas.length; i++) {
-        if (event.target == ventanas[i]) {
-            ventanas[i].style.display = 'none';
-        }
-    }
-}
-
-// Simulación del conteo de usuarios registrados
 document.addEventListener('DOMContentLoaded', () => {
-    const usuariosRegistrados = 350; // Número simulado de usuarios registrados
-    document.getElementById('usuarios-registrados').textContent = usuariosRegistrados;
-});
+    console.log('Eco POS cargado correctamente.');
+  
+    // Ejemplo de funcionalidad futura
+    const features = document.querySelectorAll('.feature');
+    features.forEach(feature => {
+      feature.addEventListener('click', () => {
+        alert('¡Haz clic en una funcionalidad de Eco POS!');
+      });
+    });
+  });
+  document.addEventListener('DOMContentLoaded', function() {
+    const hamburger = document.querySelector('.hamburger');
+    const mobileNav = document.querySelector('.mobile-nav');
+    
+    hamburger.addEventListener('click', function() {
+      this.classList.toggle('active');
+      mobileNav.classList.toggle('active');
+    });
+  });
