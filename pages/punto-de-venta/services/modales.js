@@ -1,0 +1,177 @@
+
+
+
+
+// Modal para confirmar la venta
+const modal = document.querySelector(".contenedor-pago");
+const btnAbrir = document.getElementById("aplicar-venta");
+const btnCerrar = document.getElementById("cancelar-venta");
+const btnConfirmar = document.getElementById("boton-confirmar");
+
+// Abrir el modal
+btnAbrir.addEventListener("click", () => {
+    modal.style.display = "flex";
+});
+
+// Cerrar el modal al hacer clic en la "X"
+btnCerrar.addEventListener("click", () => {
+    modal.style.display = "none";
+});
+
+
+//Modal para buscar productos
+const modalBuscar = document.querySelector(".buscar-producto");
+const btnAbrirPrd = document.getElementById("buscar");
+const btnCerrarPrd = document.getElementById("cerrar-busqueda");
+
+btnAbrirPrd.addEventListener("click", () => {
+    modalBuscar.style.display = "flex";
+});
+
+btnCerrarPrd.addEventListener("click", () => {
+    modalBuscar.style.display = "none";
+});
+
+
+//Modal para ingresar un nuevo cliente
+
+const modalCliente = document.querySelector(".nuevo-cliente");
+const btnAbrirCliente = document.getElementById("nuevocliente");
+const btnCancelarCliente = document.getElementById("btn-cancelar-cliente");
+const btnConfirmarCliente = document.getElementById("btn-confirmar-cliente");
+
+btnAbrirCliente.addEventListener("click", () => {
+    modalCliente.style.display = "flex";
+});
+
+btnCancelarCliente.addEventListener("click", () => {
+    modalCliente.style.display = "none";
+});
+
+
+//Modal para registrar un empleado
+
+const modalEmpleado = document.getElementById("alta-empleado");
+const btnAbrirEmpleado = document.getElementById("abrir-empleado");
+const btnCancelarEmpleado = document.getElementById("btn-cancelar-empleado");
+const btnConfirmarEmpleado = document.getElementById("btn-confirmar-empleado");
+
+btnAbrirEmpleado.addEventListener("click", () => {
+    modalEmpleado.style.display = "flex";
+});
+
+btnCancelarEmpleado.addEventListener("click", () => {
+    modalEmpleado.style.display = "none";
+});
+//Modal para ingresar un nuevo cliente
+
+const modalRetiro = document.getElementById("retiro");
+const btnAbrirRetiro = document.getElementById("boton-retiro");
+const btnCancelarRetiro = document.getElementById("btn-cancelar-retiro");
+const btnConfirmarRetiro = document.getElementById("btn-confirmar-retiro");
+
+btnAbrirRetiro.addEventListener("click", () => {
+    modalRetiro.style.display = "flex";
+});
+
+btnCancelarRetiro.addEventListener("click", () => {
+    modalRetiro.style.display = "none";
+});
+
+//Modal para ver las existencias
+
+const modalExistencias = document.getElementById("existencias");
+const btnAbrirExistencias= document.getElementById("boton-existencias");
+const btnCerrarExistencias = document.getElementById("btn-cancelar-existencias");
+
+btnAbrirExistencias.addEventListener("click", () => {
+    modalExistencias.style.display = "flex";
+});
+
+btnCerrarExistencias.addEventListener("click", () => {
+    modalExistencias.style.display = "none";
+});
+
+
+//Modal para ver la venta por dia
+
+const modalVentaPorDia = document.getElementById("venta-por-dia");
+const btnAbrirVentaPorDia= document.getElementById("boton-venta-por-dia");
+const btnCerrarVentaPorDia = document.getElementById("cerrar-venta-por-dia");
+
+btnAbrirVentaPorDia.addEventListener("click", () => {
+    modalVentaPorDia.style.display = "flex";
+});
+
+btnCerrarVentaPorDia.addEventListener("click", () => {
+    modalVentaPorDia.style.display = "none";
+});
+
+//Modal para ver la venta por empleado
+
+const modalVentaPorEmpleado = document.getElementById("venta-por-empleado");
+const btnAbrirVentaPorEmpleado = document.getElementById("boton-venta-por-empleado");
+const btnCerrarVentaPorEmpleado = document.getElementById("cerrar-venta-por-empleado");
+
+btnAbrirVentaPorEmpleado.addEventListener("click", () => {
+    modalVentaPorEmpleado.style.display = "flex";
+});
+
+btnCerrarVentaPorEmpleado.addEventListener("click", () => {
+    modalVentaPorEmpleado.style.display = "none";
+});
+
+/////////////////////////////
+////////////////////////////
+
+
+document.getElementById('cajero').addEventListener('keypress', async (event) => {
+    // Detectamos si la tecla presionada es "Enter"
+    console.log("cajero1 ");
+    if (event.key === 'Enter') {
+        // Obtener el valor del input
+        console.log("hola");
+        const idBuscado = document.getElementById('cajero').value;
+        
+        // Verificar si el input no está vacío
+        if (idBuscado.trim() === '') {
+            console.log('Por favor ingresa un nombre para buscar');
+            return;
+        }
+        
+        try {
+            // Realizar la solicitud fetch con el nombre ingresado
+            const response = await fetch(`http://localhost:3000/empleado/${idBuscado}`);
+            
+            // Verificar si la respuesta fue exitosa
+            if (!response.ok) {
+                throw new Error('Error en la solicitud');
+            }
+
+            
+            const data = await response.json(); 
+
+            console.log('Datos recibidos desde el servidor:', data);
+            // Mostrar la respuesta en consola (puedes hacer lo que necesites con los datos)
+            console.log(data);
+
+            // Llamamos a la función para mostrar los resultados
+            mostrarEmpleado(data);
+        } catch (error) {
+            console.error('Hubo un problema con la solicitud:', error);
+        }
+    }
+});
+
+function mostrarEmpleado(empleado){
+    const nombreEmpleado = document.getElementById("nombre-empleado");
+    console.log(nombreEmpleado.value);
+    nombreEmpleado.value = empleado.nombre;
+
+}
+
+
+
+
+
+
