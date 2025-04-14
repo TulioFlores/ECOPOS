@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <!-- Metadatos -->
     <meta charset="UTF-8">
@@ -11,7 +11,7 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">    <!-- Icono pagina -->
     <!--FAVICON-->
-    <link rel="icon" href="Logos/LogoBlanco.svg" type="image/svg+xml" sizes="any">
+    <link rel="icon" href="/public/logos/LogoBlanco.svg" type="image/svg+xml" sizes="any">
     <link rel="icon" type="image/png" href="/favicon-32x32.png">
     <!-- Bootstrap iconos -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -22,7 +22,7 @@
     <nav class="contenedor">
         <div class="container-fluid row d-flex align-content-center ">
             <div class=" col-6 ps-0" > 
-                <a href="index.html" ><img src="Logos/LogoBlanco.svg" alt="Logo Ecopos"  ></a>
+                <a href="/pages/inicio/index.html" ><img src="/public/logos/LogoBlanco.svg" alt="Logo Ecopos"  ></a>
             </div>
             <div class=" col-6 d-flex  justify-content-end">
                 <button class="hover">
@@ -55,7 +55,7 @@
                 </div><br>
             </form>
             <!-- Tabla para mostrar los productos -->
-            <table class="container-fluid tabla-principal">
+            <table class="container-fluid " id="tabla-principal">
                 <thead>
                     <tr class="row">
                         <th class="col-3 text-center">Clave</th>
@@ -135,7 +135,7 @@
                 <div class="row align-items-center"><p class="col-6" >$Pagado: </p><p class="col-6" type="number" name="pagado" id="pagado"></p></div><br>
                 <div class="row align-items-center"><p class="col-6" >$Por Pagar: </p><p class="col-6" type="number" name="porpagar" id="porpagar"></p></div><br>
                 <div class="row align-items-center"><p style="color:red" class="col-6" >Cambio: </p><p class="col-6" type="number" name="cambio" id="cambio"></p></div><br>
-                <div class="row align-items-center"><p class="col-6" >Efectivo: </p><input class="col-6" type="number" name="efectivo" id="efectivo"></div><br>
+                <div class="row align-items-center"><p class="col-6" >Efectivo: </p><input class="col-6"  name="efectivo" id="input-efectivo"></div><br>
             </form>
             <div class="col-lg-3 col-md-3 col-6 container-fluid b-derecha">
                 <div > 
@@ -160,8 +160,8 @@
                         <th class="col-4">Importe</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr class="row">
+                <tbody id="body-pago">
+                    <tr class="row" id="efectivo"> 
                         <td class="col-4">1</td>
                         <td class="col-4">Efectivo</td>
                         <td class="col-4">0.0</td>
@@ -375,6 +375,6 @@
     <!-- Script Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <!-- Javascript -->
-    <script src="pointofsale.js"></script>
+    <script src="services/pointofsale.js"></script>
 </body>
 </html>

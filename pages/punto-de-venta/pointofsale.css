@@ -7,7 +7,6 @@
     background-color: #ffcccb; /* Color rojo claro */
     cursor: pointer;
 }
-
 /* Barra de navegacion */
 nav div img{
     height: 80px;
@@ -82,6 +81,7 @@ form input{
     min-height: 200px;
     border-radius: 10px;
     margin: 10px;   
+    overflow: hidden;
 }
 .tabla-principal tfoot .row {
     height: 100px;

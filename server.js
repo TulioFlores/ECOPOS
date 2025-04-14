@@ -124,3 +124,78 @@ app.get('/cliente/:telefono', (req, res) => {
 app.listen(port, () => {
     console.log(`Servidor corriendo en http://localhost:${port}`);
 });
+
+//Api para realizar la venta
+
+app.post('/ventas', async (req, res) => {
+    const { id_cliente, id_empleado, metodo_pago, detalle } = req.body;
+
+    if (!metodo_pago || !detalle || detalle.length === 0) {
+        return res.status(400).json({ error: 'Datos incompletos para registrar la venta.' });
+    }
+
+    connection.beginTransaction(err => {
+        if (err) return res.status(500).json({ error: 'Error al iniciar transacción.' });
+
+        const ventaQuery = `
+            INSERT INTO Ventas (id_cliente, id_empleado, metodo_pago, estado)
+            VALUES (?, ?, ?, 'Completada')
+        `;
+        connection.query(ventaQuery, [id_cliente || null, id_empleado || null, metodo_pago], (err, result) => {
+            if (err) {
+                return connection.rollback(() => res.status(500).json({ error: 'Error al insertar venta.' }));
+            }
+
+            const id_venta = result.insertId;
+
+            const detalleQuery = `
+                INSERT INTO Detalle_Venta (id_venta, id_producto, cantidad, precio_unitario)
+                VALUES ?
+            `;
+            const detalleValues = detalle.map(item => [
+                id_venta,
+                item.id_producto,
+                item.cantidad,
+                item.precio_unitario
+            ]);
+
+            connection.query(detalleQuery, [detalleValues], (err) => {
+                if (err) {
+                    return connection.rollback(() => res.status(500).json({ error: 'Error al insertar detalle de venta.' }));
+                }
+
+                // Actualizar stock en productos
+                const updateStockTasks = detalle.map(item => {
+                    return new Promise((resolve, reject) => {
+                        const updateQuery = `
+                            UPDATE Productos SET stock = stock - ?
+                            WHERE id_producto = ? AND stock >= ?
+                        `;
+                        connection.query(updateQuery, [item.cantidad, item.id_producto, item.cantidad], (err, result) => {
+                            if (err || result.affectedRows === 0) {
+                                return reject(`Error al actualizar stock para el producto ${item.id_producto}`);
+                            }
+                            resolve();
+                        });
+                    });
+                });
+
+                Promise.all(updateStockTasks)
+                    .then(() => {
+                        connection.commit(err => {
+                            if (err) {
+                                return connection.rollback(() => res.status(500).json({ error: 'Error al confirmar venta.' }));
+                            }
+                            res.json({ success: true, id_venta });
+                        });
+                    })
+                    .catch(error => {
+                        connection.rollback(() => res.status(400).json({ error: error.toString() }));
+                    });
+            });
+        });
+    });
+});
+
+// module.exports = router;
+
