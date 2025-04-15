@@ -13,50 +13,7 @@ function deseleccionarFilasPago() {
         fila.classList.remove('pago-seleccionado');
     });
 }
-//Funcionalidad metodo de pago en efectivo
-document.getElementById('efectivo').addEventListener('keypress', async (event) => {
-    // Detectamos si la tecla presionada es "Enter"
-    if (event.key === 'Enter') {
-        // Obtener el valor del input
-        const telefono = document.getElementById('cliente').value;
-        
-        // Verificar si el input no está vacío
-        if (telefono.trim() === '') {
-            console.log('Por favor ingresa un nombre para buscar');
-            return;
-        }
-        
-        try {
-            // Realizar la solicitud fetch con el nombre ingresado
-            const response = await fetch(`http://localhost:3000/cliente/${telefono}`);
-            
-            // Verificar si la respuesta fue exitosa
-            if (!response.ok) {
-                throw new Error('Error en la solicitud');
-            }
 
-            
-            const data = await response.json(); 
-
-            console.log('Datos recibidos desde el servidor:', data);
-            // Mostrar la respuesta en consola (puedes hacer lo que necesites con los datos)
-            console.log(data);
-
-            // Llamamos a la función para mostrar los resultados
-            mostrarCliente(data);
-        } catch (error) {
-            console.error('Hubo un problema con la solicitud:', error);
-        }
-    }
-});
-function mostrarCliente(cliente){
-    const telefono = document.getElementById("cliente");
-    telefono.value = cliente.telefono;
-
-    const nombre = document.getElementById("nombre-cliente");
-    nombre.innerText = cliente.nombre;
-
-}
 
 document.getElementById("aplicar-venta").addEventListener("click", () => {
     let total = 0;
@@ -80,9 +37,6 @@ document.getElementById("aplicar-venta").addEventListener("click", () => {
     document.getElementById("porpagar").textContent = total.toFixed(2);
     document.getElementById("cambio").textContent = "0.00";
 
-    // También puedes llenar el nombre del cliente si lo tienes
-    // const nombreCliente = document.querySelector("#cliente-seleccionado")?.textContent || "Sin nombre";
-    // document.getElementById("nombre-cliente").textContent = nombreCliente;
 });
 
 
@@ -128,7 +82,8 @@ inputEfectivo.addEventListener('keypress', (e) => {
 botonConfirmar.addEventListener('click', async () => {
     const productos = [];
     const filas = document.querySelectorAll("#tabla-principal tbody tr");
-
+    
+    const modal = document.querySelector(".contenedor-pago");    
     filas.forEach(fila => {
         const id = fila.dataset.idProducto; // Asegúrate de guardar data-id-producto en cada tr
         const nombre = fila.querySelector(".col-nombre")?.textContent;
@@ -151,7 +106,7 @@ botonConfirmar.addEventListener('click', async () => {
 
     // Enviar al backend
     try {
-        const response = await fetch('/api/ventas', {
+        const response = await fetch('http://localhost:3000/ventas', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -163,7 +118,12 @@ botonConfirmar.addEventListener('click', async () => {
 
         if (resultado.success) {
             alert("Venta completada con éxito");
-            cerrarVentana(); // tu función para cerrar modal
+            // Cerrar el modal al hacer clic en la "X"
+            modal.style.display = "none";
+            limpiarInterfazVenta(); // limpia la interfaz para una nueva venta
+            
+            
+            
         } else {
             alert("Error al guardar la venta");
         }
@@ -176,3 +136,35 @@ function obtenerTipoPagoSeleccionado() {
     const fila = document.querySelector('#body-pago > tr.pago-seleccionado');
     return fila ? fila.children[1].textContent.trim() : 'Sin especificar';
 }
+function limpiarInterfazVenta() {
+    // Limpiar la tabla de productos (tabla principal)
+    const cuerpoTabla = document.querySelector("#tabla-principal tbody");
+    if (cuerpoTabla) {
+        cuerpoTabla.innerHTML = "";
+    }
+
+    // Limpiar los totales
+    document.getElementById("importe").textContent = "0.00";
+    document.getElementById("pagado").textContent = "0.00";
+    document.getElementById("porpagar").textContent = "0.00";
+    document.getElementById("cambio").textContent = "0.00";
+
+    // Limpiar input de efectivo
+    document.getElementById("input-efectivo").value = "";
+
+    // Deseleccionar fila de método de pago
+    deseleccionarFilasPago();
+
+    // (Opcional) Limpiar cliente si estás usando un campo
+    const clienteElement = document.getElementById("nombre-cliente");
+    if (clienteElement) {
+        clienteElement.textContent = "General";
+    }
+
+    // (Opcional) Volver a enfocar al input de producto
+    const inputProducto = document.getElementById("producto");
+    if (inputProducto) {
+        inputProducto.focus();
+    }
+}
+

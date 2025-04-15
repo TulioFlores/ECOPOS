@@ -119,6 +119,21 @@ app.get('/cliente/:telefono', (req, res) => {
         }
     });
 });
+app.get('/clientes/sugerencias/:telefono', (req, res) => {
+    const telefono = req.params.telefono;
+
+    const query = `SELECT nombre_completo AS nombre, telefono FROM Clientes WHERE telefono LIKE ? LIMIT 5`;
+    connection.query(query, [`%${telefono}%`], (err, results) => {
+        if (err) {
+            console.error('Error al buscar sugerencias:', err);
+            res.status(500).json({ error: 'Error al buscar sugerencias' });
+            return;
+        }
+
+        res.json(results);
+    });
+});
+
 
 // Iniciar el servidor
 app.listen(port, () => {
@@ -127,12 +142,19 @@ app.listen(port, () => {
 
 //Api para realizar la venta
 
-app.post('/ventas', async (req, res) => {
-    const { id_cliente, id_empleado, metodo_pago, detalle } = req.body;
+// BACKEND (Node.js - api/ventas.js)
+const router = express.Router();
 
-    if (!metodo_pago || !detalle || detalle.length === 0) {
+app.post('/ventas', async (req, res) => {
+    const { productos, total, tipoPago, cliente } = req.body;
+
+    if (!tipoPago || !productos || productos.length === 0) {
         return res.status(400).json({ error: 'Datos incompletos para registrar la venta.' });
     }
+
+    // Asignar valores de cliente y empleado (ajustar lógica si se requiere autenticación)
+    const id_cliente = null; // Por ahora se puede dejar null si es "General"
+    const id_empleado = null; // Puedes asignar desde sesión si lo manejas
 
     connection.beginTransaction(err => {
         if (err) return res.status(500).json({ error: 'Error al iniciar transacción.' });
@@ -141,7 +163,7 @@ app.post('/ventas', async (req, res) => {
             INSERT INTO Ventas (id_cliente, id_empleado, metodo_pago, estado)
             VALUES (?, ?, ?, 'Completada')
         `;
-        connection.query(ventaQuery, [id_cliente || null, id_empleado || null, metodo_pago], (err, result) => {
+        connection.query(ventaQuery, [id_cliente, id_empleado, tipoPago], (err, result) => {
             if (err) {
                 return connection.rollback(() => res.status(500).json({ error: 'Error al insertar venta.' }));
             }
@@ -152,11 +174,11 @@ app.post('/ventas', async (req, res) => {
                 INSERT INTO Detalle_Venta (id_venta, id_producto, cantidad, precio_unitario)
                 VALUES ?
             `;
-            const detalleValues = detalle.map(item => [
+            const detalleValues = productos.map(item => [
                 id_venta,
-                item.id_producto,
+                item.id,
                 item.cantidad,
-                item.precio_unitario
+                item.precio
             ]);
 
             connection.query(detalleQuery, [detalleValues], (err) => {
@@ -164,16 +186,15 @@ app.post('/ventas', async (req, res) => {
                     return connection.rollback(() => res.status(500).json({ error: 'Error al insertar detalle de venta.' }));
                 }
 
-                // Actualizar stock en productos
-                const updateStockTasks = detalle.map(item => {
+                const updateStockTasks = productos.map(item => {
                     return new Promise((resolve, reject) => {
                         const updateQuery = `
                             UPDATE Productos SET stock = stock - ?
                             WHERE id_producto = ? AND stock >= ?
                         `;
-                        connection.query(updateQuery, [item.cantidad, item.id_producto, item.cantidad], (err, result) => {
+                        connection.query(updateQuery, [item.cantidad, item.id, item.cantidad], (err, result) => {
                             if (err || result.affectedRows === 0) {
-                                return reject(`Error al actualizar stock para el producto ${item.id_producto}`);
+                                return reject(`Error al actualizar stock para el producto ${item.id}`);
                             }
                             resolve();
                         });
@@ -197,5 +218,6 @@ app.post('/ventas', async (req, res) => {
     });
 });
 
-// module.exports = router;
+
+
 
