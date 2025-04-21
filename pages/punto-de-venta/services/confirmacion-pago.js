@@ -148,6 +148,8 @@ function limpiarInterfazVenta() {
     document.getElementById("pagado").textContent = "0.00";
     document.getElementById("porpagar").textContent = "0.00";
     document.getElementById("cambio").textContent = "0.00";
+    document.getElementById("total-neto").textContent = "0.00";
+    document.getElementById("cliente").value="";
 
     // Limpiar input de efectivo
     document.getElementById("input-efectivo").value = "";
@@ -158,7 +160,7 @@ function limpiarInterfazVenta() {
     // (Opcional) Limpiar cliente si estás usando un campo
     const clienteElement = document.getElementById("nombre-cliente");
     if (clienteElement) {
-        clienteElement.textContent = "General";
+        clienteElement.textContent = "";
     }
 
     // (Opcional) Volver a enfocar al input de producto

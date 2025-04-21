@@ -15,7 +15,6 @@
     z-index: 1000;
     background-color: #5db282;
     border-radius: 10px;
-    border: 3px solid black;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
 }
 .buscar-producto table{
@@ -31,14 +30,16 @@
 .buscar-producto tbody{
     border: 3px solid black;
     min-height: 40vh;
-    border-radius: 10px;
-    margin: 10px;
+    border-radius: 0px 0px 10px 10px;
+    margin: 0px 10px;
     display: block;
     background-color: white;
     text-align: center;
 }
 #cerrar-busqueda{
-    font-size: 30px;
+    margin: 10px;
+    font-weight:900;
+    font-size: 25px;
     color:#F34C3F;
 }
 #cerrar-busqueda:hover{

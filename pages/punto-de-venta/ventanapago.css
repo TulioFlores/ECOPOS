@@ -3,15 +3,13 @@
     padding: 0;
 }
 #nuevocliente{
-    margin-left: 5px;
     font-weight: bold;
-    background-color: #ffffff;
+    background-color: #50956e;
     color: rgb(0, 0, 0);
-    border-radius: 5px;
+    border-radius: 0px 5px 5px 0px;
     border: none;
     padding: 2px;
     height: 40px;
-    border: 2px solid black ;    
 }
 #nuevocliente:hover{
     background-color: #000000;

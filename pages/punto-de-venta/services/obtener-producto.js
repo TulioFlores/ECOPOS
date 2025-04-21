@@ -62,8 +62,13 @@ function obtenerProductoPorId(idProducto, callback) {
   
     // Agregar evento para seleccionar/deseleccionar la fila
       fila.addEventListener('click', function () {
-          deseleccionarFilas(); // Asegura que solo una fila esté seleccionada
+        if(this.classList.contains('seleccionado')){
+            this.classList.remove('seleccionado');
+        }else{
+            deseleccionarFilas(); // Asegura que solo una fila esté seleccionada
           fila.classList.add('seleccionado');
+        }
+          
       });
      
       document.getElementById('btn-eliminar').addEventListener('click', function () {
@@ -83,12 +88,10 @@ function obtenerProductoPorId(idProducto, callback) {
     
   }
   function deseleccionarFilas() {
-      document.querySelectorAll('.seleccionado').forEach(fila => {
-          fila.classList.remove('seleccionado');
-      });
-      document.querySelectorAll('.pago-seleccionado').forEach(fila => {
-          fila.classList.remove('pago-seleccionado');
-      });
+    document.querySelectorAll('.seleccionado').forEach(fila => {
+        fila.classList.remove('seleccionado');
+    });
+      
   }
   
   // Función para actualizar el total en el pie de la tabla

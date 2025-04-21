@@ -4,7 +4,7 @@
 }
 
 .seleccionado {
-    background-color: #ffcccb; /* Color rojo claro */
+    background-color: #ffcccb !important; /* Color rojo claro */
     cursor: pointer;
 }
 /* Barra de navegacion */
@@ -43,16 +43,19 @@ nav{
 }
 
 /* Estilos para el punto de venta */
-.enter{
-    border-radius: 5px;
-    padding: 5px;
+#enter{ 
     font-weight: bold;
-
+    background-color: #50956e;
+    color: rgb(0, 0, 0);
+    border-radius: 0px 5px 5px 0px;
+    border: none;
+    padding: 2px;
+    height: 40px;   
 }
-.enter:hover{
-    background-color: black;
+#enter:hover{
+    background-color: #000000;
+    transition: 0.3s;
     color: white;
-    transition: 0.5s;
 }
 
 .form-escaneo{
@@ -71,8 +74,8 @@ form input{
 }
 .tabla-principal thead .row{
     background-color: #b1b2b5;
-    border-radius: 10px;
-    margin: 5px 10px 5px 10px;
+    border-radius: 10px 10px 0px 0px;
+    margin: 5px 10px 0px 10px;
 }
 .tbody {
     display: block;
@@ -80,8 +83,8 @@ form input{
     border: 2px solid black;
     height: 200px;
     min-height: 200px;
-    border-radius: 10px;
-    margin: 10px;   
+    border-radius:0px 0px 10px 10px;
+    margin: 0px 10px 10px 10px;   
     overflow: hidden;
 }
 .tabla-principal tfoot .row {
@@ -90,11 +93,20 @@ form input{
     border-radius: 10px;
     margin: 10px;
 }
+/* Colores alternados */
+.tabla-principal tbody tr:nth-child(odd) {
+background-color: #f2f2f2; /* Claro */
+}
+
+.tabla-principal tbody tr:nth-child(even) {
+background-color: #e0e0e0; /* Oscuro */
+}
 .boton-venta{
     font-size: 30px;
     background-color: #b1b2b5;
     padding: 15px;
-    border-radius: 10px;
+    
+    
 }
 .boton-venta:hover{
     transition: 0.5s;
@@ -114,12 +126,12 @@ tr, td{
 
 /* Diseno para los botones de la derecha */
 .botones button, .botones form{
-    width: 300px;
+    width: 45%;
     padding: 30px;
     margin: 10px;
     background-color: #5db282;
     border-radius: 20px;
-    border: 2px solid black;
+    border: none;
     text-align: center;
 
 }
@@ -141,7 +153,7 @@ tr, td{
     display: none;
     z-index: 1000;
     padding: 20px;
-    width: 300px;
+    width: 400px;
     height: 180px;
     background-color: #5db282;
     border-radius: 10px;
@@ -176,27 +188,6 @@ tr, td{
 }
 
 
-/* Ventana modal alta de empleado */
-
-#alta-empleado {
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    position: fixed;
-    display: none;
-    height: 80vh;
-    width: 40vw;
-    background-color: #5db282;
-    color: white;
-    border-radius: 20px;
-    box-shadow: 0 0 15px 15px rgba(0, 0, 0, 0.7);
-    padding: 20px;
-    overflow: hidden;
-    overflow-y: auto;
-    flex-direction: column;
-    justify-items: center;
-    align-items: center;
-}
 
 /* Estilos para la scrollbar sin afectar el border-radius */
 #alta-empleado::-webkit-scrollbar {
@@ -312,7 +303,6 @@ form .row {
     z-index: 1000;
     background-color: #5db282;
     border-radius: 10px;
-    border: 3px solid black;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
 }
 
@@ -322,9 +312,9 @@ form .row {
 }
 #existencias tbody{
     border: 3px solid black;
-    min-height: 40vh;
-    border-radius: 10px;
-    margin: 10px;
+    min-height: 50vh;
+    border-radius: 0px 0px 10px 10px;
+    margin: 0px 10px 10px 10px;
     display: block;
     background-color: white;
     text-align: center;
@@ -355,31 +345,7 @@ form .row {
     transition: 0.3s;
 }
 
-/*Venta por dia*/
 
-#venta-por-dia{
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    position: fixed;
-    display: none;
-    z-index: 1000;
-    padding: 20px;
-    width:500px;
-    height: 250px;
-    background-color: #5db282;
-    border-radius: 10px;
-    font-weight: bold;
-    flex-direction: column;
-    box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
-}
-#cerrar-venta-por-dia{
-    font-size: 30px;
-    color:#F34C3F;
-}
-#cerrar-venta-por-dia:hover{
-    cursor: pointer;
-}
 
 
 /*Venta por empleado*/
@@ -410,6 +376,7 @@ form .row {
 
 .sugerencias-box {
     position: absolute;
+    display: none;
     background-color: white;
     border: 1px solid #ccc;
     width: calc(50%); /* O ajusta según tu diseño */
@@ -418,6 +385,7 @@ form .row {
     overflow-y: auto;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     margin-top: 2px;
+    flex-direction: column;
 }
 
 .sugerencia-item {

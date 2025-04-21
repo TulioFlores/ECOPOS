@@ -5,13 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- CSS -->
-    <link rel="stylesheet" href="pointofsale.css">
-    <link rel="stylesheet" href="ventanapago.css">
-    <link rel="stylesheet" href="ventanabuscar.css">
+    <link rel="stylesheet" href="/punto-de-venta/pointofsale.css">
+    <link rel="stylesheet" href="/punto-de-venta/ventanapago.css">
+    <link rel="stylesheet" href="/punto-de-venta/ventanabuscar.css">
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">    <!-- Icono pagina -->
     <!--FAVICON-->
-    <link rel="icon" href="/public/logos/LogoBlanco.svg" type="image/svg+xml" sizes="any">
+    <link rel="icon" href="/logos/LogoBlanco.svg" type="image/svg+xml" sizes="any">
     <link rel="icon" type="image/png" href="/favicon-32x32.png">
     <!-- Bootstrap iconos -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
@@ -22,12 +22,12 @@
     <nav class="contenedor">
         <div class="container-fluid row d-flex align-content-center ">
             <div class=" col-6 ps-0" > 
-                <a href="/pages/inicio/index.html" ><img src="/public/logos/LogoBlanco.svg" alt="Logo Ecopos"  ></a>
+                <a href="/inicio" ><img src="/logos/LogoBlanco.svg" alt="Logo Ecopos"  ></a>
             </div>
             <div class=" col-6 d-flex  justify-content-end">
                 <button class="hover">
                     <i class="bi bi-person "></i>
-                    <a href="" target="_blank" rel="noreferrer noopener">Mi cuenta</a>
+                    <a href="/configuracion" target="_blank" rel="noreferrer noopener">Mi cuenta</a>
                 </button>
                 
             </div>
@@ -35,14 +35,14 @@
     </nav>
     <!-- Contenedor para el punto de venta -->
     <div class="row ">
-        <div class="col-xl-7 col-lg-8">
+        <div class="col-xl-8 col-lg-9">
             <!-- Formulario para escanear el producto -->
             <form class="form-escaneo"  id="form-escaneo">
-                <div class="row d-flex align-items-center">
+                <div class="row d-flex align-items-center flex-nowrap">
                     <p class="col-lg-3 col-md-3 col-2 mb-0" >Producto: </p>
                     <input class="col-lg-6 col-md-6 col-6" type="number" name="producto" id="producto">
+                    <button id="enter" class="col-lg-2 col-md-2 col-2" type="button">Enter</button>
                     <i class="bi bi-search col-lg-1 col-md-1 col-2" style="font-size: 30px;" id="buscar"></i>
-                    <button id="enter" class="enter col-lg-2 col-md-2 col-2" type="button">Enter</button>
                 </div>
                 <div class="row d-flex align-items-center">
                     <p class="col-3 mb-0 " >Cantidad: </p>
@@ -51,7 +51,7 @@
                 <div class=" row flex-nowrap d-flex align-items-center ">
                     <label class="col-3 mb-0">Cliente: </label>
                     <input class="col-6" type="text" name="cliente" id="cliente" placeholder="telefono">
-                    <button class="col-3" id="nuevocliente" type="button">Nuevo</button>
+                    <button class="col-2" id="nuevocliente" type="button">Nuevo</button>
                 </div><br>
                 <div id="sugerencias-telefono" class="sugerencias-box"></div>
             </form>
@@ -79,13 +79,13 @@
                 </tfoot>
             </table>
             <div class="row d-flex align-content-center  flex-nowrap container-fluid">
-                <button class="col-6 boton-venta " id="btn-eliminar" style="margin-left: 10px;"><i class="icono-x bi bi-x-lg "></i>Eliminar Producto</button>
-                <button id="aplicar-venta" class="col-6 boton-venta" style="margin-right: 10px;"><i class="bi bi-cart"></i>Aplicar venta</button>    
+                <button class="col-6 boton-venta " id="btn-eliminar" style="margin-left: 10px; border-radius: 10px 0px 0px 10px;border-radius: none;"><i class="icono-x bi bi-x-lg "></i>Eliminar Producto</button>
+                <button id="aplicar-venta" class="col-6 boton-venta" style="margin-right: 10px ;border-radius: 0px 10px 10px 0px;border-left: 5px;"><i class="bi bi-cart"></i>Aplicar venta</button>    
             </div>  
         </div>
 
-        <div class="col-xl-5 col-lg-4 botones">
-            <div class="row">
+        <div class="col-xl-4 col-lg-3 botones">
+            <div class="row d-flex flex-nowrap">
                 <!-- Formulario para mostrar el numero y nombre del cajero -->
                 <form class="col-6" action="" id="mostrar-cajero">
                     <div class="row">
@@ -102,28 +102,19 @@
             </div>
             
             <div class="row">
-                <!-- Boton para mostrar la venta del dia -->
-                <button class="col-6" id="boton-venta-por-dia"><i class="bi bi-clipboard-data"></i>Venta del dia</button>
                 <!-- Boton para realizar el corte por cajero -->
                 <button class="col-6" ><i class="bi bi-currency-exchange"></i>Corte por cajero</button>
-            </div>
-            <div class="row">
-                 <!-- Boton para mostrar la venta por vendedor -->
-                <button class="col-6" id="boton-venta-por-empleado"><i class="bi bi-person-lines-fill" ></i>Venta por empleado</button>
                 <!-- Boton para realizar retiro -->
                 <button class="col-6" id="boton-retiro" ><i class="bi bi-box-arrow-up"></i>Retiro</button>
             </div>
             <div class="row">
-                <!-- Boton para la alta de empleado -->
-                <button class="col-6" id="abrir-empleado"><i class="bi bi-person-fill-up" ></i>Alta de empleado</button>
                  <!-- Boton para realizar exitencias -->
                 <button class="col-6" id="boton-existencias"><i class="bi bi-card-text"></i>Existencias</button>
+                 <!-- Boton para reimprimir ultimo ticket -->
+                 <button class="col-6" id="boton-last-ticket"><i class="bi bi-ticket-detailed-fill"></i>Reimprimir ultimo ticket</button>
             </div>
            <div class="row">
-                <!-- Boton para realizar mas consultas -->
-                <button class="col-6" ><i class="bi bi-three-dots-vertical"></i>Mas consultas</button>
-                <!-- Boton para la realizar el cierre del dia -->
-                <button class="col-6" ><i class="bi bi-cloud-moon-fill"></i>Cierre del dia</button>
+                
            </div>
         </div>
     </div>
@@ -145,8 +136,8 @@
                     <button id="cancelar-venta" >Cancelar</button>
                 </div>
                 <div >
-                    <p>Fecha</p>
-                    <p >Hora</p>
+                    <p id="fecha">Fecha</p>
+                    <p id="hora">Hora</p>
                 </div>
                 
             </div>
@@ -185,13 +176,13 @@
     <!-- Ventana modal para ingresar datos nuevo cliente -->
     <div class="nuevo-cliente">
         <div class="row d-flex align-items-center">
-            <p class="col-6 mb-0">Nombre: </p><input class="col-6" type="text" name="nombre" id="nombre">
+            <p class="col-6 mb-0">Nombre: </p><input class="col-6" type="text" name="nombre-cliente" id="nuevo-cliente-nombre">
         </div>
         <div class="row d-flex align-items-center">
-            <p class="col-6 mb-0">Telefono: </p><input class="col-6" type="number" name="telefono" id="telefono">
+            <p class="col-6 mb-0">Telefono: </p><input class="col-6" type="number" name="telefono-cliente" id="telefono-cliente">
         </div>
         <div class="row d-flex align-items-center">
-            <p class="col-6 mb-0">Correo: </p><input class="col-6" type="email" name="correo" id="correo">
+            <p class="col-6 mb-0">Correo: </p><input class="col-6" type="email" name="correo-cliente" id="correo-cliente">
         </div><br>
         <div class="row d-flex align-items-center justify-content-center flex-nowrap">
             <button id="btn-cancelar-cliente" class="col-6">Cancelar</button><button id="btn-confirmar-cliente" class="col-6">Confirmar</button>
@@ -199,7 +190,7 @@
     </div>
     <!-- Ventana modal para buscar producto -->
     <div class="buscar-producto">
-        <i class="bi bi-x-circle-fill position-absolute top-0 end-0"  id="cerrar-busqueda"></i>
+        <i class="bi bi-x-lg position-absolute top-0 end-0"  id="cerrar-busqueda"></i>
         <div class="row pt-5 d-flex align-items-center justify-content-center">
             <p class="col-2 mb-0" style="font-weight: bold;">Producto: </p><input class="col-9" type="text" name="producto" id="busqueda-producto">
         </div>
@@ -217,97 +208,24 @@
             </tbody>
         </table>
     </div>
-    <!--Ventana modal para agregar un empleado-->
-    <div id="alta-empleado" class="">
-        <h1>Alta de Empleado</h1>
-        <h2>Fecha</h2>
-        <form action="" class="">
-            <div class="row">
-                <div class="col-6">
-                    <label for="primer-nombre" class="form-label">Primer Nombre</label>
-                    <input type="text" class="form-control" id="primer-nombre" name="primer_nombre" required>
-                </div>
-                <div class="col-6">
-                    <label for="segundo-nombre" class="form-label">Segundo Nombre</label>
-                    <input type="text" class="form-control" id="segundo-nombre" name="segundo_nombre">
-                </div>
-            </div>
     
-            <div class="row">
-                <div class="col-6">
-                    <label for="primer-apellido" class="form-label">Primer Apellido</label>
-                    <input type="text" class="form-control" id="primer-apellido" name="primer_apellido" required>
-                </div>
-                <div class="col-6">
-                    <label for="segundo-apellido" class="form-label">Segundo Apellido</label>
-                    <input type="text" class="form-control" id="segundo-apellido" name="segundo_apellido">
-                </div>
-            </div>
-    
-            <div class="row">
-                <div class="col-6">
-                    <label for="email" class="form-label">Email</label>
-                    <input type="email" class="form-control" id="email" name="email" required>
-                </div>
-                <div class="col-6">
-                    <label for="telefono" class="form-label">Teléfono</label>
-                    <input type="tel" class="form-control" id="telefono" name="telefono" pattern="[0-9]{10}" required>
-                </div>
-            </div>
-    
-            <div class="row">
-                <div class="col-6">
-                    <label for="puesto" class="form-label">Puesto</label>
-                    <input type="text" class="form-control" id="puesto" name="puesto" required>
-                </div>
-            </div>
-    
-            <div class="row">
-                <div class="col-6">
-                    <label for="contrasena" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="contrasena" name="contrasena" required>
-                </div>
-                <div class="col-6">
-                    <label for="confirmar-contrasena" class="form-label">Confirmar Contraseña</label>
-                    <input type="password" class="form-control" id="confirmar-contrasena" name="confirmar_contrasena" required>
-                </div>
-            </div>
-    
-            <div class="row">
-                <h4>Ingrese ID y contraseña del responsable</h4>
-                <div class="col-6">
-                    <label for="id-responsable" class="form-label">ID</label>
-                    <input type="text" class="form-control" id="id-responsable" name="id_responsable" required>
-                </div>
-                <div class="col-6">
-                    <label for="contrasena-responsable" class="form-label">Contraseña</label>
-                    <input type="password" class="form-control" id="contrasena-responsable" name="contrasena_responsable" required>
-                </div>
-            </div>
-    
-            <div class="row d-flex justify-content-end">
-                <button type="button" class="col-5 btn-cancelar" id="btn-cancelar-empleado">Cancelar</button>
-                <button type="submit" class="col-5 btn-confirmar" id="btn-confirmar-empleado">Dar de alta</button>
-            </div>
-        </form>
-    </div>
     <!--Ventana para realizar el retiro-->
     <div id="retiro">
         <h2 >Retiro</h2>
         <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Cantidad: </label><input class="col-6" type="text" name="nombre" id="nombre">
+            <label class="col-6 mb-0">Cantidad: </label><input class="col-6" type="text" name="cantidad" id="cantidad">
         </div>
         <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Motivo: </label><input class="col-6" type="number" name="telefono" id="telefono">
+            <label class="col-6 mb-0">Motivo: </label><input class="col-6" type="number" name="motivo" id="motivo">
         </div>
         <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Cajero: </label><input class="col-6" type="email" name="correo" id="correo">
+            <label class="col-6 mb-0">Cajero: </label><input class="col-6" type="email" name="cajero" id="cajero-retiro">
         </div><br>
         <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Contraseña: </label><input class="col-6" type="number" name="telefono" id="telefono">
+            <label class="col-6 mb-0">Contraseña: </label><input class="col-6" type="number" name="contraseña" id="contraseña">
         </div>
         <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Confirmar contraseña: </label><input class="col-6" type="number" name="telefono" id="telefono">
+            <label class="col-6 mb-0">Confirmar contraseña: </label><input class="col-6" type="number" name="conf-contraseña" id="conf-contraseña">
         </div>
         <div class="row d-flex align-items-center justify-content-center flex-nowrap">
             <button id="btn-cancelar-retiro" class="col-6">Cancelar</button><button id="btn-confirmar-retiro" class="col-6">Confirmar</button>
@@ -332,57 +250,17 @@
             <button id="btn-cancelar-existencias" class="col-6">Salir</button><button id="btn-imprimir-existencias" class="col-6">Imprimir</button>
         </div>
     </div>
-     <!-- Ventana modal para ver venta por dia-->
-     <div id="venta-por-dia">
-        <i class="bi bi-x-circle-fill position-absolute top-0 end-0"  id="cerrar-venta-por-dia"></i>
-        <h3>Venta por dia</h3>
-        <div class="row d-flex align-items-center">
-            <label class="col-3 mb-0">Inicio: </label>
-            <input class="col-3" type="date" name="nombre" id="nombre">
-            <label class="col-3 mb-0">Fin: </label>
-            <input class="col-3" type="date" name="nombre" id="nombre">
-        </div>
-        <br>
-        <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Efectivo: </label><input class="col-6" type="text" name="nombre" id="nombre">
-        </div>
-        <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Tarjeta: </label><input class="col-6" type="number" name="telefono" id="telefono">
-        </div>
-        <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Total: </label><input class="col-6" type="email" name="correo" id="correo">
-        </div><br>
-    </div>
-    <!-- Ventana modal para ver venta por vendedor-->
-    <div id="venta-por-empleado">
-        <i class="bi bi-x-circle-fill position-absolute top-0 end-0"  id="cerrar-venta-por-empleado"></i>
-        <h3>Venta por empleado</h3>
-        <div class="row d-flex align-items-center">
-            <label class="col-3 mb-0">Inicio: </label>
-            <input class="col-3" type="date" name="nombre" id="nombre">
-            <label class="col-3 mb-0">Fin: </label>
-            <input class="col-3" type="date" name="nombre" id="nombre">
-        </div>
-        <br>
-        <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Efectivo: </label><input class="col-6" type="text" name="nombre" id="nombre">
-        </div>
-        <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Tarjeta: </label><input class="col-6" type="number" name="telefono" id="telefono">
-        </div>
-        <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Total: </label><input class="col-6" type="email" name="correo" id="correo">
-        </div><br>
-    </div>
+     
+    
     <!-- Script Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <!-- Javascript -->
-    <script src="services/agregar-cliente.js"></script>
-    <script src="services/busqueda-productos.js"></script>
-    <script src="services/confirmacion-pago.js"></script>
-    <script src="services/modales.js"></script>
-    <script src="services/obtener-producto.js"></script>
-
+    <script src="punto-de-venta/services/agregar-cliente.js"></script>
+    <script src="punto-de-venta/services/busqueda-productos.js"></script>
+    <script src="punto-de-venta/services/confirmacion-pago.js"></script>
+    <script src="punto-de-venta/services/modales.js"></script>
+    <script src="punto-de-venta/services/obtener-producto.js"></script>
+    <script src="punto-de-venta/services/obtenerhora.js"></script>
 
 
 </body>

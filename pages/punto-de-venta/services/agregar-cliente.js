@@ -41,8 +41,15 @@ function mostrarCliente(cliente){
     nombre.innerText = cliente.nombre;
 
 }
+document.getElementById('cliente').addEventListener('input', () => {
+    const telefono = document.getElementById("cliente").value.trim();
+    if (telefono === '') {
+        document.getElementById("nombre-cliente").innerText = '';
+    }
+});
 function mostrarSugerencias(clientes) {
     const contenedor = document.getElementById('sugerencias-telefono');
+    contenedor.style.display="flex";
     contenedor.innerHTML = ''; // Limpiar sugerencias anteriores
 
     clientes.forEach(cliente => {
@@ -53,6 +60,7 @@ function mostrarSugerencias(clientes) {
         item.addEventListener('click', () => {
             mostrarCliente(cliente); // Llenamos el input y nombre al hacer clic
             contenedor.innerHTML = ''; // Ocultamos sugerencias
+            contenedor.style.display="none";
         });
 
         contenedor.appendChild(item);
@@ -75,4 +83,58 @@ document.getElementById('cliente').addEventListener('input', async (event) => {
     } catch (error) {
         console.error('Error al obtener sugerencias:', error);
     }
+});
+
+
+// Botones
+btnConfirmarCliente = document.getElementById("btn-confirmar-cliente");
+btnCancelarCliente = document.getElementById("btn-cancelar-cliente");
+
+// Función para registrar cliente
+btnConfirmarCliente.addEventListener("click", async () => {
+    const nombre = document.getElementById("nuevo-cliente-nombre").value.trim();
+    const telefono = document.getElementById("telefono-cliente").value.trim();
+    const correo = document.getElementById("correo-cliente").value.trim();
+
+    if (!nombre || !telefono || !correo) {
+        alert("Por favor llena todos los campos.");
+        return;
+    }
+
+    try {
+        const response = await fetch('http://localhost:3000/cliente', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                nombre_completo: nombre,
+                telefono: telefono,
+                correo: correo
+            })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert("Cliente registrado exitosamente.");
+            // Limpiar campos
+            document.getElementById("nuevo-cliente-nombre").value = "";
+            document.getElementById("telefono-cliente").value = "";
+            document.getElementById("correo-cliente").value = "";
+        } else {
+            alert("Error: " + data.error);
+        }
+
+    } catch (error) {
+        console.error("Error al registrar cliente:", error);
+        alert("Error de conexión con el servidor.");
+    }
+});
+
+// Cancelar: Limpiar los campos
+btnCancelarCliente.addEventListener("click", () => {
+    document.getElementById("nuevo-cliente-nombre").value = "";
+    document.getElementById("telefono-cliente").value = "";
+    document.getElementById("correo-cliente").value = "";
 });

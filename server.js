@@ -1,7 +1,9 @@
 import express from 'express';
 import mysql from 'mysql2';
 import cors from 'cors';
-
+import path from 'path';
+import bcrypt from 'bcrypt';
+import { fileURLToPath } from 'url';
 const app = express();
 const port = 3000;
 
@@ -25,6 +27,29 @@ connection.connect(err => {
     console.log('Conectado a MySQL');
 });
 
+//Ruteo
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
+// Servir archivos estáticos desde "pages"
+app.use(express.static(path.join(__dirname, 'pages')));
+app.use(express.static(path.join(__dirname, 'public')));
+
+
+// Ruta limpia para pointofsale.html
+app.get('/pointofsale', (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages','punto-de-venta', 'pointofsale.html'));
+});
+app.get('/configuracion', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages','configuracion', 'configuracion.html'));
+});
+app.get('/reportes', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages','configuracion', 'reportes.html'));
+});
+app.get('/inicio', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages','inicio', 'index.html'));
+});
 // Endpoint para obtener un producto por ID usando el Stored Procedure
 app.get('/producto/:id', (req, res) => {
     const idProducto = req.params.id;
@@ -142,9 +167,6 @@ app.listen(port, () => {
 
 //Api para realizar la venta
 
-// BACKEND (Node.js - api/ventas.js)
-const router = express.Router();
-
 app.post('/ventas', async (req, res) => {
     const { productos, total, tipoPago, cliente } = req.body;
 
@@ -218,6 +240,107 @@ app.post('/ventas', async (req, res) => {
     });
 });
 
+// Endpoint para obtener la fecha y hora del servidor
+app.get('/hora-servidor', (req, res) => {
+    const fechaHora = new Date();
+  
+    const dia = String(fechaHora.getDate()).padStart(2, '0');
+    const mes = String(fechaHora.getMonth() + 1).padStart(2, '0'); // +1 porque enero es 0
+    const anio = fechaHora.getFullYear();
+  
+    const hora = fechaHora.toLocaleTimeString('es-MX', {
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+  
+    res.json({
+      fecha: `${dia}/${mes}/${anio}`,
+      hora: hora
+    });
+  });
+
+  
+  // Registrar nuevo cliente
+// Ruta para registrar un nuevo cliente
+app.post('/cliente', (req, res) => {
+    const { nombre_completo, telefono, correo } = req.body;
+
+    if (!nombre_completo || !telefono || !correo) {
+        return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+    }
+
+    const query = 'INSERT INTO clientes (nombre_completo, telefono, correo, fecha_registro) VALUES (?, ?, ?, NOW())';
+    const values = [nombre_completo, telefono, correo];
+
+    connection.query(query, values, (err, results) => {
+        if (err) {
+            console.error('Error al insertar cliente:', err);
+            return res.status(500).json({ error: 'Error al registrar cliente.' });
+        }
+
+        res.status(201).json({ mensaje: 'Cliente registrado exitosamente', id_cliente: results.insertId });
+    });
+});
 
 
 
+//Dar de alta un empleado
+
+
+// Ruta para alta de empleado
+app.post('/altaempleados', (req, res) => {
+    const {
+      primer_nombre,
+      segundo_nombre,
+      primer_apellido,
+      segundo_apellido,
+      correo,
+      telefono,
+      puesto,
+      contrasena,
+      id_responsable,
+      contrasena_responsable
+    } = req.body;
+  
+    // Validar existencia del responsable
+    connection.query('SELECT * FROM empleados WHERE id_empleado = ? AND activo = 1', [id_responsable], async (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Error al validar responsable' });
+      }
+  
+      if (results.length === 0) {
+        return res.status(401).json({ error: 'ID de responsable inválido o inactivo' });
+      }
+      const responsable = results[0];
+      const passwordValida = await bcrypt.compare(contrasena_responsable, responsable.contrasena_hash);
+      if (!passwordValida) {
+        return res.status(401).json({ error: 'Contraseña del responsable incorrecta' });
+      }
+  
+      // Generar datos para el nuevo empleado
+      const nombreCompleto = `${primer_nombre} ${segundo_nombre || ''} ${primer_apellido} ${segundo_apellido || ''}`.toUpperCase().trim();
+      const ultimos3 = telefono.slice(-3);
+      const username = `${primer_nombre.toUpperCase()}${ultimos3}`;
+      const contrasenaHash = await bcrypt.hash(contrasena, 10);
+      const fechaHoy = new Date().toISOString().split('T')[0];
+  
+      const query = `
+        INSERT INTO empleados (nombre_completo, cargo, username, correo, telefono, contrasena_hash, fecha_contratacion, activo)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+      const values = [nombreCompleto, puesto, username, correo, telefono, contrasenaHash, fechaHoy, 1];
+  
+      connection.query(query, values, (err, result) => {
+        if (err) {
+          console.error(err);
+          return res.status(500).json({ error: 'Error al registrar empleado' });
+        }
+  
+        res.status(201).json({
+          message: 'Empleado registrado con éxito',
+          id: result.insertId,
+          username
+        });
+      });
+    });
+  });

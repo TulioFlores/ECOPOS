@@ -49,21 +49,8 @@ btnCancelarCliente.addEventListener("click", () => {
 });
 
 
-//Modal para registrar un empleado
 
-const modalEmpleado = document.getElementById("alta-empleado");
-const btnAbrirEmpleado = document.getElementById("abrir-empleado");
-const btnCancelarEmpleado = document.getElementById("btn-cancelar-empleado");
-const btnConfirmarEmpleado = document.getElementById("btn-confirmar-empleado");
-
-btnAbrirEmpleado.addEventListener("click", () => {
-    modalEmpleado.style.display = "flex";
-});
-
-btnCancelarEmpleado.addEventListener("click", () => {
-    modalEmpleado.style.display = "none";
-});
-//Modal para ingresar un nuevo cliente
+//Modal para realizar retiro
 
 const modalRetiro = document.getElementById("retiro");
 const btnAbrirRetiro = document.getElementById("boton-retiro");
@@ -93,33 +80,8 @@ btnCerrarExistencias.addEventListener("click", () => {
 });
 
 
-//Modal para ver la venta por dia
 
-const modalVentaPorDia = document.getElementById("venta-por-dia");
-const btnAbrirVentaPorDia= document.getElementById("boton-venta-por-dia");
-const btnCerrarVentaPorDia = document.getElementById("cerrar-venta-por-dia");
 
-btnAbrirVentaPorDia.addEventListener("click", () => {
-    modalVentaPorDia.style.display = "flex";
-});
-
-btnCerrarVentaPorDia.addEventListener("click", () => {
-    modalVentaPorDia.style.display = "none";
-});
-
-//Modal para ver la venta por empleado
-
-const modalVentaPorEmpleado = document.getElementById("venta-por-empleado");
-const btnAbrirVentaPorEmpleado = document.getElementById("boton-venta-por-empleado");
-const btnCerrarVentaPorEmpleado = document.getElementById("cerrar-venta-por-empleado");
-
-btnAbrirVentaPorEmpleado.addEventListener("click", () => {
-    modalVentaPorEmpleado.style.display = "flex";
-});
-
-btnCerrarVentaPorEmpleado.addEventListener("click", () => {
-    modalVentaPorEmpleado.style.display = "none";
-});
 
 /////////////////////////////
 ////////////////////////////
