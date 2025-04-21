@@ -55,7 +55,9 @@
         <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse show">
           <div class="position-sticky pt-3 text-white">
             <h6 class="sidebar-heading px-3 mb-1 text-white">
-              <a class="nav-link text-white" href="/pointofsale"><i class="bi bi-pc-display-horizontal"></i> Captura de venta</a>
+              <a class="nav-link text-white" href="#" id="abrirCapturaVenta">
+                <i class="bi bi-pc-display-horizontal"></i> Captura de venta
+              </a>              
             </h6><br>
             <h6 class="sidebar-heading px-3 mb-1 text-white">
               <a class="nav-link text-white" href="/reportes"><i class="bi bi-card-text"></i> Reportes</a>
@@ -215,6 +217,33 @@
                 </div>
               </div>
             </div>
+            <!-- Modal de autenticación -->
+            <div class="modal fade" id="modalAccesoVenta" tabindex="-1" aria-labelledby="modalAccesoVentaLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title" id="modalAccesoVentaLabel">Acceso a Captura de Venta</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form id="formAccesoVenta">
+                      <div class="mb-3">
+                        <label for="usuarioVenta" class="form-label">Usuario</label>
+                        <input type="text" class="form-control" id="usuarioVenta" required>
+                      </div>
+                      <div class="mb-3">
+                        <label for="contrasenaVenta" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="contrasenaVenta" required>
+                      </div>
+                      <div class="text-end">
+                        <button type="submit" class="btn btn-success">Acceder</button>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
+
 
           <footer class="pt-4 my-md-5 pt-md-5 border-top">
             <div class="row">

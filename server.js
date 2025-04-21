@@ -344,3 +344,31 @@ app.post('/altaempleados', (req, res) => {
       });
     });
   });
+
+
+
+  //Api para login local
+
+  app.post('/login', (req, res) => {
+    const { username, contrasena } = req.body;
+  
+    if (!username || !contrasena) {
+      return res.status(400).json({ error: 'Usuario y contraseña requeridos' });
+    }
+  
+    const query = 'SELECT * FROM empleados WHERE username = ? AND activo = 1';
+  
+    connection.query(query, [username], async (err, results) => {
+      if (err) return res.status(500).json({ error: 'Error al consultar' });
+  
+      if (results.length === 0) {
+        return res.status(401).json({ error: 'Usuario no encontrado o inactivo' });
+      }
+  
+      const empleado = results[0];
+      const valid = await bcrypt.compare(contrasena, empleado.contrasena_hash);
+      if (!valid) return res.status(401).json({ error: 'Contraseña incorrecta' });
+  
+      res.json({ success: true, empleado: empleado.username });
+    });
+  });
