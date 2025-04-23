@@ -22,7 +22,7 @@
     <nav class="contenedor">
         <div class="container-fluid row d-flex align-content-center ">
             <div class=" col-6 ps-0" > 
-                <a href="/inicio" ><img src="/logos/LogoBlanco.svg" alt="Logo Ecopos"  ></a>
+                <a href="/" ><img src="/logos/LogoBlanco.svg" alt="Logo Ecopos"  ></a>
             </div>
             <div class=" col-6 d-flex  justify-content-end">
                 <button class="hover">
@@ -161,18 +161,29 @@
                     </tr>
                     <tr class="row">
                         <td class="col-4">2</td>
-                        <td class="col-4">Tarjeta</td>
-                        <td class="col-4">0.0</td>
-                    </tr>
-                    <tr class="row">
-                        <td class="col-4">3</td>
-                        <td class="col-4">American Express</td>
-                        <td class="col-4">0.0</td>
+                        <td class="col-4">Mercado Pago</td>
+                        <td class="col-4" ><input type="numer" id="mercado-pago" placeholder="0.0" value="0.0"></td>
                     </tr>
                 </tbody>
             </table>
          </div>
     </div>
+    <!--Modal para el qr-->
+    <!-- Modal para QR de Mercado Pago -->
+    <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content qr-modal">
+            <div class="modal-header">
+            <h5 class="modal-title" id="qrModalLabel">Pago con QR</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body text-center" id="qrContainer">
+            <p class="text-muted">Esperando código QR...</p>
+            </div>
+        </div>
+        </div>
+    </div>
+  
     <!-- Ventana modal para ingresar datos nuevo cliente -->
     <div class="nuevo-cliente">
         <div class="row d-flex align-items-center">

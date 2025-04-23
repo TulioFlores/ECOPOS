@@ -54,63 +54,66 @@ inputEfectivo.addEventListener('keypress', (e) => {
         const efectivo = parseFloat(inputEfectivo.value) || 0;
         const importe = parseFloat(importeElement.textContent) || 0;
 
-        // Buscar si la fila de "Efectivo" está seleccionada
         const filaEfectivo = Array.from(document.querySelectorAll('#body-pago > tr'))
             .find(fila => fila.classList.contains('pago-seleccionado') && fila.children[1].textContent.includes('Efectivo'));
 
         if (!filaEfectivo) {
-            alert('Selecciona el tipo de pago "Efectivo" para continuar.');
+            alert('Selecciona "Efectivo" como forma de pago primero.');
             return;
         }
 
-        const diferencia = efectivo - importe;
+        const restante = importe - efectivo;
 
-        if (diferencia >= 0) {
-            cambioElement.textContent = diferencia.toFixed(2);
-            porPagarElement.textContent = "0.00";
-
-            // Aplicar venta
-            botonConfirmar.click(); // Puedes cambiarlo por la lógica de tu venta
-        } else {
-            cambioElement.textContent = "0.00";
-            porPagarElement.textContent = Math.abs(diferencia).toFixed(2);
-        }
+        document.getElementById("pagado").textContent = efectivo.toFixed(2);
+        document.getElementById("porpagar").textContent = (restante > 0 ? restante.toFixed(2) : "0.00");
+        document.getElementById("cambio").textContent = (efectivo > importe ? (efectivo - importe).toFixed(2) : "0.00");
     }
 });
 
 
+
+
 botonConfirmar.addEventListener('click', async () => {
+    const importe = parseFloat(importeElement.textContent);
+    const pagado = parseFloat(document.getElementById("pagado").textContent);
+    const porPagar = parseFloat(document.getElementById("porpagar").textContent);
+    const cambio = parseFloat(document.getElementById("cambio").textContent);
+
+    if (pagado <= 0 && porPagar > 0) {
+        alert("Debes ingresar al menos un pago.");
+        return;
+    }
+
+    const tipoPago = pagado > 0 && porPagar > 0 ? "Efectivo + Tarjeta"
+                    : pagado >= importe ? "Efectivo"
+                    : "Tarjeta";
+
     const productos = [];
     const filas = document.querySelectorAll("#tabla-principal tbody tr");
-    
-    const modal = document.querySelector(".contenedor-pago");    
+
     filas.forEach(fila => {
-        const id = fila.dataset.idProducto; // Asegúrate de guardar data-id-producto en cada tr
+        const id = fila.dataset.idProducto;
         const nombre = fila.querySelector(".col-nombre")?.textContent;
         const precio = fila.dataset.precio;
         const cantidad = parseInt(fila.querySelector(".col-cantidad")?.textContent || 1);
         const total = parseFloat(fila.querySelector(".col-total")?.textContent || 0);
-
         productos.push({ id, nombre, precio, cantidad, total });
     });
 
     const venta = {
         productos,
-        total: parseFloat(document.getElementById("importe").textContent),
-        pagado: parseFloat(document.getElementById("pagado").textContent),
-        porPagar: parseFloat(document.getElementById("porpagar").textContent),
-        cambio: parseFloat(document.getElementById("cambio").textContent),
-        tipoPago: obtenerTipoPagoSeleccionado(), // 'Efectivo', 'Tarjeta', etc.
+        total: importe,
+        pagado,
+        porPagar,
+        cambio,
+        tipoPago,
         cliente: document.getElementById("nombre-cliente").textContent || 'General',
     };
 
-    // Enviar al backend
     try {
         const response = await fetch('http://localhost:3000/ventas', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(venta)
         });
 
@@ -118,12 +121,8 @@ botonConfirmar.addEventListener('click', async () => {
 
         if (resultado.success) {
             alert("Venta completada con éxito");
-            // Cerrar el modal al hacer clic en la "X"
-            modal.style.display = "none";
-            limpiarInterfazVenta(); // limpia la interfaz para una nueva venta
-            
-            
-            
+            document.querySelector(".contenedor-pago").style.display = "none";
+            limpiarInterfazVenta();
         } else {
             alert("Error al guardar la venta");
         }
@@ -132,9 +131,10 @@ botonConfirmar.addEventListener('click', async () => {
     }
 });
 
+
 function obtenerTipoPagoSeleccionado() {
     const fila = document.querySelector('#body-pago > tr.pago-seleccionado');
-    return fila ? fila.children[1].textContent.trim() : 'Sin especificar';
+    return fila ? fila.children[1].textContent.trim() : "";
 }
 function limpiarInterfazVenta() {
     // Limpiar la tabla de productos (tabla principal)
@@ -170,3 +170,44 @@ function limpiarInterfazVenta() {
     }
 }
 
+///Pago con mercado pago
+document.getElementById('mercado-pago').addEventListener('keypress', async (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const monto = parseFloat(e.target.value);
+      if (isNaN(monto) || monto <= 0) {
+        alert('Ingresa un monto válido');
+        return;
+      }
+  
+      try {
+        const response = await fetch('http://localhost:3000/mercadoqr', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ monto })
+        });
+  
+        const data = await response.json();
+  
+        if (data.qr_url) {
+          const qrContainer = document.getElementById('qrContainer');
+          qrContainer.innerHTML = `
+            <h5>Escanea para pagar con Mercado Pago</h5>
+            <img src="${data.qr_url}" alt="QR Mercado Pago" width="250">
+          `;
+  
+          const qrModal = new bootstrap.Modal(document.getElementById('qrModal'));
+          qrModal.show();
+        } else {
+          alert('Error al generar el QR');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Error en la solicitud');
+      }
+    }
+  });
+  
+  

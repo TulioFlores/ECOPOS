@@ -29,7 +29,6 @@
     z-index: 1000;
     background-color:#5db282;
     border-radius: 10px;
-    border: 3px solid black;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
     overflow-x: hidden;
     overflow-y: auto;
@@ -107,6 +106,24 @@
     background-color:rgb(170, 170, 170) ;
     cursor: pointer;
 }
+
+#mercado-pago{
+    all: unset;
+}
+
+.qr-modal .modal-content {
+    padding: 20px;
+    border-radius: 15px;
+    background-color: #f8f9fa;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .qr-modal img {
+    border: 3px solid #198754;
+    border-radius: 12px;
+    padding: 5px;
+  }
+  
 @media screen and  (max-width: 980px) {
     .contenedor-pago{
         height: 85vh;

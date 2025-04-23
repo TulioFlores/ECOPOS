@@ -3,6 +3,7 @@ import mysql from 'mysql2';
 import cors from 'cors';
 import path from 'path';
 import bcrypt from 'bcrypt';
+import mercadopago from 'mercadopago';
 import { fileURLToPath } from 'url';
 const app = express();
 const port = 3000;
@@ -38,6 +39,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 // Ruta limpia para pointofsale.html
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages','inicio', 'index.html'));
+});
 app.get('/pointofsale', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages','punto-de-venta', 'pointofsale.html'));
 });
@@ -47,8 +51,14 @@ app.get('/configuracion', (req, res) => {
 app.get('/reportes', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages','configuracion', 'reportes.html'));
 });
-app.get('/inicio', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages','inicio', 'index.html'));
+app.get('/login', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages','inicio-de-sesion', 'login.html'));
+});
+app.get('/register', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages','inicio-de-sesion', 'register.html'));
+});
+app.get('/login-password', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages','inicio-de-sesion', 'login-password.html'));
 });
 // Endpoint para obtener un producto por ID usando el Stored Procedure
 app.get('/producto/:id', (req, res) => {
@@ -168,9 +178,9 @@ app.listen(port, () => {
 //Api para realizar la venta
 
 app.post('/ventas', async (req, res) => {
-    const { productos, total, tipoPago, cliente } = req.body;
+    const { productos, total, tipoPago, cliente, pagado } = req.body;
 
-    if (!tipoPago || !productos || productos.length === 0) {
+    if (!tipoPago || !productos || productos.length === 0 || pagado === 0) {
         return res.status(400).json({ error: 'Datos incompletos para registrar la venta.' });
     }
 
@@ -368,7 +378,73 @@ app.post('/altaempleados', (req, res) => {
       const empleado = results[0];
       const valid = await bcrypt.compare(contrasena, empleado.contrasena_hash);
       if (!valid) return res.status(401).json({ error: 'Contraseña incorrecta' });
-  
-      res.json({ success: true, empleado: empleado.username });
+      res.json({
+        success: true,
+        empleado: {
+          id_empleado: empleado.id_empleado,
+          username: empleado.username,
+          nombre_completo: empleado.nombre_completo
+        }
+      });
+      
     });
+  });
+
+  // Ruta para agregar producto
+app.post('/agregar-producto', (req, res) => {
+    const { nombre, precio, stock, descripcion } = req.body;
+  
+    const nuevoProducto = {
+      nombre,
+      descripcion,
+      precio,
+      stock,
+      fecha_creacion: new Date(),
+      activo: 1
+    };
+  
+    const query = 'INSERT INTO productos SET ?';
+    connection.query(query, nuevoProducto, (err, result) => {
+      if (err) {
+        console.error('Error al insertar el producto:', err);
+        return res.status(500).json({ mensaje: 'Error al insertar el producto' });
+      }
+      res.status(201).json({ mensaje: 'Producto agregado con éxito', id: result.insertId });
+    });
+  });
+  
+
+
+  ///Pago con mercado pago
+mercadopago.configure({
+    access_token:'TEST-4621541618541712-042220-4dcfeeb53d968a34c84e411bad744900-1462138141'
+});
+app.post('/mercadoqr', async (req, res) => {
+    const { monto } = req.body;
+  
+    try {
+      const preference = await mercadopago.preferences.create({
+        items: [
+          {
+            title: "Pago con QR",
+            quantity: 1,
+            currency_id: "MXN",
+            unit_price: parseFloat(monto),
+          },
+        ],
+        payment_methods: {
+          excluded_payment_types: [{ id: "ticket" }],
+          installments: 1
+        },
+        back_urls: {
+          success: "http://localhost:3000/confirmacion",
+        },
+      });
+  
+      const qr_url = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${preference.body.init_point}`;
+      res.json({ qr_url });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Error al generar el QR' });
+    }
   });

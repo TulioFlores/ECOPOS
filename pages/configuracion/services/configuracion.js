@@ -37,12 +37,13 @@
 const modalVentaPorDia = document.getElementById("venta-por-dia");
 const modalVentaPorEmpleado = document.getElementById("venta-por-empleado");
 const modalEmpleado = document.getElementById("alta-empleado");
+const modalProducto = document.getElementById("agregar-producto");
 
 // Botones
 const btnAbrirVentaPorDia = document.getElementById("boton-venta-por-dia");
 const btnAbrirVentaPorEmpleado = document.getElementById("boton-venta-por-empleado");
 const btnAbrirEmpleado = document.getElementById("abrir-empleado");
-
+const btnAbrirProducto = document.getElementById("boton-agregar-producto");
 // Botones cancelar/confirmar del modal de empleado
 const btnCancelarEmpleado = document.getElementById("btn-cancelar-empleado");
 const btnConfirmarEmpleado = document.getElementById("btn-confirmar-empleado");
@@ -52,6 +53,7 @@ function cerrarTodosLosModales() {
     modalVentaPorDia.style.display = "none";
     modalVentaPorEmpleado.style.display = "none";
     modalEmpleado.style.display = "none";
+    modalProducto.style.display = "none";
 }
 
 // Abrir modal de Venta por Día
@@ -74,7 +76,12 @@ btnAbrirEmpleado.addEventListener("click", () => {
     cerrarTodosLosModales();
     if (!yaVisible) modalEmpleado.style.display = "flex";
 });
-
+// Abrir modal de Alta de Producto
+btnAbrirProducto.addEventListener("click", () => {
+    const yaVisible = modalProducto.style.display === "flex";
+    cerrarTodosLosModales();
+    if (!yaVisible) modalProducto.style.display = "flex";
+});
 
 // También cierra el modal si se presiona Cancelar o Confirmar
 btnCancelarEmpleado.addEventListener("click", () => {
