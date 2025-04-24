@@ -75,7 +75,8 @@
                         <td class="col-4">Descuento</td>
                         <td class="col-4">Total neto <p id="total-neto"></p></td>
                     </tr>
-                    
+                    <a href="http://localhost:3000/tickets/ticket-123.pdf" download>Descargar Ticket</a>
+
                 </tfoot>
             </table>
             <div class="row d-flex align-content-center  flex-nowrap container-fluid">
@@ -83,7 +84,16 @@
                 <button id="aplicar-venta" class="col-6 boton-venta" style="margin-right: 10px ;border-radius: 0px 10px 10px 0px;border-left: 5px;"><i class="bi bi-cart"></i>Aplicar venta</button>    
             </div>  
         </div>
-
+        <!-- Modal para mostrar el QR del ticket -->
+        <div id="modal-ticket" class="modal-qr">
+            <div class="modal-content-qr">
+            <span id="cerrar-modal-ticket" class="close-qr">&times;</span>
+            <h3>Ticket generado</h3>
+            <p>Escanea el QR o <a id="descargar-ticket" href="#" download target="_blank">descarga el ticket</a></p>
+            <img id="qr-image-ticket" src="" alt="QR del ticket" />
+            </div>
+        </div>
+  
         <div class="col-xl-4 col-lg-3 botones">
             <div class="row d-flex flex-nowrap">
                 <!-- Formulario para mostrar el numero y nombre del cajero -->

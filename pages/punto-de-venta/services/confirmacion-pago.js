@@ -109,7 +109,8 @@ botonConfirmar.addEventListener('click', async () => {
         tipoPago,
         cliente: document.getElementById("nombre-cliente").textContent || 'General',
     };
-
+   
+    
     try {
         const response = await fetch('http://localhost:3000/ventas', {
             method: 'POST',
@@ -121,6 +122,17 @@ botonConfirmar.addEventListener('click', async () => {
 
         if (resultado.success) {
             alert("Venta completada con éxito");
+            // Mostrar modal con QR
+            const qrImg = document.getElementById("qr-image-ticket");
+            const ticketLink = document.getElementById("descargar-ticket");
+            const modal = document.getElementById("modal-ticket");
+        
+            qrImg.src = resultado.qrImage;
+            ticketLink.href = resultado.ticketUrl;
+        
+            modal.style.display = "flex";
+        
+            // Limpiar interfaz
             document.querySelector(".contenedor-pago").style.display = "none";
             limpiarInterfazVenta();
         } else {
@@ -129,6 +141,7 @@ botonConfirmar.addEventListener('click', async () => {
     } catch (error) {
         console.error("Error al enviar la venta:", error);
     }
+    
 });
 
 
@@ -210,4 +223,30 @@ document.getElementById('mercado-pago').addEventListener('keypress', async (e) =
     }
   });
   
+
+
+  async function generarQR() {
+    const idVenta = document.getElementById("id-venta-generada").value;
+  
+    const response = await fetch('http://localhost:3000/generar-ticket', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        idVenta,
+        productos: [
+          { descripcion: 'Producto A', cantidad: 2, precio: 25 },
+          { descripcion: 'Producto B', cantidad: 1, precio: 40 }
+        ],
+        total: 90
+      })
+    });
+  
+    const result = await response.json();
+  
+    if (result.success) {
+      document.getElementById('qr-ticket').src = result.qrImage;
+    }
+  }
   

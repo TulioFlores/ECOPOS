@@ -133,7 +133,10 @@ function mostrarEmpleado(empleado){
 }
 
 
-
-
+//Modal para cerrar la ventana del ticket
+document.getElementById("cerrar-modal-ticket").addEventListener("click", () => {
+    document.getElementById("modal-ticket").style.display = "none";
+  });
+  
 
 

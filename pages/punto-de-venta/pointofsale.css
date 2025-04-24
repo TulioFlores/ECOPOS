@@ -397,7 +397,42 @@ form .row {
     background-color: #f0f0f0;
 }
 
-
+.modal-qr {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0,0,0,0.6);
+    justify-content: center;
+    align-items: center;
+  }
+  /*Modal para el qr del ticket*/
+  .modal-content-qr {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    text-align: center;
+    position: relative;
+    max-width: 400px;
+    width: 90%;
+  }
+  
+  .modal-content-qr img {
+    max-width: 200px;
+    margin-top: 10px;
+  }
+  
+  .close-qr {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    font-size: 24px;
+    cursor: pointer;
+  }
+  
 @media screen and  (max-width: 980px) {
     #alta-empleado{
         height: 85vh;

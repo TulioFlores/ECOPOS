@@ -5,6 +5,9 @@ import path from 'path';
 import bcrypt from 'bcrypt';
 import mercadopago from 'mercadopago';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
+import PDFDocument from 'pdfkit';
+import QRCode from 'qrcode';
 const app = express();
 const port = 3000;
 
@@ -60,6 +63,14 @@ app.get('/register', (req, res) => {
 app.get('/login-password', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages','inicio-de-sesion', 'login-password.html'));
 });
+
+app.use('/tickets', express.static(path.join(__dirname, 'tickets'))); // Carpeta para exponer PDFs
+
+// Crear carpeta si no existe
+const ticketsPath = path.join(__dirname, 'tickets');
+if (!fs.existsSync(ticketsPath)) {
+  fs.mkdirSync(ticketsPath);
+}
 // Endpoint para obtener un producto por ID usando el Stored Procedure
 app.get('/producto/:id', (req, res) => {
     const idProducto = req.params.id;
@@ -235,11 +246,43 @@ app.post('/ventas', async (req, res) => {
 
                 Promise.all(updateStockTasks)
                     .then(() => {
-                        connection.commit(err => {
+                        connection.commit(async err => {
                             if (err) {
                                 return connection.rollback(() => res.status(500).json({ error: 'Error al confirmar venta.' }));
                             }
-                            res.json({ success: true, id_venta });
+
+                            const ticketDir = path.join(__dirname, 'tickets');
+                            if (!fs.existsSync(ticketDir)) {
+                                fs.mkdirSync(ticketDir);
+                            }
+
+                            // Generar el PDF
+                            const pdfPath = path.join(ticketDir, `ticket-${id_venta}.pdf`);
+                            const doc = new PDFDocument();
+                            doc.pipe(fs.createWriteStream(pdfPath));
+
+                            // Contenido del ticket
+                            doc.fontSize(18).text(`Ticket de Venta #${id_venta}`, { align: 'center' }).moveDown();
+                            productos.forEach(p => {
+                                doc.fontSize(12).text(`${p.nombre} x${p.cantidad} - $${(p.precio * p.cantidad).toFixed(2)}`);
+                            });
+                            doc.moveDown().fontSize(14).text(`Total: $${total.toFixed(2)}`, { align: 'right' });
+                            doc.text(`Pago: $${pagado.toFixed(2)}`, { align: 'right' });
+                            doc.text(`Cambio: $${(pagado - total).toFixed(2)}`, { align: 'right' });
+                            doc.text(`Método de pago: ${tipoPago}`, { align: 'right' });
+                            doc.end();
+
+                            // Generar URL de descarga y QR
+                            const ticketUrl = `http://localhost:3000/tickets/ticket-${id_venta}.pdf`;
+                            const qrImage = await QRCode.toDataURL(ticketUrl);
+
+                            // Enviar respuesta final
+                            res.json({
+                                success: true,
+                                id_venta,
+                                ticketUrl,
+                                qrImage
+                            });
                         });
                     })
                     .catch(error => {
@@ -447,4 +490,36 @@ app.post('/mercadoqr', async (req, res) => {
       console.error(error);
       res.status(500).json({ error: 'Error al generar el QR' });
     }
+  });
+
+
+  app.post('/generar-ticket', async (req, res) => {
+    const { idVenta, productos, total } = req.body;
+  
+    const pdfPath = path.join(ticketsPath, `ticket-${idVenta}.pdf`);
+    const doc = new PDFDocument();
+    doc.pipe(fs.createWriteStream(pdfPath));
+  
+    // Encabezado
+    doc.fontSize(18).text(`Ticket de Venta #${idVenta}`, { align: 'center' }).moveDown();
+  
+    // Lista de productos
+    productos.forEach(p => {
+      doc.fontSize(12).text(`${p.descripcion} x${p.cantidad} - $${(p.precio * p.cantidad).toFixed(2)}`);
+    });
+  
+    doc.moveDown();
+    doc.fontSize(14).text(`Total: $${total.toFixed(2)}`, { align: 'right' });
+  
+    doc.end();
+  
+    // Generar QR que apunte a la ruta de descarga
+    const url = `http://localhost:3000/tickets/ticket-${idVenta}.pdf`;
+    const qr = await QRCode.toDataURL(url);
+  
+    res.json({
+      success: true,
+      downloadUrl: url,
+      qrImage: qr // base64 para mostrar directamente en <img>
+    });
   });
