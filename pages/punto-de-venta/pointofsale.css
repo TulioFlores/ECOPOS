@@ -432,6 +432,25 @@ form .row {
     font-size: 24px;
     cursor: pointer;
   }
+/*alerta*/
+  .alerta-venta {
+    position: fixed;
+    bottom: 20px;
+    right: 0px;
+    background-color: #f44336; /* rojo por defecto (error) */
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    font-weight: bold;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+    z-index: 9999;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.alerta-venta.success {
+    background-color: #4CAF50; /* verde para éxito */
+}
+
   
 @media screen and  (max-width: 980px) {
     #alta-empleado{

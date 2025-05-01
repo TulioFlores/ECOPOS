@@ -110,6 +110,12 @@
 #mercado-pago{
     all: unset;
 }
+#input-efectivo{
+    all: unset;
+}
+#input-tarjeta{
+    all: unset;
+}
 
 .qr-modal .modal-content {
     padding: 20px;

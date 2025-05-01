@@ -139,4 +139,18 @@ document.getElementById("cerrar-modal-ticket").addEventListener("click", () => {
   });
   
 
+//Modal para alerta
+  function mostrarAlerta(mensaje, tipo = 'error') {
+    const alerta = document.getElementById("alerta");
+    const texto = document.getElementById("alerta-mensaje");
 
+    alerta.className = 'alerta-venta'; // reset
+    if (tipo === 'success') alerta.classList.add('success');
+
+    texto.textContent = mensaje;
+    alerta.style.display = 'block';
+
+    setTimeout(() => {
+        alerta.style.display = 'none';
+    }, 3000);
+}

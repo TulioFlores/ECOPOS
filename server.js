@@ -8,9 +8,18 @@ import { fileURLToPath } from 'url';
 import fs from 'fs';
 import PDFDocument from 'pdfkit';
 import QRCode from 'qrcode';
+import http from 'http';
+import { Server } from 'socket.io';
 const app = express();
 const port = 3000;
 
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*" // 👈 Permitir conexión de todos lados en pruebas
+  }
+});
 // Middleware para permitir peticiones desde el navegador
 app.use(cors());
 app.use(express.json());
@@ -22,6 +31,18 @@ const connection = mysql.createConnection({
     password: '',
     database: 'negocio_1'
 });
+
+// WebSocket conexión
+io.on('connection', (socket) => {
+  console.log('✅ Cliente conectado a WebSocket');
+
+  socket.on('disconnect', () => {
+      console.log('❌ Cliente desconectado');
+  });
+});
+
+// Exporta io para usarlo en tu webhook
+export { io };
 
 connection.connect(err => {
     if (err) {
@@ -65,7 +86,14 @@ app.get('/login-password', (req, res) => {
 });
 
 app.use('/tickets', express.static(path.join(__dirname, 'tickets'))); // Carpeta para exponer PDFs
-
+// // Iniciar el servidor
+// app.listen(port, () => {
+//     console.log(`Servidor corriendo en http://localhost:${port}`);
+// });
+// Iniciar servidor
+server.listen(3000, () => {
+  console.log('Servidor escuchando en http://localhost:3000');
+});
 // Crear carpeta si no existe
 const ticketsPath = path.join(__dirname, 'tickets');
 if (!fs.existsSync(ticketsPath)) {
@@ -181,117 +209,117 @@ app.get('/clientes/sugerencias/:telefono', (req, res) => {
 });
 
 
-// Iniciar el servidor
-app.listen(port, () => {
-    console.log(`Servidor corriendo en http://localhost:${port}`);
-});
 
-//Api para realizar la venta
+
 
 app.post('/ventas', async (req, res) => {
-    const { productos, total, tipoPago, cliente, pagado } = req.body;
+  const { productos, total, cliente, pagado, porPagar, cambio, tipoPago } = req.body;
 
-    if (!tipoPago || !productos || productos.length === 0 || pagado === 0) {
-        return res.status(400).json({ error: 'Datos incompletos para registrar la venta.' });
-    }
+  if (!tipoPago || productos.length === 0 || pagado <= 0) {
+    return res.status(400).json({ error: 'Datos incompletos para registrar la venta.' });
+  }
 
-    // Asignar valores de cliente y empleado (ajustar lógica si se requiere autenticación)
-    const id_cliente = null; // Por ahora se puede dejar null si es "General"
-    const id_empleado = null; // Puedes asignar desde sesión si lo manejas
+  const id_cliente = null;
+  const id_empleado = null;
 
-    connection.beginTransaction(err => {
-        if (err) return res.status(500).json({ error: 'Error al iniciar transacción.' });
+  connection.beginTransaction(err => {
+    if (err) return res.status(500).json({ error: 'Error al iniciar transacción.' });
 
-        const ventaQuery = `
-            INSERT INTO Ventas (id_cliente, id_empleado, metodo_pago, estado)
-            VALUES (?, ?, ?, 'Completada')
-        `;
-        connection.query(ventaQuery, [id_cliente, id_empleado, tipoPago], (err, result) => {
-            if (err) {
-                return connection.rollback(() => res.status(500).json({ error: 'Error al insertar venta.' }));
+    const ventaQuery = `
+      INSERT INTO ventas (id_cliente, id_empleado, total, pagado, por_pagar, cambio, cliente)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+
+    connection.query(ventaQuery, [id_cliente, id_empleado, total, pagado, porPagar, cambio, cliente], (err, result) => {
+      if (err) return connection.rollback(() => res.status(500).json({ error: 'Error al insertar venta.' }));
+
+      const id_venta = result.insertId;
+      const detalleValues = productos.map(p => [id_venta, p.id, p.cantidad, p.precio]);
+
+      connection.query(`INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio_unitario) VALUES ?`, [detalleValues], (err) => {
+        if (err) return connection.rollback(() => res.status(500).json({ error: 'Error al insertar detalle de venta.' }));
+
+        const updateStock = productos.map(p => new Promise((resolve, reject) => {
+          connection.query(
+            `UPDATE productos SET stock = stock - ? WHERE id_producto = ? AND stock >= ?`,
+            [p.cantidad, p.id, p.cantidad],
+            (err, result) => {
+              if (err || result.affectedRows === 0) return reject(`Error al actualizar stock para ${p.id}`);
+              resolve();
             }
+          );
+        }));
 
-            const id_venta = result.insertId;
+        Promise.all(updateStock)
+          .then(() => {
+            const pagos = Array.isArray(tipoPago) ? tipoPago : [{ metodo: tipoPago, monto: pagado }];
+            const insertarPagos = pagos.map(tp => new Promise((resolve, reject) => {
+              connection.query('SELECT id_tipo_pago FROM tipo_pago WHERE descripcion = ?', [tp.metodo], (err, results) => {
+                if (err || !results.length) return reject(`No se encontró el tipo de pago: ${tp.metodo}`);
+                connection.query(`INSERT INTO pagos (id_venta, id_tipo_pago, monto) VALUES (?, ?, ?)`,
+                  [id_venta, results[0].id_tipo_pago, tp.monto], (err) => {
+                    if (err) return reject('Error al insertar pago.');
+                    resolve();
+                  });
+              });
+            }));
 
-            const detalleQuery = `
-                INSERT INTO Detalle_Venta (id_venta, id_producto, cantidad, precio_unitario)
-                VALUES ?
-            `;
-            const detalleValues = productos.map(item => [
-                id_venta,
-                item.id,
-                item.cantidad,
-                item.precio
-            ]);
+            Promise.all(insertarPagos)
+              .then(async () => {
+                connection.commit(async err => {
+                  if (err) return connection.rollback(() => res.status(500).json({ error: 'Error al confirmar venta.' }));
 
-            connection.query(detalleQuery, [detalleValues], (err) => {
-                if (err) {
-                    return connection.rollback(() => res.status(500).json({ error: 'Error al insertar detalle de venta.' }));
-                }
+                  // Generar ticket
+                  const ticketDir = path.join(__dirname, 'tickets');
+                  if (!fs.existsSync(ticketDir)) fs.mkdirSync(ticketDir);
 
-                const updateStockTasks = productos.map(item => {
-                    return new Promise((resolve, reject) => {
-                        const updateQuery = `
-                            UPDATE Productos SET stock = stock - ?
-                            WHERE id_producto = ? AND stock >= ?
-                        `;
-                        connection.query(updateQuery, [item.cantidad, item.id, item.cantidad], (err, result) => {
-                            if (err || result.affectedRows === 0) {
-                                return reject(`Error al actualizar stock para el producto ${item.id}`);
-                            }
-                            resolve();
-                        });
-                    });
+                  const pdfPath = path.join(ticketDir, `ticket-${id_venta}.pdf`);
+                  const doc = new PDFDocument({ margin: 20, size: [250, 600] });
+                  doc.pipe(fs.createWriteStream(pdfPath));
+
+                  doc.fontSize(14).text('ECO POS', { align: 'center' });
+                  doc.fontSize(10).text('RFC: ECO123456789', { align: 'center' });
+                  doc.text('Calle Principal #123', { align: 'center' });
+                  doc.text('Tel: 312-123-4567', { align: 'center' });
+                  doc.moveDown();
+
+                  doc.text(`Fecha: ${new Date().toLocaleString('es-MX')}`);
+                  doc.text(`Ticket No: ${id_venta}`);
+                  doc.text(`Cliente: ${cliente}`);
+                  doc.moveDown().text('------------------------------------------');
+
+                  productos.forEach(p => {
+                    const line = `${p.nombre} x${p.cantidad} $${parseFloat(p.precio).toFixed(2)}`;
+                    const total = `$${(p.precio * p.cantidad).toFixed(2)}`;
+                    doc.text(line, { continued: true }).text(total, { align: 'right' });
+                  });
+
+                  doc.moveDown().text('------------------------------------------');
+                  doc.text(`Total: $${total.toFixed(2)}`, { align: 'right' });
+                  doc.text(`Pagado: $${pagado.toFixed(2)}`, { align: 'right' });
+                  doc.text(`Cambio: $${cambio.toFixed(2)}`, { align: 'right' });
+
+                  doc.moveDown().fontSize(11).text('¡Gracias por su compra!', { align: 'center' });
+
+                  const ticketUrl = `http://localhost:3000/tickets/ticket-${id_venta}.pdf`;
+                  const qrImage = await QRCode.toDataURL(ticketUrl);
+                  const base64 = qrImage.replace(/^data:image\/png;base64,/, '');
+                  const buffer = Buffer.from(base64, 'base64');
+                  doc.image(buffer, { width: 100, align: 'center' });
+                  doc.end();
+
+                  res.json({ success: true, id_venta, ticketUrl, qrImage });
                 });
-
-                Promise.all(updateStockTasks)
-                    .then(() => {
-                        connection.commit(async err => {
-                            if (err) {
-                                return connection.rollback(() => res.status(500).json({ error: 'Error al confirmar venta.' }));
-                            }
-
-                            const ticketDir = path.join(__dirname, 'tickets');
-                            if (!fs.existsSync(ticketDir)) {
-                                fs.mkdirSync(ticketDir);
-                            }
-
-                            // Generar el PDF
-                            const pdfPath = path.join(ticketDir, `ticket-${id_venta}.pdf`);
-                            const doc = new PDFDocument();
-                            doc.pipe(fs.createWriteStream(pdfPath));
-
-                            // Contenido del ticket
-                            doc.fontSize(18).text(`Ticket de Venta #${id_venta}`, { align: 'center' }).moveDown();
-                            productos.forEach(p => {
-                                doc.fontSize(12).text(`${p.nombre} x${p.cantidad} - $${(p.precio * p.cantidad).toFixed(2)}`);
-                            });
-                            doc.moveDown().fontSize(14).text(`Total: $${total.toFixed(2)}`, { align: 'right' });
-                            doc.text(`Pago: $${pagado.toFixed(2)}`, { align: 'right' });
-                            doc.text(`Cambio: $${(pagado - total).toFixed(2)}`, { align: 'right' });
-                            doc.text(`Método de pago: ${tipoPago}`, { align: 'right' });
-                            doc.end();
-
-                            // Generar URL de descarga y QR
-                            const ticketUrl = `http://localhost:3000/tickets/ticket-${id_venta}.pdf`;
-                            const qrImage = await QRCode.toDataURL(ticketUrl);
-
-                            // Enviar respuesta final
-                            res.json({
-                                success: true,
-                                id_venta,
-                                ticketUrl,
-                                qrImage
-                            });
-                        });
-                    })
-                    .catch(error => {
-                        connection.rollback(() => res.status(400).json({ error: error.toString() }));
-                    });
-            });
-        });
+              })
+              .catch(error => connection.rollback(() => res.status(400).json({ error: error.toString() })));
+          })
+          .catch(error => connection.rollback(() => res.status(400).json({ error: error.toString() })));
+      });
     });
+  });
 });
+
+
 
 // Endpoint para obtener la fecha y hora del servidor
 app.get('/hora-servidor', (req, res) => {
@@ -475,15 +503,12 @@ app.post('/mercadoqr', async (req, res) => {
             unit_price: parseFloat(monto),
           },
         ],
-        payment_methods: {
-          excluded_payment_types: [{ id: "ticket" }],
-          installments: 1
-        },
         back_urls: {
           success: "http://localhost:3000/confirmacion",
         },
+        notification_url: "https://d85a-189-195-132-181.ngrok-free.app/webhook", // ✅ válida aquí
       });
-  
+      
       const qr_url = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${preference.body.init_point}`;
       res.json({ qr_url });
     } catch (error) {
@@ -523,3 +548,28 @@ app.post('/mercadoqr', async (req, res) => {
       qrImage: qr // base64 para mostrar directamente en <img>
     });
   });
+
+  // Webhook para Mercado Pago
+app.post('/webhook', async (req, res) => {
+  const { type, data } = req.body;
+
+  if (type === 'payment') {
+    const paymentId = data.id;
+
+    try {
+      const payment = await mercadopago.payment.findById(paymentId);
+
+      if (payment.body.status === 'approved') {
+        console.log('✅ Pago aprobado. Emitiendo evento por WebSocket...');
+        io.emit('pago-aprobado', {
+          monto: payment.body.transaction_amount
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error consultando pago:', error);
+    }
+  }
+
+  res.sendStatus(200);
+});
+
