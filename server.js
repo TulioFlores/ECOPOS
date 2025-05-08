@@ -289,9 +289,16 @@ app.post('/ventas', async (req, res) => {
                   });
                 
                   doc.moveDown().text('------------------------------------------');
-                  doc.text(`Total: $${total.toFixed(2)}`, { align: 'right' });
+
+                  const subtotal = total / 1.16;
+                  const iva = total - subtotal;
+
+                  doc.text(`Subtotal: $${subtotal.toFixed(2)}`, { align: 'right' });
+                  doc.text(`IVA (16%): $${iva.toFixed(2)}`, { align: 'right' });
+                  doc.text(`Total (con IVA): $${total.toFixed(2)}`, { align: 'right' });
                   doc.text(`Pagado: $${pagado.toFixed(2)}`, { align: 'right' });
                   doc.text(`Cambio: $${cambio.toFixed(2)}`, { align: 'right' });
+
                 
                   // 🔄 Consultar métodos de pago REALES desde BD
                   connection.query(`

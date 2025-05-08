@@ -165,8 +165,9 @@ document.addEventListener('DOMContentLoaded', () => {
         modalCierre.hide();
         const modalElement = document.getElementById('modal-corte-cajero');
         const modalCorte = bootstrap.Modal.getInstance(modalElement);
-        modalCorte.hide(); // Esto lo cierra
-
+        modalCorte.hide();
+        localStorage.removeItem('cajero');
+        window.location.href= '/configuracion';
       } else {
         alert('Error al registrar el cierre.');
       }
@@ -175,5 +176,4 @@ document.addEventListener('DOMContentLoaded', () => {
       alert('Error en la conexión con el servidor.');
     }
   });
-  
 });
