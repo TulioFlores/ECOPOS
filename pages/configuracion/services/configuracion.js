@@ -28,7 +28,7 @@ document.getElementById('abrirCapturaVenta').addEventListener('click', () => {
             username: data.empleado.username,
             nombre: data.empleado.nombre_completo
           }));
-        
+          
           // Redirige al punto de venta
           window.location.href = '/pointofsale';
         }else {

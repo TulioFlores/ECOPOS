@@ -11,7 +11,7 @@ import QRCode from 'qrcode';
 import http from 'http';
 import { Server } from 'socket.io';
 const app = express();
-const port = 3000;
+
 
 
 const server = http.createServer(app);
@@ -170,7 +170,6 @@ app.get('/empleado/:id', (req, res) => {
         }
     });
 });
-
 // Endpoint para obtener un cliente por numero de telefono
 app.get('/cliente/:telefono', (req, res) => {
     const telefono = req.params.telefono;
@@ -184,9 +183,9 @@ app.get('/cliente/:telefono', (req, res) => {
         if (results[0].length > 0) {
             const cliente = {
                 nombre: results[0][0].nombre_completo,
-                telefono: results[0][0].telefono
+                telefono: results[0][0].telefono,
+                id_cliente: results[0][0].id_cliente
             };
-            console.log(cliente)
             res.json(cliente);
         } else {
             res.status(404).json({ error: 'Producto no encontrado' });
@@ -213,24 +212,20 @@ app.get('/clientes/sugerencias/:telefono', (req, res) => {
 
 
 app.post('/ventas', async (req, res) => {
-  const { productos, total, cliente, pagado, porPagar, cambio, tipoPago } = req.body;
-
+  const { productos, total, cliente, pagado, porPagar, cambio, tipoPago, empleado,  nom_cliente } = req.body;
   if (!tipoPago || productos.length === 0 || pagado <= 0) {
     return res.status(400).json({ error: 'Datos incompletos para registrar la venta.' });
   }
-
-  const id_cliente = null;
-  const id_empleado = null;
 
   connection.beginTransaction(err => {
     if (err) return res.status(500).json({ error: 'Error al iniciar transacción.' });
 
     const ventaQuery = `
-      INSERT INTO ventas (id_cliente, id_empleado, total, pagado, por_pagar, cambio, cliente)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
+      INSERT INTO ventas (total, pagado, por_pagar, cambio, id_cliente, id_empleado)
+      VALUES (?, ?, ?, ?, ?, ?)
     `;
 
-    connection.query(ventaQuery, [id_cliente, id_empleado, total, pagado, porPagar, cambio, cliente], (err, result) => {
+    connection.query(ventaQuery, [total, pagado, porPagar, cambio, cliente , empleado, ], (err, result) => {
       if (err) return connection.rollback(() => res.status(500).json({ error: 'Error al insertar venta.' }));
 
       const id_venta = result.insertId;
@@ -268,47 +263,62 @@ app.post('/ventas', async (req, res) => {
               .then(async () => {
                 connection.commit(async err => {
                   if (err) return connection.rollback(() => res.status(500).json({ error: 'Error al confirmar venta.' }));
-
-                  // Generar ticket
+                
                   const ticketDir = path.join(__dirname, 'tickets');
                   if (!fs.existsSync(ticketDir)) fs.mkdirSync(ticketDir);
-
+                
                   const pdfPath = path.join(ticketDir, `ticket-${id_venta}.pdf`);
                   const doc = new PDFDocument({ margin: 20, size: [250, 600] });
                   doc.pipe(fs.createWriteStream(pdfPath));
-
+                
                   doc.fontSize(14).text('ECO POS', { align: 'center' });
                   doc.fontSize(10).text('RFC: ECO123456789', { align: 'center' });
                   doc.text('Calle Principal #123', { align: 'center' });
                   doc.text('Tel: 312-123-4567', { align: 'center' });
                   doc.moveDown();
-
+                
                   doc.text(`Fecha: ${new Date().toLocaleString('es-MX')}`);
                   doc.text(`Ticket No: ${id_venta}`);
-                  doc.text(`Cliente: ${cliente}`);
+                  doc.text(`Cliente: ${nom_cliente}`);
                   doc.moveDown().text('------------------------------------------');
-
+                
                   productos.forEach(p => {
                     const line = `${p.nombre} x${p.cantidad} $${parseFloat(p.precio).toFixed(2)}`;
                     const total = `$${(p.precio * p.cantidad).toFixed(2)}`;
                     doc.text(line, { continued: true }).text(total, { align: 'right' });
                   });
-
+                
                   doc.moveDown().text('------------------------------------------');
                   doc.text(`Total: $${total.toFixed(2)}`, { align: 'right' });
                   doc.text(`Pagado: $${pagado.toFixed(2)}`, { align: 'right' });
                   doc.text(`Cambio: $${cambio.toFixed(2)}`, { align: 'right' });
-
-                  doc.moveDown().fontSize(11).text('¡Gracias por su compra!', { align: 'center' });
-
-                  const ticketUrl = `http://localhost:3000/tickets/ticket-${id_venta}.pdf`;
-                  const qrImage = await QRCode.toDataURL(ticketUrl);
-                  const base64 = qrImage.replace(/^data:image\/png;base64,/, '');
-                  const buffer = Buffer.from(base64, 'base64');
-                  doc.image(buffer, { width: 100, align: 'center' });
-                  doc.end();
-
-                  res.json({ success: true, id_venta, ticketUrl, qrImage });
+                
+                  // 🔄 Consultar métodos de pago REALES desde BD
+                  connection.query(`
+                    SELECT tp.descripcion AS metodo, p.monto
+                    FROM pagos p
+                    JOIN tipo_pago tp ON p.id_tipo_pago = tp.id_tipo_pago
+                    WHERE p.id_venta = ?
+                  `, [id_venta], async (err, pagosRegistrados) => {
+                    if (err) return res.status(500).json({ error: 'Error al obtener métodos de pago' });
+                
+                    doc.moveDown().text('Métodos de pago:', { underline: true });
+                    pagosRegistrados.forEach(p => {
+                      doc.text(`${p.metodo}: $${parseFloat(p.monto).toFixed(2)}`);
+                    });
+                
+                    doc.moveDown().fontSize(11).text('¡Gracias por su compra!', { align: 'center' });
+                
+                    const ticketUrl = `http://localhost:3000/tickets/ticket-${id_venta}.pdf`;
+                    const qrImage = await QRCode.toDataURL(ticketUrl);
+                    const base64 = qrImage.replace(/^data:image\/png;base64,/, '');
+                    const buffer = Buffer.from(base64, 'base64');
+                    doc.image(buffer, { width: 100, align: 'center' });
+                
+                    doc.end();
+                
+                    res.json({ success: true, id_venta, ticketUrl, qrImage });
+                  });
                 });
               })
               .catch(error => connection.rollback(() => res.status(400).json({ error: error.toString() })));
@@ -343,24 +353,40 @@ app.get('/hora-servidor', (req, res) => {
   // Registrar nuevo cliente
 // Ruta para registrar un nuevo cliente
 app.post('/cliente', (req, res) => {
-    const { nombre_completo, telefono, correo } = req.body;
+  const { nombre_completo, telefono, correo } = req.body;
 
-    if (!nombre_completo || !telefono || !correo) {
-        return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
-    }
+  if (!nombre_completo || !telefono || !correo) {
+      return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+  }
 
-    const query = 'INSERT INTO clientes (nombre_completo, telefono, correo, fecha_registro) VALUES (?, ?, ?, NOW())';
-    const values = [nombre_completo, telefono, correo];
+  // Verificar si el teléfono ya existe
+  const checkQuery = 'SELECT id_cliente FROM clientes WHERE telefono = ?';
+  connection.query(checkQuery, [telefono], (checkErr, checkResults) => {
+      if (checkErr) {
+          console.error('Error al verificar teléfono:', checkErr);
+          return res.status(500).json({ error: 'Error al verificar el teléfono.' });
+      }
 
-    connection.query(query, values, (err, results) => {
-        if (err) {
-            console.error('Error al insertar cliente:', err);
-            return res.status(500).json({ error: 'Error al registrar cliente.' });
-        }
+      if (checkResults.length > 0) {
+          return res.status(409).json({ error: 'El número de teléfono ya está registrado.' });
+      }
 
-        res.status(201).json({ mensaje: 'Cliente registrado exitosamente', id_cliente: results.insertId });
-    });
+      // Insertar nuevo cliente
+      const insertQuery = 'INSERT INTO clientes (nombre_completo, telefono, correo, fecha_registro) VALUES (?, ?, ?, NOW())';
+      const values = [nombre_completo, telefono, correo];
+
+      connection.query(insertQuery, values, (insertErr, results) => {
+          if (insertErr) {
+              console.error('Error al insertar cliente:', insertErr);
+              return res.status(500).json({ error: 'Error al registrar cliente.' });
+          }
+
+          res.status(201).json({ mensaje: 'Cliente registrado exitosamente', id_cliente: results.insertId });
+      });
+  });
 });
+
+
 
 
 
@@ -428,8 +454,6 @@ app.post('/altaempleados', (req, res) => {
 
 
 
-  //Api para login local
-
   app.post('/login', (req, res) => {
     const { username, contrasena } = req.body;
   
@@ -449,17 +473,63 @@ app.post('/altaempleados', (req, res) => {
       const empleado = results[0];
       const valid = await bcrypt.compare(contrasena, empleado.contrasena_hash);
       if (!valid) return res.status(401).json({ error: 'Contraseña incorrecta' });
-      res.json({
-        success: true,
-        empleado: {
-          id_empleado: empleado.id_empleado,
-          username: empleado.username,
-          nombre_completo: empleado.nombre_completo
+  
+      // Buscar si ya existe una apertura de caja hoy
+      const hoy = new Date();
+      const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 0, 0, 0); // 00:00:00 de hoy
+  
+      const checkQuery = `
+      SELECT m1.id FROM movimientos_caja m1
+      WHERE m1.id_empleado = ? AND m1.id_tipo_movimiento = 1
+      AND NOT EXISTS (
+        SELECT 1 FROM movimientos_caja m2
+        WHERE m2.id_empleado = m1.id_empleado
+          AND m2.id_tipo_movimiento = 2
+          AND m2.fecha > m1.fecha
+      )
+      ORDER BY m1.fecha DESC
+      LIMIT 1
+    `;
+  
+      connection.query(checkQuery, [empleado.id_empleado, inicioDia], (checkErr, checkResults) => {
+        if (checkErr) return res.status(500).json({ error: 'Error al verificar apertura de caja' });
+  
+        if (checkResults.length === 0) {
+          // No hay apertura hoy, insertarla
+          const insertQuery = `
+            INSERT INTO movimientos_caja (id_empleado, id_tipo_movimiento, fecha)
+            VALUES (?, 1, NOW())
+          `;
+          connection.query(insertQuery, [empleado.id_empleado], (insertErr) => {
+            if (insertErr) return res.status(500).json({ error: 'Error al registrar apertura de caja' });
+  
+            // Enviar respuesta con apertura registrada
+            res.json({
+              success: true,
+              apertura_registrada: true,
+              empleado: {
+                id_empleado: empleado.id_empleado,
+                username: empleado.username,
+                nombre_completo: empleado.nombre_completo
+              }
+            });
+          });
+        } else {
+          // Ya había apertura registrada hoy
+          res.json({
+            success: true,
+            apertura_registrada: false,
+            empleado: {
+              id_empleado: empleado.id_empleado,
+              username: empleado.username,
+              nombre_completo: empleado.nombre_completo
+            }
+          });
         }
       });
-      
     });
   });
+  
 
   // Ruta para agregar producto
 app.post('/agregar-producto', (req, res) => {
@@ -572,4 +642,123 @@ app.post('/webhook', async (req, res) => {
 
   res.sendStatus(200);
 });
+
+app.post('/retiros', (req, res) => {
+  const { cantidad, motivo, username, contraseña } = req.body;
+
+  if (!cantidad || !motivo || !username || !contraseña) {
+    return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+  }
+
+  // Buscar cajero
+  connection.query('SELECT id_empleado, contrasena_hash FROM empleados WHERE username = ?', [username], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error en la consulta.' });
+    if (results.length === 0) return res.status(404).json({ error: 'Cajero no encontrado.' });
+
+    const empleado = results[0];
+    
+    // Comparar contraseñas
+    bcrypt.compare(contraseña, empleado.contrasena_hash, (err, coinciden) => {
+      if (err || !coinciden) return res.status(401).json({ error: 'Contraseña incorrecta.' });
+
+      // Ejecutar el SP
+      connection.query('CALL sp_registrar_retiro(?, ?, ?)', [cantidad, motivo, empleado.id_empleado], (err) => {
+        if (err) return res.status(500).json({ error: 'Error al registrar el retiro.' });
+
+        res.json({ success: true, message: 'Retiro registrado correctamente.' });
+      });
+    });
+  });
+});
+
+
+//Api para ver todos los productos
+app.get('/productos', (req, res) => {
+  connection.query('SELECT * FROM productos', (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error al obtener productos.' });
+    res.json(results);
+  });
+});
+
+// Ruta para autenticar cajero
+app.post('/autenticar-cajero', (req, res) => {
+  const { usuario, contrasena } = req.body;
+
+  if (!usuario || !contrasena) {
+    return res.status(400).json({ error: 'Usuario y contraseña requeridos' });
+  }
+
+  const query = 'SELECT * FROM empleados WHERE username = ?'; // o usa nombre_usuario si así lo tienes
+
+  connection.query(query, [usuario], (err, results) => {
+    if (err) return res.status(500).json({ error: 'Error en la base de datos' });
+    if (results.length === 0) return res.status(401).json({ error: 'Usuario no encontrado' });
+
+    const empleado = results[0];
+
+    bcrypt.compare(contrasena, empleado.contrasena_hash, (err, valid) => {
+      if (err || !valid) return res.status(401).json({ error: 'Contraseña incorrecta' });
+
+      // Si todo está bien, responder con los datos necesarios para el corte
+      res.json({ success: true, empleado: { id: empleado.id_empleado, nombre: empleado.nombre } });
+    });
+  });
+});
+//mostrar el resumen del turno
+app.post('/resumen-turno', async (req, res) => {
+  const { username } = req.body;
+  if (!username) return res.status(400).json({ error: 'Usuario requerido' });
+
+  try {
+    connection.query('CALL sp_resumen_turno_usuario(?)', [username], (err, results) => {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: 'Error al ejecutar SP' });
+      }
+
+      // El resultado viene como un arreglo de arreglos
+      const resumen = results[0][0] || {};  // Primer resultado del primer recordset
+
+      res.json({
+        efectivo: resumen.total_efectivo || 0,
+        tarjeta: resumen.total_tarjeta || 0,
+        mercado_pago: resumen.total_mercado_pago || 0,
+        retiros: resumen.total_retiros || 0,
+        total_venta: resumen.total || 0
+      });
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+});
+
+app.post('/api/aplicar-cierre', (req, res) => {
+  const { id_empleado, faltante, sobrante, montoCorrecto } = req.body;
+
+  if (!id_empleado || montoCorrecto === undefined) {
+    return res.status(400).json({ success: false, error: 'Datos incompletos' });
+  }
+
+  connection.query(
+    `INSERT INTO movimientos_caja (id_tipo_movimiento, fecha, id_empleado, Faltante, Sobrante, MontoCorrecto)
+     VALUES (2, NOW(), ?, ?, ?, ?)`,
+    [id_empleado, faltante || 0, sobrante || 0, montoCorrecto],
+    (err, result) => {
+      if (err) {
+        console.error('Error al insertar cierre en movimientos_caja:', err);
+        return res.status(500).json({ success: false, error: 'Error al guardar cierre de caja' });
+      }
+
+      // ✅ Solo esta respuesta debe enviarse en éxito
+      return res.json({ success: true, message: 'Cierre de caja registrado correctamente.' });
+    }
+  );
+});
+
+
+
+
+
 

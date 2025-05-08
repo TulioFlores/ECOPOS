@@ -18,13 +18,14 @@ document.getElementById('cliente').addEventListener('keypress', async (event) =>
             if (!response.ok) {
                 throw new Error('Error en la solicitud');
             }
-
+            
             
             const data = await response.json(); 
-
+            if (!data.error) {
+                localStorage.setItem('id_cliente', data.id_cliente,);  // debes retornar id_cliente en el backend
+                localStorage.setItem('nom_cliente', data.nombre);  // debes retornar id_cliente en el backend
+            }
             console.log('Datos recibidos desde el servidor:', data);
-            // Mostrar la respuesta en consola (puedes hacer lo que necesites con los datos)
-            console.log(data);
 
             // Llamamos a la función para mostrar los resultados
             mostrarCliente(data);
@@ -36,7 +37,6 @@ document.getElementById('cliente').addEventListener('keypress', async (event) =>
 function mostrarCliente(cliente){
     const telefono = document.getElementById("cliente");
     telefono.value = cliente.telefono;
-
     const nombre = document.getElementById("nombre-cliente");
     nombre.innerText = cliente.nombre;
 
@@ -97,7 +97,7 @@ btnConfirmarCliente.addEventListener("click", async () => {
     const correo = document.getElementById("correo-cliente").value.trim();
 
     if (!nombre || !telefono || !correo) {
-        alert("Por favor llena todos los campos.");
+        mostrarAlerta("Por favor llena todos los campos.");
         return;
     }
 
@@ -117,20 +117,21 @@ btnConfirmarCliente.addEventListener("click", async () => {
         const data = await response.json();
 
         if (response.ok) {
-            alert("Cliente registrado exitosamente.");
+            mostrarAlerta("Cliente registrado exitosamente.");
             // Limpiar campos
             document.getElementById("nuevo-cliente-nombre").value = "";
             document.getElementById("telefono-cliente").value = "";
             document.getElementById("correo-cliente").value = "";
         } else {
-            alert("Error: " + data.error);
+            mostrarAlerta("Error: " + data.error);
         }
 
     } catch (error) {
         console.error("Error al registrar cliente:", error);
-        alert("Error de conexión con el servidor.");
+        mostrarAlerta("Error de conexión con el servidor.");
     }
 });
+
 
 // Cancelar: Limpiar los campos
 btnCancelarCliente.addEventListener("click", () => {

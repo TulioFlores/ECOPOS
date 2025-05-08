@@ -158,7 +158,12 @@ botonConfirmar.addEventListener('click', async () => {
   const pagado = parseFloat(document.getElementById("pagado").textContent);
   const porPagar = parseFloat(document.getElementById("porpagar").textContent);
   const cambio = parseFloat(document.getElementById("cambio").textContent);
-
+  const empleadoData = JSON.parse(localStorage.getItem("cajero"));
+  const id_empleado = empleadoData?.id;  
+  if (!id_empleado) {
+    mostrarAlerta("Error: No se pudo identificar al empleado.");
+    return;
+  }
   if (pagado <= 0) return mostrarAlerta("Debes ingresar al menos un pago.");
   if (pagado < importe) return mostrarAlerta("El monto pagado es insuficiente para completar la venta.");
 
@@ -181,13 +186,14 @@ botonConfirmar.addEventListener('click', async () => {
   const venta = {
     productos,
     total: importe,
-    cliente: document.getElementById("nombre-cliente").textContent || 'General',
+    cliente: parseInt(localStorage.getItem("id_cliente")),
     pagado,
     porPagar,
     cambio,
     tipoPago,
+    empleado: id_empleado,
+    nom_cliente: localStorage.getItem("nom_cliente") || 'General'
   };
-
   try {
     const response = await fetch('http://localhost:3000/ventas', {
       method: 'POST',
@@ -200,7 +206,14 @@ botonConfirmar.addEventListener('click', async () => {
     if (resultado.success) {
       mostrarAlerta("Venta completada con éxito");
       mostrarTicket(resultado.qrImage, resultado.ticketUrl);
+      guardarUltimoTicket(resultado.ticketUrl, resultado.qrImage);
       limpiarInterfazVenta();
+      montoEfectivo = 0;            //Muy importante
+      montoTarjeta = 0;
+      montoPagoMercado = 0;
+      localStorage.removeItem('nom_cliente');
+      localStorage.removeItem('id_cliente');
+
     } else {
       mostrarAlerta("Error al guardar la venta");
     }
@@ -335,3 +348,36 @@ document.getElementById('mercado-pago').addEventListener('keypress', async (e) =
     }
   }
   
+
+  //reimpresion de ticket
+// ⏺️ Guardar el último ticket en localStorage
+function guardarUltimoTicket(url, qr) {
+  localStorage.setItem("ultimoTicketUrl", url);
+  localStorage.setItem("ultimoQrBase64", qr);
+}
+
+// 🔄 Mostrar el último ticket desde localStorage
+function mostrarUltimoTicket() {
+  const url = localStorage.getItem("ultimoTicketUrl");
+  const qr = localStorage.getItem("ultimoQrBase64");
+
+  if (!url || !qr) {
+    alert("No hay ticket reciente para reimprimir.");
+    return;
+  }
+
+  document.getElementById("qr-image-ticket").src = qr;
+  document.getElementById("descargar-ticket").href = url;
+  document.getElementById("modal-ticket").style.display = "flex";
+}
+
+// 🎯 Evento al hacer clic en el botón
+document.getElementById("boton-ultimo-ticket").addEventListener("click", () => {
+  mostrarUltimoTicket();
+});
+
+// ❌ Cerrar el modal
+document.getElementById("cerrar-modal-ticket").addEventListener("click", () => {
+  document.getElementById("modal-ticket").style.display = "none";
+});
+
