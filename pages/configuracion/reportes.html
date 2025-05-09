@@ -89,7 +89,7 @@
                 <!-- Boton para agregar un producto a la base de datos -->
                 <button class="col-6" id="boton-agregar-producto"><i class="bi bi-cloud-moon-fill"></i>Agregar producto</button>
                 <!-- Boton para la realizar el cierre del dia -->
-                <button class="col-6 " type="button" data-bs-toggle="collapse" data-bs-target="#cierreDelDia" aria-expanded="false" aria-controls="cierreDelDia">
+                <button class="col-6 " type="button" data-bs-toggle="modal" data-bs-target="#modal-autenticacion-corte"  aria-expanded="false" aria-controls="cierreDelDia">
                   <i class="bi bi-cloud-moon-fill"></i>Cierre del Día
                 </button>
             </div>  
@@ -279,7 +279,7 @@
                         <input type="password" class="form-control" id="contrasenaVenta" required>
                       </div>
                       <div class="text-end">
-                        <button type="submit" class="btn btn-success">Acceder</button>
+                        <button type="submit" class="btn btn-success" >Acceder</button>
                       </div>
                     </form>
                   </div>
@@ -293,46 +293,85 @@
                   <h3 class="text-center mb-4">Cierre del día</h3>
               
                   <div class="d-flex justify-content-center gap-3 mb-3">
-                    <input type="text" class="form-control cierre-input w-auto" id="fecha" readonly value="16/02/2025" style="width: 150px;">
-                    <input type="text" class="form-control cierre-input w-auto" id="hora" readonly value="16:24:03" style="width: 150px;">
-                    <button class="btn btn-dark">Iniciar Cierre</button>
+                    <p  class="form-control cierre-input w-auto fecha"   style="width: 150px;"></p>
+                    <p class="form-control cierre-input w-auto hora"   style="width: 150px;"></p>
+                    <button class="btn btn-dark" id="boton-cierre">Iniciar Cierre</button>
                   </div>
               
-                  <div class="mb-2 label-text">VENTA BRUTA:</div>
-                  <div class="mb-2 label-text">DEVOLUCIONES:</div>
-                  <div class="mb-2 label-text">GASTOS:</div>
-                  <div class="mb-4 label-text">VENTA NETA:</div>
+                  <!-- <div class="row mb-4 align-items-center">
+                    <div class="col-6 label-text">VENTA NETA:</div>
+                    <div class="col-6">
+                      <input type="text" class="form-control cierre-input text-end" id="ventaNeta" value="$0.00" >
+                    </div>
+                  </div> -->
+
               
                   <div class="text-warning text-center fw-bold mb-3">**** DESGLOSE TIPOS DE COBRO ****</div>
               
-                  <div class="mb-2">
-                    <label class="label-text">EFECTIVO:</label>
-                    <input type="text" id="efectivo" class="form-control cierre-input">
+                  <div class="row mb-2 align-items-center">
+                    <div class="col-auto label-fixed">EFECTIVO:</div>
+                    <div class="col-auto">
+                      <input type="text" id="efectivo-cierre" class="form-control cierre-input" style="width: 140px;">
+                    </div>
                   </div>
-                  <div class="mb-2">
-                    <label class="label-text">TARJETA:</label>
-                    <input type="text" id="tarjeta" class="form-control cierre-input">
+                  <div class="row mb-2 align-items-center">
+                    <div class="col-auto label-fixed">TARJETA:</div>
+                    <div class="col-auto">
+                      <input type="text" id="tarjeta-cierre" class="form-control cierre-input" style="width: 140px;">
+                    </div>
                   </div>
-                  <div class="mb-2">
-                    <label class="label-text">OTRAS FORMAS DE PAGO:</label>
-                    <input type="text" id="otros" class="form-control cierre-input">
+                  <div class="row mb-2 align-items-center">
+                    <div class="col-auto label-fixed">MERCADO PAGO:</div>
+                    <div class="col-auto">
+                      <input type="text" id="mp-cierre" class="form-control cierre-input" style="width: 140px;">
+                    </div>
                   </div>
-                  <div class="mb-2">
-                    <label class="label-text">EFECTIVO COMPLEMENTARIO:</label>
-                    <input type="text" id="efectivoComp" class="form-control cierre-input">
+                  <div class="row mb-4 align-items-center">
+                    <div class="col-auto label-fixed">MONTO TOTAL:</div>
+                    <div class="col-auto">
+                      <input type="text" id="monto-cierre" class="form-control cierre-input" style="width: 140px;">
+                    </div>
                   </div>
-                  <div class="mb-4">
-                    <label class="label-text">MONTO:</label>
-                    <input type="text" id="monto" class="form-control cierre-input">
-                  </div>
+
               
                   <div class="d-flex justify-content-end gap-2">
-                    <button class="btn btn-light text-dark fw-bold">Aplicar Cierre</button>
+                    <button class="btn btn-light text-dark fw-bold" id="aplicar-cierre">Aplicar Cierre</button>
                     <button class="btn btn-secondary">Salir</button>
                   </div>
                 </div>
               </div>
-
+              
+              <!-- Modal de Autenticación para Corte por Cajero -->
+            <div class="modal fade" id="modal-autenticacion-corte" tabindex="-1" aria-labelledby="modalCorteCajeroLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="modalCorteCajeroLabel">Autenticación para Corte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    
+                    <div class="modal-body">
+                    <form id="form-autenticacion-corte">
+                        <div class="mb-3">
+                        <label for="usuarioCorte" class="form-label">Usuario</label>
+                        <input type="text" class="form-control" id="usuarioCorte" name="usuario" required>
+                        </div>
+                        <div class="mb-3">
+                        <label for="contrasenaCorte" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="contrasenaCorte" name="contrasena" required>
+                        </div>
+                    </form>
+                    </div>
+                    
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="form-autenticacion-corte" class="btn btn-success" >Confirmar</button>
+                    </div>
+                    
+                </div>
+                </div>
+            </div>
           <footer class="pt-4 my-md-5 pt-md-5 border-top">
             <div class="row">
               <div class="col-12 col-md">
@@ -351,5 +390,7 @@
     <script src="/configuracion/services/reportes.js"></script>
     <script src="/configuracion/services/agregar-empleado.js"></script>
     <script src="/configuracion/services/agregar-producto.js"></script>
+    <script src="/configuracion/services/cierre-del-dia.js"></script>
+    <script src="../punto-de-venta/services/obtenerhora.js"></script>
   </body>
 </html>

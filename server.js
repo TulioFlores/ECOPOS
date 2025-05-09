@@ -763,9 +763,44 @@ app.post('/api/aplicar-cierre', (req, res) => {
     }
   );
 });
+//Cierre del dia
+app.post('/resumen-dia', (req, res) => {
+  connection.query('CALL sp_resumen_dia()', (error, results) => {
+    if (error) {
+      console.error(error);
+      return res.status(500).json({ error: 'Error al obtener resumen del día' });
+    }
+
+    const data = results[0][0] || {};
+    res.json({
+      efectivo: data.total_efectivo || 0,
+      tarjeta: data.total_tarjeta || 0,
+      mercado_pago: data.total_mercado_pago || 0,
+      total: data.total || 0
+    });
+  });
+});
 
 
+app.post('/api/aplicar-cierre', (req, res) => {
+  const { faltante, sobrante, montoCorrecto, id_empleado } = req.body;
 
+  if (montoCorrecto === undefined) {
+    return res.status(400).json({ success: false, error: 'Monto requerido' });
+  }
 
+  connection.query(
+    `INSERT INTO movimientos_caja (id_tipo_movimiento, fecha, Faltante, Sobrante, MontoCorrecto, id_empleado)
+     VALUES (3, NOW(), ?, ?, ?, ?)`,
+    [faltante || 0, sobrante || 0, montoCorrecto, id_empleado],
+    (err, result) => {
+      if (err) {
+        console.error('Error al insertar cierre en movimientos_caja:', err);
+        return res.status(500).json({ success: false, error: 'Error al guardar cierre de caja' });
+      }
 
+      return res.json({ success: true, message: 'Cierre de caja registrado correctamente.' });
+    }
+  );
+});
 

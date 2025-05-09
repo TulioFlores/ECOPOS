@@ -150,3 +150,7 @@
   font-size: 1.1rem;
   font-weight: 500;
 }
+.label-fixed {
+    min-width: 250px; /* Ajusta según el espacio que necesites */
+    font-weight: bold;
+  }
