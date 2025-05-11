@@ -1,0 +1,107 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+header {
+    background-color: black;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 14px;
+}
+
+.logo img {
+    height: 42px;
+}
+
+.usuario {
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+}
+
+.usuario img {
+    width: 35px;
+    height: 35px;
+    background-color: white;
+    border-radius: 50%;
+}
+
+.cuadro {
+    background-color: #4caf50; /* verde oscuro moderado */
+    padding: 14px;
+    border-radius: 7px;
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.2);
+    width: 490px;
+    height: auto;
+    margin-top: 200px;
+}
+
+main {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 56vh;
+}
+
+.horario {
+    background: white;
+    padding: 19px;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 7px;
+    border-radius: 3.5px;
+}
+
+input {
+    padding-top: 12px;
+    width: 100%;
+    border-radius: 3.5px;
+    margin-bottom: 7px;
+    font-size: 15px;
+}
+
+.botones {
+    background-color: #4caf50; /* verde oscuro moderado */
+    padding: 14px;
+    border-radius: 7px;
+    box-shadow: 0 0 7px rgba(0, 0, 0, 0.2);
+    width: auto;
+    height: auto;
+    margin-top: 42px;
+}
+
+button {
+    height: 35px;
+    font-size: 14px;
+    margin: 3.5px;
+    cursor: pointer;
+    transition: 0.3s;
+    background-color: #388e3c; /* verde aún más oscuro */
+    color: white;
+}
+
+.contenedor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+}
+
+.button:hover {
+    background-color: #2e7d32; /* verde oscuro para hover */
+}
+
+select {
+    padding-top: 12px;
+    width: 100%;
+    border-radius: 3.5px;
+    margin-bottom: 7px;
+    font-size: 15px;
+    height: 35px;
+}

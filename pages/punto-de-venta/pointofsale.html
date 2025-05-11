@@ -109,7 +109,7 @@
 
                 </form>
                 <!-- Boton para la asistencia -->
-                <button class="col-6"><i class="bi bi-clock"></i>Checador</button>
+                <button class="col-6" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAsistencia"><i class="bi bi-clock" ></i>Checador</button>
             </div>
             
             <div class="row">
@@ -402,8 +402,48 @@
           </div>
         </div>
       </div>
-      
-    
+      <!--Modal para el checador-->
+      <div class="modal fade" id="modalAsistencia" tabindex="-1" aria-labelledby="modalAsistenciaLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg"> <!-- Puedes ajustar el tamaño con modal-sm, modal-lg, etc. -->
+            <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="modalAsistenciaLabel">Registro De Asistencia</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3 d-flex justify-content-between">
+                <span class="fecha"></span>
+                <span class="hora"></span>
+                </div>
+                <div class="mb-3">
+                <label for="numEmpleado" class="form-label">Teclee el usuario:</label>
+                <input type="text" class="form-control" id="numEmpleado">
+                </div>
+                <div class="mb-3">
+                <label for="nombreEmpleado" class="form-label">Nombre del empleado:</label>
+                <input type="text" class="form-control" id="nombreEmpleado">
+                </div>
+                <div class="mb-3">
+                <input type="text" class="form-control" id="apellidoP" placeholder="Apellido paterno">
+                </div>
+                <div class="mb-3">
+                <input type="text" class="form-control" id="apellidoM" placeholder="Apellido materno">
+                </div>
+                <div class="mb-3">
+                <label for="tipoAsistencia" class="form-label">Tipo de asistencia:</label>
+                <select id="tipoAsistencia" class="form-select">
+                    <option value="Entrada">Entrada</option>
+                    <option value="Salida">Salida</option>
+                </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="registrar" class="btn btn-success">Registrar</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+            </div>
+        </div>
+    </div>
     <!-- Script Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
     <!-- Javascript -->
@@ -419,6 +459,7 @@
     <script src="punto-de-venta/services/ultimo-ticket.js"></script>
     <script src="punto-de-venta/services/mostrar-existencias.js"></script>
     <script src="punto-de-venta/services/corte-por-cajero.js"></script>
+    <script src="punto-de-venta/services/asistencia.js"></script>
 
 
 

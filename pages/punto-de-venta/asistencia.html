@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Asistencia</title>
-    <link rel="stylesheet" href="./assets/estilos/Estilos-Karim1.css">
-    <link rel="shortcut icon" href="/Proyecto/material/LogoColor.svg" type="image/x-icon">
+    <link rel="stylesheet" href="/punto-de-venta/asistencia.css">
+    <link rel="shortcut icon" href="/ProyectoEcoPunto/material/LogoColor.svg" type="image/x-icon">
     <script>
         function actualizarReloj() {
             const ahora = new Date();
@@ -16,11 +16,12 @@
         }
         setInterval(actualizarReloj, 1000);
     </script>
+    
 </head>
 <body>
     <header>
-        <div class="logo"> <img src="/Proyecto/material/LogoBlanco.svg" alt="logo"></div>
-        <div class="usuario"> <img src="/Proyecto/material/avatar.png" alt="usuario">Mi cuenta</div>
+        <div class="logo"> <img src="/material/LogoBlanco.svg" alt="logo"></div>
+        <div class="usuario"> <img src="/material/avatar.png" alt="usuario">Mi cuenta</div>
     </header>
     <main>
         
@@ -37,21 +38,60 @@
                     <input type="text" id="numEmpleado"> 
                     <label for="nombreEmpleado">Nombre del empleado:</label>
                     <input type="text" id="nombreEmpleado">
-                    <input type="text">
-                    <input type="text">
-                    <div class="photo-box"></div>   
+                    <input type="text" id="apellidoP">
+                    <input type="text" id="apellidoM">
+                    <label for="tipoAsistencia">Tipo de asistencia:</label>
+                    <select id="tipoAsistencia">
+                        <option value="Entrada">Entrada</option>
+                        <option value="Salida">Salida</option>
+                    </select>
                 </div>
                 </div>
             <div class="botones">
-                <button id="entrada">Entrada</button>
-                <button id="salidacomida">Salida Hora Comida</button>
-                <button id="entradacomida">Entrada Hora Comida</button>
-                <button id="salida">Salida</button>
                 <br>
                 <button id="registrar">Registrar</button>
-                <button id="incidencias">Incidencias</button>   
             </div>
         </section>
     </main>
 </body>
-</html>
+
+<script>
+        document.getElementById('registrar').addEventListener('click', () => {
+        const idEmpleado = document.getElementById('numEmpleado').value.trim();
+        const nombre = document.getElementById('nombreEmpleado').value.trim();
+        const apellidoP = document.getElementById('apellidoP').value.trim();
+        const apellidoM = document.getElementById('apellidoM').value.trim();
+        const tipo = document.getElementById('tipoAsistencia').value;
+
+        const soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$/;
+
+        // Validación de campos
+        if (!idEmpleado || !nombre || !apellidoP || !apellidoM ||
+            !soloLetras.test(nombre) || !soloLetras.test(apellidoP) || !soloLetras.test(apellidoM)) {
+            alert("Formulario incompleto o inválido. Verifica que los nombres y apellidos contengan solo letras.");
+            return;
+        }
+
+        // Envío al servidor
+        fetch('http://localhost:3000/registrar-asistencia', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id_empleado: idEmpleado, tipo: tipo })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+            } else {
+                alert(data.mensaje || 'Asistencia registrada');
+            }
+        })
+        .catch(err => {
+            console.error('Error al registrar:', err);
+            alert('Error al registrar la asistencia');
+        });
+    });
+    </script>
+</html>                               

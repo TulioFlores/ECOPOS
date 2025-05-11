@@ -10,6 +10,7 @@ import PDFDocument from 'pdfkit';
 import QRCode from 'qrcode';
 import http from 'http';
 import { Server } from 'socket.io';
+// const bodyParser = require('body-parser');
 const app = express();
 
 
@@ -828,3 +829,22 @@ app.post('/api/aplicar-cierre', (req, res) => {
   );
 });
 
+// Ruta para manejar el registro de asistencia
+app.post('/registrar-asistencia', (req, res) => {
+  const { id_empleado, tipo } = req.body;
+
+  if (!id_empleado || !tipo) {
+    return res.status(400).json({ error: 'Faltan datos requeridos' });
+  }
+
+  const fecha_hora = new Date();
+
+  const query = 'INSERT INTO asistencia (id_empleado, fecha_hora, tipo) VALUES (?, ?, ?)';
+  db.query(query, [id_empleado, fecha_hora, tipo], (err, result) => {
+    if (err) {
+      console.error('Error al insertar en la base de datos:', err);
+      return res.status(500).json({ error: 'Error en el servidor' });
+    }
+    res.status(200).json({ mensaje: 'Asistencia registrada correctamente' });
+  });
+});
