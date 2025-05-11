@@ -18,8 +18,8 @@ document.getElementById('btn-confirmar-empleado').addEventListener('click', asyn
       telefono: document.getElementById('telefono').value.trim(),
       puesto: document.getElementById('puesto').value.trim(),
       contrasena: contrasena,
-      id_responsable: document.getElementById('id-responsable').value.trim(),
-      contrasena_responsable: document.getElementById('contrasena-responsable').value
+      contrasena_responsable: document.getElementById('contrasena-responsable').value,
+      contrasena_responsable_conf: document.getElementById('contrasena-responsable-conf').value
     };
   
     try {

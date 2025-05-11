@@ -17,35 +17,59 @@ botonEnter.addEventListener('click', () => {
   
     // Llamar al backend para obtener el producto
     obtenerProductoPorId(idProducto, (err, producto) => {
-        if (err) {
-            console.log("Producto no encontrado.");
-        } else {
-            agregarProductoATabla(producto, cantidad);
-            productoInput.value = '';
-            cantidadInput.value = '1';
+    if (err) {
+        console.log("Producto no encontrado.");
+    } else {
+        const cantidad = parseInt(cantidadInput.value) || 1;
+
+        // Validación de stock antes de agregar
+        if (cantidad > producto.stock) {
+            alert(`Solo hay ${producto.stock} unidades disponibles de este producto.`);
+            return;
         }
-    });
+
+        agregarProductoATabla(producto, cantidad);
+        productoInput.value = '';
+        cantidadInput.value = '1';
+    }
+});
+
   });
 // Función para obtener un producto desde el backend
 function obtenerProductoPorId(idProducto, callback) {
     fetch(`http://localhost:3000/producto/${idProducto}`)
         .then(response => {
             if (!response.ok) {
-                throw new Error('Producto no encontrado');
+                return response.json().then(errorData => {
+                    if (errorData.error === 'Sin stock disponible') {
+                        alert('Este producto no tiene stock disponible.');
+                    } else {
+                        alert(errorData.error || 'Error al obtener el producto.');
+                    }
+                    throw new Error(errorData.error);
+                });
             }
             return response.json();
         })
-        .then(data => callback(null, data))
+        .then(data => callback(null, data))  // ✅ Solo entra aquí si tiene stock
         .catch(error => callback(error, null));
-  }
+}
+
   
-  function agregarProductoATabla(producto, cantidad) {
+function agregarProductoATabla(producto, cantidad) {
     const tbody = document.getElementById('productos-body');
+
+    // Validar stock al agregar
+    if (cantidad > producto.stock) {
+        alert(`Solo hay ${producto.stock} unidades disponibles en stock.`);
+        return;
+    }
 
     // Crear la fila
     const fila = document.createElement('tr');
     fila.dataset.idProducto = producto.id;
     fila.dataset.precio = producto.precio;
+    fila.dataset.stock = producto.stock;  // ✅ Guardamos el stock disponible
     fila.classList.add('row');
 
     fila.innerHTML = `
@@ -53,7 +77,7 @@ function obtenerProductoPorId(idProducto, callback) {
         <td class="col-3 text-center col-nombre">${producto.descripcion}</td>
         <td class="col-3 text-center col-cantidad">
             <input type="number" class="form-control form-control-sm text-center cantidad-fila" 
-                value="${cantidad}" min="1" style="all: unset;">
+                value="${cantidad}" min="1" max="${producto.stock}" style="all: unset;">
         </td>
         <td class="col-3 text-center col-total">$${(producto.precio * cantidad).toFixed(2)}</td>
     `;
@@ -74,10 +98,16 @@ function obtenerProductoPorId(idProducto, callback) {
     const inputCantidadFila = fila.querySelector('.cantidad-fila');
     inputCantidadFila.addEventListener('change', function () {
         let nuevaCantidad = parseInt(this.value);
+        const stockDisponible = parseInt(fila.dataset.stock);
+
         if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
-            nuevaCantidad = 1; // Validar que mínimo sea 1
-            this.value = 1;
+            nuevaCantidad = 1;
+        } else if (nuevaCantidad > stockDisponible) {
+            alert(`Solo hay ${stockDisponible} unidades en stock.`);
+            nuevaCantidad = stockDisponible;
         }
+
+        this.value = nuevaCantidad;
 
         const precioUnitario = parseFloat(fila.dataset.precio) || 0;
 
@@ -95,7 +125,7 @@ function obtenerProductoPorId(idProducto, callback) {
         actualizarTotal(nuevoMonto - montoAnterior);
     });
 
-    // Evento del botón eliminar (debe estar aquí para funcionar bien)
+    // Evento del botón eliminar
     const btnEliminar = document.getElementById('btn-eliminar');
     btnEliminar.addEventListener('click', function () {
         const filaSeleccionada = document.querySelector('.seleccionado');
@@ -111,6 +141,7 @@ function obtenerProductoPorId(idProducto, callback) {
     // Actualizar el total al agregar el producto
     actualizarTotal(producto.precio * cantidad);
 }
+
 
   function deseleccionarFilas() {
     document.querySelectorAll('.seleccionado').forEach(fila => {

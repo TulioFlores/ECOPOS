@@ -106,21 +106,32 @@ app.get('/producto/:id', (req, res) => {
     connection.query(query, [idProducto], (err, results) => {
         if (err) {
             console.error('Error al llamar al Stored Procedure:', err);
-            res.status(500).json({ error: 'Error al obtener el producto' });
-            return;
+            return res.status(500).json({ error: 'Error al obtener el producto' });
         }
-        if (results[0].length > 0) {
-            const producto = {
-                id: results[0][0].id_producto,
-                descripcion: results[0][0].nombre,
-                precio: results[0][0].precio
-            };
-            res.json(producto);
+
+        const resultado = results[0][0];
+
+        if (resultado) {
+            if (resultado.mensaje === 'SIN STOCK') {
+                return res.status(409).json({ error: 'Sin stock disponible' });
+            } else if (resultado.mensaje === 'PRODUCTO NO ENCONTRADO') {
+                return res.status(404).json({ error: 'Producto no encontrado' });
+            } else {
+                const producto = {
+                    id: resultado.id_producto,
+                    descripcion: resultado.nombre,
+                    precio: resultado.precio,
+                    stock: resultado.stock  // 👈️ Incluye el stock
+                };
+                return res.json(producto);
+            }
         } else {
-            res.status(404).json({ error: 'Producto no encontrado' });
+            return res.status(404).json({ error: 'Producto no encontrado' });
         }
     });
 });
+
+
 
 app.get('/buscar/:nombre', (req, res) => {
     const nombreBuscado = req.params.nombre;
@@ -398,66 +409,79 @@ app.post('/cliente', (req, res) => {
 
 
 //Dar de alta un empleado
-
-
 // Ruta para alta de empleado
-app.post('/altaempleados', (req, res) => {
-    const {
-      primer_nombre,
-      segundo_nombre,
-      primer_apellido,
-      segundo_apellido,
-      correo,
-      telefono,
-      puesto,
-      contrasena,
-      id_responsable,
-      contrasena_responsable
-    } = req.body;
-  
-    // Validar existencia del responsable
-    connection.query('SELECT * FROM empleados WHERE id_empleado = ? AND activo = 1', [id_responsable], async (err, results) => {
+app.post('/altaempleados', async (req, res) => {
+  const {
+    primer_nombre,
+    segundo_nombre,
+    primer_apellido,
+    segundo_apellido,
+    correo,
+    telefono,
+    puesto,
+    contrasena,
+    contrasena_responsable,
+    contrasena_responsable_conf
+  } = req.body;
+
+  // Validar coincidencia de contraseñas
+  if (contrasena_responsable !== contrasena_responsable_conf) {
+    return res.status(400).json({ error: 'Las contraseñas no coinciden' });
+  }
+
+  try {
+    // Buscar al gerente activo
+    const [gerente] = await new Promise((resolve, reject) => {
+      connection.query(
+        'SELECT * FROM empleados WHERE cargo = "Gerente" AND activo = 1 LIMIT 1',
+        (err, results) => {
+          if (err) return reject(err);
+          resolve(results);
+        }
+      );
+    });
+
+    if (!gerente) {
+      return res.status(401).json({ error: 'No hay ningún gerente activo en el sistema' });
+    }
+
+    const passwordValida = await bcrypt.compare(contrasena_responsable, gerente.contrasena_hash);
+    if (!passwordValida) {
+      return res.status(401).json({ error: 'Contraseña incorrecta del gerente' });
+    }
+
+    // Generar datos para el nuevo empleado
+    const nombreCompleto = `${primer_nombre} ${segundo_nombre || ''} ${primer_apellido} ${segundo_apellido || ''}`.toUpperCase().trim();
+    const ultimos3 = telefono.slice(-3);
+    const username = `${primer_nombre.toUpperCase()}${ultimos3}`;
+    const contrasenaHash = await bcrypt.hash(contrasena, 10);
+    const fechaHoy = new Date().toISOString().split('T')[0];
+
+    const query = `
+      INSERT INTO empleados (nombre_completo, cargo, username, correo, telefono, contrasena_hash, fecha_contratacion, activo)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    const values = [nombreCompleto, puesto, username, correo, telefono, contrasenaHash, fechaHoy, 1];
+
+    connection.query(query, values, (err, result) => {
       if (err) {
         console.error(err);
-        return res.status(500).json({ error: 'Error al validar responsable' });
+        return res.status(500).json({ error: 'Error al registrar empleado' });
       }
-  
-      if (results.length === 0) {
-        return res.status(401).json({ error: 'ID de responsable inválido o inactivo' });
-      }
-      const responsable = results[0];
-      const passwordValida = await bcrypt.compare(contrasena_responsable, responsable.contrasena_hash);
-      if (!passwordValida) {
-        return res.status(401).json({ error: 'Contraseña del responsable incorrecta' });
-      }
-  
-      // Generar datos para el nuevo empleado
-      const nombreCompleto = `${primer_nombre} ${segundo_nombre || ''} ${primer_apellido} ${segundo_apellido || ''}`.toUpperCase().trim();
-      const ultimos3 = telefono.slice(-3);
-      const username = `${primer_nombre.toUpperCase()}${ultimos3}`;
-      const contrasenaHash = await bcrypt.hash(contrasena, 10);
-      const fechaHoy = new Date().toISOString().split('T')[0];
-  
-      const query = `
-        INSERT INTO empleados (nombre_completo, cargo, username, correo, telefono, contrasena_hash, fecha_contratacion, activo)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-      `;
-      const values = [nombreCompleto, puesto, username, correo, telefono, contrasenaHash, fechaHoy, 1];
-  
-      connection.query(query, values, (err, result) => {
-        if (err) {
-          console.error(err);
-          return res.status(500).json({ error: 'Error al registrar empleado' });
-        }
-  
-        res.status(201).json({
-          message: 'Empleado registrado con éxito',
-          id: result.insertId,
-          username
-        });
+
+      res.status(201).json({
+        message: 'Empleado registrado con éxito',
+        id: result.insertId,
+        username
       });
     });
-  });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error en el proceso de alta de empleado' });
+  }
+});
+
 
 
 

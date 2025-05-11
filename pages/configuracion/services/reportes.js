@@ -89,7 +89,7 @@ document.getElementById('abrirCapturaVenta').addEventListener('click', () => {
         }));
       
         // Redirige al punto de venta
-        window.location.href = '/configuracion';
+        window.location.href = '/pointofsale';
       }else {
         alert(data.error || 'Credenciales inválidas');
       }
