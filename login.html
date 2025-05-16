@@ -7,6 +7,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="./assets/estilos/Estilos-Edgar.css">
     <link href="https://fonts.googleapis.com/css2?family=Source+Sans+Pro:wght@400;600&display=swap" rel="stylesheet">
+
+<!-- Firebase App (core) -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+
+<!-- Firebase Authentication -->
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+
 </head>
 <body class="d-flex align-items-center min-vh-100">
     <div class="container-fluid">
@@ -33,34 +40,43 @@
                             <hr class="flex-grow-1">
                         </div>
 
-                        <div class="d-flex justify-content-center gap-3 mb-4">
-                            <button type="button" class="btn btn-outline-secondary rounded-circle p-2">
+                        <!-- <div class="d-flex justify-content-center gap-3 mb-4">
+                            <button type="button" onclick="loginWithFacebook()" class="btn btn-outline-secondary rounded-circle p-2">
                                 <img src="./assets/images/facebook.svg" alt="Facebook" style="width: 24px; height: 24px;">
                             </button>
-                            <button type="button" class="btn btn-outline-secondary rounded-circle p-2">
+                            <button type="button" onclick="loginWithApple()" class="btn btn-outline-secondary rounded-circle p-2">
                                 <img src="./assets/images/apple.svg" alt="Apple" style="width: 24px; height: 24px;">
                             </button>
-                            <button type="button" class="btn btn-outline-secondary rounded-circle p-2">
+                            <button type="button" onclick="loginWithGoogle()" class="btn btn-outline-secondary rounded-circle p-2">
                                 <img src="./assets/images/google.svg" alt="Google" style="width: 24px; height: 24px;">
                             </button>
-                        </div>
+                        </div> -->
 
                         <p class="text-center mt-3">¿Eres nuevo en ECOPOS? <a href="register.html" class="text-decoration-none">Comenzar →</a></p>
                     </form>
+                    
                     <script>
-                        function validateForm() {
-                            var email = document.getElementById("email").value;
-                            
-                            if (email === "") {
-                                alert("Por favor ingrese su correo electrónico.");
-                                return false; // No permite que el formulario se envíe
-                            }
-                            
-                            // Si el correo está ingresado, redirige a la siguiente página
-                            window.location.href = "login-password.html";
-                            return false; // Evita que el formulario se envíe de la forma tradicional
+                        function validateFworm() {
+                        var email = document.getElementById("email").value;
+                        
+                        if (email === "") {
+                            alert("Por favor ingrese su correo electrónico.");
+                            return false;
                         }
+
+                        // Guardar correo en localStorage
+                        localStorage.setItem("correoLogin", email);
+
+                        // Redirige al formulario de contraseña
+                        window.location.href = "login-password.html";
+                        return false;
+                    }
+
+                        
                     </script>
+                    
+                    
+                      
                 </div>
             </div>
         </div>
