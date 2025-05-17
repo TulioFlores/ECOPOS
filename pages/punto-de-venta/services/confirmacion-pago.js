@@ -86,18 +86,19 @@ inputEfectivo.addEventListener('keypress', (e) => {
       return;
     }
 
-    montoEfectivo += efectivo;
+    // Actualiza el monto efectivo con lo que hay en el input (sin acumular)
+    montoEfectivo = efectivo;
 
-    const pagadoActual = parseFloat(document.getElementById('pagado').textContent) || 0;
-    const nuevoPagado = pagadoActual + efectivo;
-    const restante = importe - nuevoPagado;
+    // Calcula el total pagado sumando tarjeta + efectivo
+    const pagadoTotal = montoEfectivo + montoTarjeta;
+    const restante = importe - pagadoTotal;
 
-    document.getElementById("pagado").textContent = nuevoPagado.toFixed(2);
+    document.getElementById("pagado").textContent = pagadoTotal.toFixed(2);
     document.getElementById("porpagar").textContent = (restante > 0 ? restante.toFixed(2) : "0.00");
-    document.getElementById("cambio").textContent = (nuevoPagado > importe ? (nuevoPagado - importe).toFixed(2) : "0.00");
-
+    document.getElementById("cambio").textContent = (pagadoTotal > importe ? (pagadoTotal - importe).toFixed(2) : "0.00");
   }
 });
+
 
 inputTarjeta.addEventListener('keypress', (e) => {
   if (e.key === 'Enter') {
@@ -114,18 +115,19 @@ inputTarjeta.addEventListener('keypress', (e) => {
       return;
     }
 
-    montoTarjeta += tarjeta;
+    // Actualiza el monto tarjeta con lo que hay en el input (sin acumular)
+    montoTarjeta = tarjeta;
 
-    const pagadoActual = parseFloat(document.getElementById('pagado').textContent) || 0;
-    const nuevoPagado = pagadoActual + tarjeta;
-    const restante = importe - nuevoPagado;
+    // Calcula el total pagado sumando tarjeta + efectivo
+    const pagadoTotal = montoEfectivo + montoTarjeta;
+    const restante = importe - pagadoTotal;
 
-    document.getElementById("pagado").textContent = nuevoPagado.toFixed(2);
+    document.getElementById("pagado").textContent = pagadoTotal.toFixed(2);
     document.getElementById("porpagar").textContent = (restante > 0 ? restante.toFixed(2) : "0.00");
-    document.getElementById("cambio").textContent = (nuevoPagado > importe ? (nuevoPagado - importe).toFixed(2) : "0.00");
-
+    document.getElementById("cambio").textContent = (pagadoTotal > importe ? (pagadoTotal - importe).toFixed(2) : "0.00");
   }
 });
+
 
 const socket = io('http://localhost:3000');
 

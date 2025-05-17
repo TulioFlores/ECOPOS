@@ -92,7 +92,7 @@ app.use('/tickets', express.static(path.join(__dirname, 'tickets'))); // Carpeta
 //     console.log(`Servidor corriendo en http://localhost:${port}`);
 // });
 // Iniciar servidor
-server.listen(3000, () => {
+server.listen(3000, '0.0.0.0',() => {
   console.log('Servidor escuchando en http://localhost:3000');
 });
 // Crear carpeta si no existe
@@ -473,7 +473,8 @@ app.post('/altaempleados', async (req, res) => {
       res.status(201).json({
         message: 'Empleado registrado con éxito',
         id: result.insertId,
-        username
+        username,
+        success:true
       });
     });
 
@@ -800,8 +801,8 @@ app.post('/resumen-dia', (req, res) => {
     res.json({
       efectivo: data.total_efectivo || 0,
       tarjeta: data.total_tarjeta || 0,
-      mercado_pago: data.total_mercado_pago || 0,
-      total: data.total || 0
+      total_mercado_pago: data.total_mercado_pago || 0,
+      total_general: data.total_general || 0
     });
   });
 });
@@ -846,5 +847,44 @@ app.post('/registrar-asistencia', (req, res) => {
       return res.status(500).json({ error: 'Error en el servidor' });
     }
     res.status(200).json({ mensaje: 'Asistencia registrada correctamente' });
+  });
+});
+
+// Ruta: api/ventas/resumen-intervalo
+app.get('/api/ventas/resumen-intervalo', (req, res) => {
+  const { inicio, fin } = req.query;
+
+  if (!inicio || !fin) {
+    return res.status(400).json({ error: 'Fechas de inicio y fin requeridas' });
+  }
+
+  const query = 'CALL sp_resumen_por_intervalo(?, ?)';
+  connection.query(query, [inicio, fin], (err, results) => {
+    if (err) {
+      console.error('Error en resumen de intervalo:', err);
+      return res.status(500).json({ error: 'Error al obtener el resumen' });
+    }
+
+    res.json(results[0][0]); // Devuelve solo el primer objeto del result set
+  });
+});
+
+//API venta por empleado
+app.post('/por-empleado', (req, res) => {
+  const { inicio, fin, username } = req.body;
+
+  if (!inicio || !fin || !username) {
+    return res.status(400).json({ success: false, error: 'Datos incompletos' });
+  }
+
+  const query = 'CALL sp_resumen_por_intervalo_empleado(?, ?, ?)';
+  connection.query(query, [inicio, fin, username], (err, results) => {
+    if (err) {
+      console.error('Error en resumen de intervalo:', err);
+      return res.status(500).json({ success: false, error: 'Error al obtener el resumen' });
+    }
+
+    const resumen = results[0][0] || {};
+    res.json({ success: true, datos: resumen });
   });
 });

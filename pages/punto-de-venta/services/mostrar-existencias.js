@@ -32,3 +32,46 @@ document.getElementById("boton-existencias").addEventListener("click", () => {
     document.getElementById("existencias").style.display = "none";
   });
   
+
+  //Imprimir existencias
+   document.getElementById('btn-imprimir-existencias').addEventListener('click', async () => {
+    try {
+      const response = await fetch('/productos');
+      const productos = await response.json();
+
+      // Llenar la tabla
+      const tbody = document.getElementById('contenido-tabla-pdf');
+      tbody.innerHTML = ''; // Limpiar por si ya se generó antes
+
+      productos.forEach(p => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${p.clave || ''}</td>
+          <td>${p.descripcion || ''}</td>
+          <td>${p.stock || 0}</td>
+          <td>${p.precio || 0}</td>
+        `;
+        tbody.appendChild(row);
+      });
+
+      // Mostrar temporalmente el contenido para convertirlo en PDF
+      const contenido = document.getElementById('contenido-pdf');
+      contenido.style.display = 'block';
+
+      // Generar PDF
+      await html2pdf().set({
+        margin: 10,
+        filename: 'existencias.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(contenido).save();
+
+      // Ocultar nuevamente
+      contenido.style.display = 'none';
+
+    } catch (err) {
+      console.error('Error al generar el PDF:', err);
+      alert('Hubo un problema al generar el PDF.');
+    }
+  });

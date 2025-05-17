@@ -56,11 +56,9 @@
   }
   
   #venta-por-dia {
-      position: fixed;
       display: none;
       z-index: 1000;
       padding: 20px;
-      height: 250px;
       background-color: #ffffff;
       border-radius: 10px;
       font-weight: bold;
@@ -73,11 +71,8 @@
 
 /*Venta por empleado*/
 #venta-por-empleado{
-    position: fixed;
     display: none;
-    z-index: 1000;
     padding: 20px;
-    height: 250px;
     background-color: #ffffff;
     border-radius: 10px;
     font-weight: bold;

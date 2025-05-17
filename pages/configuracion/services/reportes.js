@@ -111,3 +111,66 @@ document.getElementById('abrirCapturaVenta').addEventListener('click', () => {
   if (currentPath === "/configuracion/") resaltarActivo("linkConfig");
   if (currentPath === "/reportes") resaltarActivo("linkReportes");
   if (currentPath === "/pages/punto-de-venta/pointofsale.html") resaltarActivo("linkChecador");
+
+
+  //Boton para ver la venta por dia
+  document.getElementById('btn-buscar-ventas').addEventListener('click', () => {
+  const inicio = document.getElementById('fecha-inicio').value;
+  const fin = document.getElementById('fecha-fin').value;
+
+  if (!inicio || !fin) {
+    alert('Por favor selecciona ambas fechas.');
+    return;
+  }
+
+  fetch(`/api/ventas/resumen-intervalo?inicio=${inicio}&fin=${fin}`)
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('efectivo-dia').value = parseFloat(data.total_efectivo).toFixed(2);
+      document.getElementById('tarjeta-dia').value = parseFloat(data.total_tarjeta).toFixed(2);
+      document.getElementById('mp-dia').value = parseFloat(data.total_mercado_pago).toFixed(2);
+      document.getElementById('total-dia').value = parseFloat(data.total_general).toFixed(2);
+    })
+    .catch(error => {
+      console.error('Error al obtener resumen:', error);
+      alert('Error al buscar ventas. Revisa la consola.');
+    });
+});
+//Ventas por intervalo y por empleado
+document.getElementById('btn-buscar-empleado').addEventListener('click', async () => {
+  const username = document.getElementById('usuario-empleado').value.trim();
+  const fechaInicio = document.getElementById('fecha-inicio-empleado').value;
+  const fechaFin = document.getElementById('fecha-fin-empleado').value;
+
+  if (!username || !fechaInicio || !fechaFin) {
+    alert('Por favor, completa todos los campos.');
+    return;
+  }
+
+  try {
+    const res = await fetch('/por-empleado', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        inicio: fechaInicio,
+        fin: fechaFin,
+        username: username
+      })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      const d = data.datos;
+      document.getElementById('efectivo-empleado').value = d.total_efectivo || 0;
+      document.getElementById('tarjeta-empleado').value = d.total_tarjeta || 0;
+      document.getElementById('mp-empleado').value = d.total_mercado_pago || 0;
+      document.getElementById('total-empleado').value = d.total_general || 0;
+    } else {
+      alert('No se pudo obtener el resumen.');
+    }
+  } catch (error) {
+    console.error('Error en la petición:', error);
+    alert('Error al obtener los datos');
+  }
+});
