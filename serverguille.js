@@ -1,27 +1,27 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const mysql = require('mysql2/promise');
-const { body, param, validationResult } = require('express-validator');
+// require('dotenv').config();
+// const express = require('express');
+// const cors = require('cors');
+// const mysql = require('mysql2/promise');
+// const { body, param, validationResult } = require('express-validator');
 
-const app = express();
-const PORT = process.env.PORT || 3001;
+// const app = express();
+// const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+// // Middleware
+// app.use(cors());
+// app.use(express.json());
 
-// Pool de conexión MySQL
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    port: process.env.DB_PORT,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
+// // Pool de conexión MySQL
+// const pool = mysql.createPool({
+//     host: process.env.DB_HOST,
+//     user: process.env.DB_USER,
+//     password: process.env.DB_PASSWORD,
+//     database: process.env.DB_NAME,
+//     port: process.env.DB_PORT,
+//     waitForConnections: true,
+//     connectionLimit: 10,
+//     queueLimit: 0
+// });
 
 // Validación personalizada para URL de imagen
 const validateImageUrl = (value) => {
@@ -316,13 +316,13 @@ app.get('/api/productos/bajo-stock', async (req, res) => {
     }
 });
 
-// Middleware para manejo de errores
-app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ error: 'Error interno del servidor' });
-});
+// // Middleware para manejo de errores
+// app.use((err, req, res, next) => {
+//     console.error(err.stack);
+//     res.status(500).json({ error: 'Error interno del servidor' });
+// });
 
-// Iniciar servidor
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-});
+// // Iniciar servidor
+// app.listen(PORT, () => {
+//     console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+// });

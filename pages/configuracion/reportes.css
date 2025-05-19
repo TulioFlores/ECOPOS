@@ -2,7 +2,9 @@
     margin: 0px;
     padding: 0px;
 }
-
+#abrir-provedores{
+  display: none;
+}
 /* Contenedor de botones */
 .botones-reportes {
     display: flex;

@@ -28,12 +28,14 @@ const modalVentaPorDia = document.getElementById("venta-por-dia");
 const modalVentaPorEmpleado = document.getElementById("venta-por-empleado");
 const modalEmpleado = document.getElementById("alta-empleado");
 const modalProducto = document.getElementById("agregar-producto");
+const modalProvedores = document.getElementById("abrir-provedores");
 
 // Botones
 const btnAbrirVentaPorDia = document.getElementById("boton-venta-por-dia");
 const btnAbrirVentaPorEmpleado = document.getElementById("boton-venta-por-empleado");
 const btnAbrirEmpleado = document.getElementById("abrir-empleado");
 const btnAbrirProducto = document.getElementById("boton-agregar-producto");
+const btnAbrirProvedores = document.getElementById("boton-provedores");
 // Botones cancelar/confirmar del modal de empleado
 const btnCancelarEmpleado = document.getElementById("btn-cancelar-empleado");
 const btnConfirmarEmpleado = document.getElementById("btn-confirmar-empleado");
@@ -44,7 +46,8 @@ const btnConfirmarEmpleado = document.getElementById("btn-confirmar-empleado");
     modalVentaPorEmpleado.style.display = "none";
     modalEmpleado.style.display = "none";
     modalProducto.style.display = "none";
-    cerrarCollapse("cierreDelDia");
+    modalProvedores.style.display = "none";
+        cerrarCollapse("cierreDelDia");
 }
 
 // Abrir modal de Venta por Día
@@ -79,6 +82,14 @@ btnAbrirProducto.addEventListener("click", () => {
     resaltarActivo("boton-agregar-producto");
     cerrarTodosLosModales();
     if (!yaVisible) modalProducto.style.display = "flex";
+    cerrarSidebar();
+});
+// Abrir Provedores
+btnAbrirProvedores.addEventListener("click", () => {
+    const yaVisible = modalProvedores.style.display === "flex";
+    resaltarActivo("boton-provedores");
+    cerrarTodosLosModales();
+    if (!yaVisible) modalProvedores.style.display = "flex";
     cerrarSidebar();
 });
 
