@@ -10,6 +10,7 @@ import PDFDocument from 'pdfkit';
 import QRCode from 'qrcode';
 import http from 'http';
 import { Server } from 'socket.io';
+import session  from 'express-session';
 // const bodyParser = require('body-parser');
 const app = express();
 
@@ -22,9 +23,22 @@ const io = new Server(server, {
   }
 });
 // Middleware para permitir peticiones desde el navegador
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000", // o el puerto donde esté tu frontend
+  credentials: true // <- Necesario para permitir cookies
+}));
 app.use(express.json());
-
+app.use(session({
+  name: "sid", // puedes usar otro nombre si deseas
+  secret: "clave_secreta_segura",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true,       // No accesible por JS del cliente
+    secure: false,        // true si usas HTTPS en producción
+    sameSite: "lax",      // Protege contra CSRF básico
+  }
+}));
 // Configurar la conexión a MySQL
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -62,19 +76,34 @@ const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, 'pages')));
 app.use(express.static(path.join(__dirname, 'public')));
 
+function verificarAutenticacion(req, res, next) {
+  if (req.session && req.session.usuario) {
+    return next(); // Está autenticado, continúa
+  } else {
+    return res.redirect('/login'); // Redirigir a la página de login
+  }
+}
+//  Funcion para verificar que es gerente
+function soloGerentes(req, res, next) {
+  if (req.session.usuario.cargo === 'Gerente') {
+    return next();
+  } else {
+    return res.status(403).send('Acceso denegado: No autorizado');
+  }
+}
+
+
+
 
 // Ruta limpia para pointofsale.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages','inicio', 'index.html'));
 });
-app.get('/pointofsale', (req, res) => {
+app.get('/pointofsale', verificarAutenticacion, (req, res) => {
   res.sendFile(path.join(__dirname, 'pages','punto-de-venta', 'pointofsale.html'));
 });
-app.get('/configuracion', (req, res) => {
+app.get('/configuracion', verificarAutenticacion, (req, res) => {
     res.sendFile(path.join(__dirname, 'pages','configuracion', 'configuracion.html'));
-});
-app.get('/reportes', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages','configuracion', 'reportes.html'));
 });
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages','inicio-de-sesion', 'login.html'));
@@ -82,15 +111,17 @@ app.get('/login', (req, res) => {
 app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages','inicio-de-sesion', 'register.html'));
 });
-app.get('/login-password', (req, res) => {
+app.get('/login-password', verificarAutenticacion, (req, res) => {
     res.sendFile(path.join(__dirname, 'pages','inicio-de-sesion', 'login-password.html'));
 });
-
+app.get('/reportes-emp', verificarAutenticacion, (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages','configuracion', 'reportes-empleado.html'));
+});
+app.get('/reportes', verificarAutenticacion, soloGerentes, (req, res) => {
+  res.sendFile(path.join(__dirname, 'pages', 'configuracion', 'reportes-admin.html'));
+});
 app.use('/tickets', express.static(path.join(__dirname, 'tickets'))); // Carpeta para exponer PDFs
-// // Iniciar el servidor
-// app.listen(port, () => {
-//     console.log(`Servidor corriendo en http://localhost:${port}`);
-// });
+
 // Iniciar servidor
 server.listen(3000, '0.0.0.0',() => {
   console.log('Servidor escuchando en http://localhost:3000');
@@ -487,82 +518,58 @@ app.post('/altaempleados', async (req, res) => {
 
 
 
-  app.post('/login', (req, res) => {
-    const { username, contrasena } = req.body;
-  
-    if (!username || !contrasena) {
-      return res.status(400).json({ error: 'Usuario y contraseña requeridos' });
-    }
-  
-    const query = 'SELECT * FROM empleados WHERE username = ? AND activo = 1';
-  
-    connection.query(query, [username], async (err, results) => {
-      if (err) return res.status(500).json({ error: 'Error al consultar' });
-  
-      if (results.length === 0) {
-        return res.status(401).json({ error: 'Usuario no encontrado o inactivo' });
-      }
-  
-      const empleado = results[0];
-      const valid = await bcrypt.compare(contrasena, empleado.contrasena_hash);
-      if (!valid) return res.status(401).json({ error: 'Contraseña incorrecta' });
-  
-      // Buscar si ya existe una apertura de caja hoy
-      const hoy = new Date();
-      const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 0, 0, 0); // 00:00:00 de hoy
-  
-      const checkQuery = `
-      SELECT m1.id FROM movimientos_caja m1
-      WHERE m1.id_empleado = ? AND m1.id_tipo_movimiento = 1
-      AND NOT EXISTS (
-        SELECT 1 FROM movimientos_caja m2
-        WHERE m2.id_empleado = m1.id_empleado
-          AND m2.id_tipo_movimiento = 2
-          AND m2.fecha > m1.fecha
-      )
-      ORDER BY m1.fecha DESC
-      LIMIT 1
-    `;
-  
-      connection.query(checkQuery, [empleado.id_empleado, inicioDia], (checkErr, checkResults) => {
-        if (checkErr) return res.status(500).json({ error: 'Error al verificar apertura de caja' });
-  
-        if (checkResults.length === 0) {
-          // No hay apertura hoy, insertarla
-          const insertQuery = `
-            INSERT INTO movimientos_caja (id_empleado, id_tipo_movimiento, fecha)
-            VALUES (?, 1, NOW())
-          `;
-          connection.query(insertQuery, [empleado.id_empleado], (insertErr) => {
-            if (insertErr) return res.status(500).json({ error: 'Error al registrar apertura de caja' });
-  
-            // Enviar respuesta con apertura registrada
-            res.json({
-              success: true,
-              apertura_registrada: true,
-              empleado: {
-                id_empleado: empleado.id_empleado,
-                username: empleado.username,
-                nombre_completo: empleado.nombre_completo
-              }
-            });
-          });
-        } else {
-          // Ya había apertura registrada hoy
-          res.json({
-            success: true,
-            apertura_registrada: false,
-            empleado: {
-              id_empleado: empleado.id_empleado,
-              username: empleado.username,
-              nombre_completo: empleado.nombre_completo
-            }
-          });
-        }
+  app.get('/abrir-captura-venta', (req, res) => {
+  const usuario = req.session.usuario;
+
+  if (!usuario || !usuario.id) {
+    return res.status(401).json({ error: 'No hay sesión activa' });
+  }
+
+  const hoy = new Date();
+  const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 0, 0, 0);
+
+  const checkQuery = `
+    SELECT m1.id FROM movimientos_caja m1
+    WHERE m1.id_empleado = ? AND m1.id_tipo_movimiento = 1
+    AND NOT EXISTS (
+      SELECT 1 FROM movimientos_caja m2
+      WHERE m2.id_empleado = m1.id_empleado
+        AND m2.id_tipo_movimiento = 2
+        AND m2.fecha > m1.fecha
+    )
+    ORDER BY m1.fecha DESC
+    LIMIT 1
+  `;
+
+  connection.query(checkQuery, [usuario.id], (checkErr, checkResults) => {
+    if (checkErr) return res.status(500).json({ error: 'Error al verificar apertura de caja' });
+
+    if (checkResults.length === 0) {
+      // No hay apertura hoy, insertarla
+      const insertQuery = `
+        INSERT INTO movimientos_caja (id_empleado, id_tipo_movimiento, fecha)
+        VALUES (?, 1, NOW())
+      `;
+      connection.query(insertQuery, [usuario.id], (insertErr) => {
+        if (insertErr) return res.status(500).json({ error: 'Error al registrar apertura de caja' });
+
+        res.json({
+          success: true,
+          apertura_registrada: true,
+          empleado: usuario
+        });
       });
-    });
+    } else {
+      // Ya hay apertura
+      res.json({
+        success: true,
+        apertura_registrada: false,
+        empleado: usuario
+      });
+    }
   });
-  
+});
+
 
   // Ruta para agregar producto
 app.post('/agregar-producto', (req, res) => {
@@ -888,3 +895,83 @@ app.post('/por-empleado', (req, res) => {
     res.json({ success: true, datos: resumen });
   });
 });
+
+// Ruta para el registro
+app.post('/register', async (req, res) => {
+    const { correo, nombre, apellidos, puesto, contraseña } = req.body;
+
+    try {
+        const hashedPassword = await bcrypt.hash(contraseña, 10);
+
+        const query = 'INSERT INTO empleados (nombre_completo, cargo, correo, contraseña) VALUES (?, ?, ?, ?, ?)';
+        connection.query(query, [correo, nombre, apellidos, puesto, hashedPassword], (err, result) => {
+            if (err) {
+                console.error('Error al registrar:', err);
+                return res.status(400).json({ 
+                    success: false, 
+                    mensaje: 'Error al registrar. Tal vez el correo ya existe.' 
+                });
+            }
+
+            res.json({ 
+                success: true, 
+                mensaje: 'Registro exitoso',
+                redirectTo: '/login.html'
+            });
+        });
+    } catch (error) {
+        console.error('Error al encriptar la contraseña:', error);
+        res.status(500).json({ success: false, mensaje: 'Error en el servidor' });
+    }
+});
+
+
+
+
+
+app.post("/login-inicio", (req, res) => {
+  const { correo, contraseña } = req.body;
+
+  if (!correo || !contraseña) {
+    return res.status(400).json("Faltan datos");
+  }
+
+  connection.query("SELECT * FROM empleados WHERE correo = ?", [correo], async (err, results) => {
+    if (err) return res.status(500).json("Error de servidor");
+
+    if (results.length === 0) return res.status(401).json("Usuario no encontrado");
+
+    const user = results[0];
+    const esCorrecta = await bcrypt.compare(contraseña, user.contrasena_hash);
+
+    if (!esCorrecta) return res.status(401).json("Contraseña incorrecta");
+
+    // Aquí se crea la sesión
+    req.session.usuario = {
+      id: user.id_empleado,
+      username: user.username,
+      nombre: user.nombre_completo,
+      correo: user.correo,
+      cargo: user.cargo,
+      puntoVentaAutenticado: false // aún no ha entrado al POS
+    };
+
+    res.json({
+      mensaje: "Inicio de sesión exitoso",
+      rol: user.cargo
+    });
+  });
+});
+
+app.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Error al destruir sesión:", err);
+      return res.status(500).json({ mensaje: "Error al cerrar sesión" });
+    }
+
+    res.clearCookie("sid"); // Asegúrate de usar el mismo nombre que pusiste en session.name
+    res.status(200).json({ mensaje: "Sesión cerrada" });
+  });
+});
+

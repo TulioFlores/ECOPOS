@@ -8,6 +8,7 @@ const btnAbrir = document.getElementById("aplicar-venta");
 const btnCerrar = document.getElementById("cancelar-venta");
 const btnConfirmar = document.getElementById("boton-confirmar");
 
+
 // Abrir el modal
 btnAbrir.addEventListener("click", () => {
     modal.style.display = "flex";
@@ -25,12 +26,10 @@ const btnAbrirPrd = document.getElementById("buscar");
 const btnCerrarPrd = document.getElementById("cerrar-busqueda");
 
 btnAbrirPrd.addEventListener("click", () => {
-    modalBuscar.style.display = "flex";
+    const modal = new bootstrap.Modal(document.getElementById("modalBusquedaProducto"));
+    modal.show();
 });
 
-btnCerrarPrd.addEventListener("click", () => {
-    modalBuscar.style.display = "none";
-});
 
 
 //Modal para ingresar un nuevo cliente
@@ -58,11 +57,12 @@ const btnCancelarRetiro = document.getElementById("btn-cancelar-retiro");
 const btnConfirmarRetiro = document.getElementById("btn-confirmar-retiro");
 
 btnAbrirRetiro.addEventListener("click", () => {
-    modalRetiro.style.display = "flex";
+    const modalRetiro = new bootstrap.Modal(document.getElementById('modalRetiro'));
+    modalRetiro.show();
 });
 
 btnCancelarRetiro.addEventListener("click", () => {
-    modalRetiro.style.display = "none";
+    
 });
 
 //Modal para ver las existencias
@@ -72,11 +72,11 @@ const btnAbrirExistencias= document.getElementById("boton-existencias");
 const btnCerrarExistencias = document.getElementById("btn-cancelar-existencias");
 
 btnAbrirExistencias.addEventListener("click", () => {
-    modalExistencias.style.display = "flex";
+    const modalExistencias = new bootstrap.Modal(document.getElementById('modalExistencias'));
+    modalExistencias.show();
 });
 
 btnCerrarExistencias.addEventListener("click", () => {
-    modalExistencias.style.display = "none";
 });
 
 

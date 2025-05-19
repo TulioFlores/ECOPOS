@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="" />
+    <meta name="author" content="" />
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!--Bootstrap Icons-->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/configuracion/configuracion.css">
+    <link rel="stylesheet" href="/configuracion/reportes.css">
+     <!--FAVICON-->
+     <link rel="icon" href="/logos/LogoBlanco.svg" type="image/svg+xml" sizes="any">
+     <link rel="icon" type="image/png" href="/favicon-32x32.png">
+     <title>Reportes - Ecopos</title>
+  </head>
+  <body>
+    <nav class="navbar navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center gap-2 mb-0 p-0" href="/">
+          <img src="/logos/LogoBlanco.svg" alt="Logo Ecopos" height="60px" />
+          <span>ECOPOS</span>
+        </a>
+
+        <!-- Ícono de usuario con dropdown siempre visible -->
+        <div class="dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user fa-fw"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" id="Salir">Salir</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <button class="sidebar-toggle-btn" onclick="document.getElementById('sidebar').classList.toggle('collapsed')">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="container-fluid">
+      <div class="row">
+        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-dark sidebar collapse show">
+          <div class="position-sticky pt-3 text-white">
+            <h6 class="sidebar-heading px-3 mb-1 text-white">
+              <a class="nav-link text-white" href="#" id="abrirCapturaVenta">
+                <i class="bi bi-pc-display-horizontal"></i> Captura de venta
+              </a>
+            </h6><br>
+            <h6 class="sidebar-heading px-3 mb-1 text-white">
+              <a class="nav-link text-white" href="/reportes" id="linkConfig">
+                <i class="bi bi-gear-fill"></i> Configuración
+              </a>
+            </h6><br>
+            <!-- Boton para la asistencia -->
+            <h6 class="sidebar-heading px-3 mb-1 text-white">
+              <a class="nav-link text-white" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalAsistencia">
+                <i class="bi bi-clock" ></i>Checador
+              </a>
+            </h6><br>
+            
+            <!-- Cierre del dia-->
+            <h6 class="sidebar-heading px-3 mb-1 text-white ">
+              <a class="nav-link text-white" type="button" data-bs-toggle="modal" data-bs-target="#modal-autenticacion-corte"  aria-expanded="false" aria-controls="cierreDelDia">
+                  <i class="bi bi-cloud-moon-fill"></i>Cierre del Día
+              </a>
+            </h6>
+            
+            <div class="px-3 pt-3 text-muted small">Logged in as: Start Bootstrap</div>
+          </div>
+        </nav>
+        
+        <main class="col-md-9 col-lg-10 ms-sm-auto  px-md-4 container-fluid">
+           
+            <!-- Ventana modal para ver venta por dia-->
+            <div id="venta-por-dia" class="container bg-light rounded shadow p-4 my-4">
+              <h3 class="mb-4 text-center">Venta por Día</h3>
+
+              <div class="row mb-3">
+                <div class="col-md-6 mb-2">
+                  <label for="fecha-inicio" class="form-label">Inicio:</label>
+                  <input type="date" id="fecha-inicio" class="form-control">
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label for="fecha-fin" class="form-label">Fin:</label>
+                  <input type="date" id="fecha-fin" class="form-control">
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-4 mb-2">
+                  <label for="efectivo-dia" class="form-label">Efectivo:</label>
+                  <input type="number" id="efectivo-dia" class="form-control" readonly>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label for="tarjeta-dia" class="form-label">Tarjeta:</label>
+                  <input type="number" id="tarjeta-dia" class="form-control" readonly>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label for="mp-dia" class="form-label">Mercado Pago:</label>
+                  <input type="number" id="mp-dia" class="form-control" readonly>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label for="total-dia" class="form-label">Total:</label>
+                  <input type="number" id="total-dia" class="form-control" readonly>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-center">
+                <button id="btn-buscar-ventas" class="btn btn-primary mt-2">
+                  <i class="bi bi-search"></i> Buscar
+                </button>
+              </div>
+            </div>
+
+            <!-- Ventana modal para ver venta por vendedor-->
+            <div id="venta-por-empleado" class="container bg-light rounded shadow p-4 my-4">
+              <h3 class="mb-4 text-center">Venta por Empleado</h3>
+
+              <div class="row mb-3">
+                <div class="col-md-12 mb-2">
+                  <label for="usuario-empleado" class="form-label">Usuario del empleado:</label>
+                  <input type="text" id="usuario-empleado" class="form-control" placeholder="Ej. juan.perez">
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6 mb-2">
+                  <label for="fecha-inicio-empleado" class="form-label">Inicio:</label>
+                  <input type="date" id="fecha-inicio-empleado" class="form-control">
+                </div>
+                <div class="col-md-6 mb-2">
+                  <label for="fecha-fin-empleado" class="form-label">Fin:</label>
+                  <input type="date" id="fecha-fin-empleado" class="form-control">
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-4 mb-2">
+                  <label for="efectivo-empleado" class="form-label">Efectivo:</label>
+                  <input type="number" id="efectivo-empleado" class="form-control" readonly>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label for="tarjeta-empleado" class="form-label">Tarjeta:</label>
+                  <input type="number" id="tarjeta-empleado" class="form-control" readonly>
+                </div><div class="col-md-4 mb-2">
+                  <label for="mp-empleado" class="form-label">Mercado Pago:</label>
+                  <input type="number" id="mp-empleado" class="form-control" readonly>
+                </div>
+                <div class="col-md-4 mb-2">
+                  <label for="total-empleado" class="form-label">Total:</label>
+                  <input type="number" id="total-empleado" class="form-control" readonly>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-center">
+                <button id="btn-buscar-empleado" class="btn btn-primary mt-2">
+                  <i class="bi bi-search"></i> Buscar
+                </button>
+              </div>
+            </div>
+
+
+            <!-- Formulario para agregar producto -->
+            <div class="container mt-5" id="agregar-producto">
+              <h3 class="mb-4">Agregar Producto</h3>
+              <form>
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="nombre-producto" class="form-label">Nombre del producto</label>
+                    <input type="text" class="form-control" id="nombre-producto" name="nombre-producto" required maxlength="100">
+                  </div>
+                  <div class="col-md-6 mb-3">
+                    <label for="precio" class="form-label">Precio</label>
+                    <input type="number" step="0.01" class="form-control" id="precio" name="precio" required>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6 mb-3">
+                    <label for="stock" class="form-label">Stock</label>
+                    <input type="number" class="form-control" id="stock" name="stock" required>
+                  </div>
+                </div>
+
+                <div class="mb-3">
+                  <label for="descripcion" class="form-label">Descripción</label>
+                  <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+                </div>
+                <button type="submit" class="btn btn-success">Guardar producto</button>
+              </form>
+            </div>
+
+            <!--Ventana modal para agregar un empleado-->
+            <div id="alta-empleado" class="">
+                <h1 class="text-al">Alta de Empleado</h1><br>
+                <h2 >Fecha</h2><br>
+                <form id="form-empleado">
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="primer-nombre" class="form-label">Primer Nombre</label>
+                            <input type="text" class="form-control" id="primer-nombre" name="primer_nombre" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="segundo-nombre" class="form-label">Segundo Nombre</label>
+                            <input type="text" class="form-control" id="segundo-nombre" name="segundo_nombre">
+                        </div>
+                    </div>
+            
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="primer-apellido" class="form-label">Primer Apellido</label>
+                            <input type="text" class="form-control" id="primer-apellido" name="primer_apellido" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="segundo-apellido" class="form-label">Segundo Apellido</label>
+                            <input type="text" class="form-control" id="segundo-apellido" name="segundo_apellido">
+                        </div>
+                    </div>
+            
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <input type="tel" class="form-control" id="telefono" name="telefono" pattern="[0-9]{10}" required>
+                        </div>
+                    </div>
+            
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="puesto" class="form-label">Puesto</label>
+                            <input type="text" class="form-control" id="puesto" name="puesto" placeholder="Empleado"  readonly>
+                        </div>
+                    </div>
+            
+                    <div class="row">
+                        <div class="col-6">
+                            <label for="contrasena" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" id="contrasena" name="contrasena" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="confirmar-contrasena" class="form-label">Confirmar Contraseña</label>
+                            <input type="password" class="form-control" id="confirmar-contrasena" name="confirmar_contrasena" required>
+                        </div>
+                    </div>
+            
+                    <div class="row">
+                        <h4>Ingrese constraseña del responsable</h4>
+                        <div class="col-6">
+                            <label for="contrasena-responsable" class="form-label">Constraseña</label>
+                            <input type="password" class="form-control" id="contrasena-responsable" name="contrasena-responsable" required>
+                        </div>
+                        <div class="col-6">
+                            <label for="contrasena-responsable-conf" class="form-label">Confirmar constraseña</label>
+                            <input type="password" class="form-control" id="contrasena-responsable-conf" name="contrasena_responsable-conf" required>
+                        </div>
+                    </div>
+            
+                    <div class="row d-flex justify-content-end">
+                        <button type="button" class="col-5 btn-cancelar" id="btn-cancelar-empleado">Cancelar</button>
+                        <button type="submit" class="col-5 btn-confirmar" id="btn-confirmar-empleado">Dar de alta</button>
+                    </div>
+                </form>
+            </div>
+            <!-- Modal de confirmación -->
+            <div class="modal fade" id="modalMensaje" tabindex="-1" aria-labelledby="modalMensajeLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modalMensajeLabel">Resultado</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  </div>
+                  <div class="modal-body" id="modalMensajeBody">
+                    <!-- Aquí irá el mensaje dinámico -->
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+              <!-- Contenedor colapsable cierre del dia -->
+              <div class="collapse" id="cierreDelDia">
+                <div class="card card-body bg-success text-white">
+              
+                  <h3 class="text-center mb-4">Cierre del día</h3>
+              
+                  <div class="d-flex justify-content-center gap-3 mb-3">
+                    <p  class="form-control cierre-input w-auto fecha"   style="width: 150px;"></p>
+                    <p class="form-control cierre-input w-auto hora"   style="width: 150px;"></p>
+                    <button class="btn btn-dark" id="boton-cierre">Iniciar Cierre</button>
+                  </div>
+              
+                  <!-- <div class="row mb-4 align-items-center">
+                    <div class="col-6 label-text">VENTA NETA:</div>
+                    <div class="col-6">
+                      <input type="text" class="form-control cierre-input text-end" id="ventaNeta" value="$0.00" >
+                    </div>
+                  </div> -->
+
+              
+                  <div class="text-warning text-center fw-bold mb-3">**** DESGLOSE TIPOS DE COBRO ****</div>
+              
+                  <div class="row mb-2 align-items-center">
+                    <div class="col-auto label-fixed">EFECTIVO:</div>
+                    <div class="col-auto">
+                      <input type="text" id="efectivo-cierre" class="form-control cierre-input" style="width: 140px;">
+                    </div>
+                  </div>
+                  <div class="row mb-2 align-items-center">
+                    <div class="col-auto label-fixed">TARJETA:</div>
+                    <div class="col-auto">
+                      <input type="text" id="tarjeta-cierre" class="form-control cierre-input" style="width: 140px;">
+                    </div>
+                  </div>
+                  <div class="row mb-2 align-items-center">
+                    <div class="col-auto label-fixed">MERCADO PAGO:</div>
+                    <div class="col-auto">
+                      <input type="text" id="mp-cierre" class="form-control cierre-input" style="width: 140px;">
+                    </div>
+                  </div>
+                  <div class="row mb-4 align-items-center">
+                    <div class="col-auto label-fixed">MONTO TOTAL:</div>
+                    <div class="col-auto">
+                      <input type="text" id="monto-cierre" class="form-control cierre-input" style="width: 140px;">
+                    </div>
+                  </div>
+
+              
+                  <div class="d-flex justify-content-end gap-2">
+                    <button class="btn btn-light text-dark fw-bold" id="aplicar-cierre">Aplicar Cierre</button>
+                    <button class="btn btn-secondary">Salir</button>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Modal de Autenticación para Corte por Cajero -->
+            <div class="modal fade" id="modal-autenticacion-corte" tabindex="-1" aria-labelledby="modalCorteCajeroLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="modalCorteCajeroLabel">Autenticación para Corte</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    
+                    <div class="modal-body">
+                    <form id="form-autenticacion-corte">
+                        <div class="mb-3">
+                        <label for="usuarioCorte" class="form-label">Usuario</label>
+                        <input type="text" class="form-control" id="usuarioCorte" name="usuario" required>
+                        </div>
+                        <div class="mb-3">
+                        <label for="contrasenaCorte" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="contrasenaCorte" name="contrasena" required>
+                        </div>
+                    </form>
+                    </div>
+                    
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" form="form-autenticacion-corte" class="btn btn-success" >Confirmar</button>
+                    </div>
+                    
+                </div>
+                </div>
+            </div>
+            <!--Modal para el checador-->
+            <div class="modal fade " id="modalAsistencia" tabindex="-1" aria-labelledby="modalAsistenciaLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg " > <!-- Puedes ajustar el tamaño con modal-sm, modal-lg, etc. -->
+                  <div class="modal-content bg-success bg-primary">
+                  <div class="modal-header">
+                      <h1 class="modal-title fs-5" id="modalAsistenciaLabel">Registro De Asistencia</h1>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  </div>
+                  <div class="modal-body">
+                      <div class="mb-3 d-flex justify-content-between">
+                      <span class="fecha"></span>
+                      <span class="hora"></span>
+                      </div>
+                      <div class="mb-3">
+                      <label for="numEmpleado" class="form-label">Teclee el usuario:</label>
+                      <input type="text" class="form-control" id="numEmpleado">
+                      </div>
+                      <div class="mb-3">
+                      <label for="nombreEmpleado" class="form-label">Nombre del empleado:</label>
+                      <input type="text" class="form-control" id="nombreEmpleado">
+                      </div>
+                      <div class="mb-3">
+                      <input type="text" class="form-control" id="apellidoP" placeholder="Apellido paterno">
+                      </div>
+                      <div class="mb-3">
+                      <input type="text" class="form-control" id="apellidoM" placeholder="Apellido materno">
+                      </div>
+                      <div class="mb-3">
+                      <label for="tipoAsistencia" class="form-label">Tipo de asistencia:</label>
+                      <select id="tipoAsistencia" class="form-select">
+                          <option value="Entrada">Entrada</option>
+                          <option value="Salida">Salida</option>
+                      </select>
+                      </div>
+                  </div>
+                  <div class="modal-footer">
+                      <button id="registrar" class="btn btn-success">Registrar</button>
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                  </div>
+                  </div>
+              </div>
+          </div>
+          <footer class="pt-4 my-md-5 pt-md-5 border-top">
+            <div class="row">
+              <div class="col-12 col-md">
+                <small class="d-block mb-3 text-muted">&copy; 2023 Your Website</small>
+                <a href="#">Privacy Policy</a> &middot; <a href="#">Terms & Conditions</a>
+              </div>
+            </div>
+          </footer>
+        </main>
+      </div>
+    </div>
+
+
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/configuracion/services/reportes-emp.js"></script>
+    <script src="/configuracion/services/agregar-empleado.js"></script>
+    <script src="/configuracion/services/agregar-producto.js"></script>
+    <script src="/configuracion/services/cierre-del-dia.js"></script>
+    <script src="../punto-de-venta/services/obtenerhora.js"></script>
+  </body>
+</html>

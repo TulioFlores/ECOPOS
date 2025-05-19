@@ -39,63 +39,91 @@
     </nav>
     <!-- Contenedor para el punto de venta -->
     <div class="row ">
-        <div class="col-xl-8 col-lg-9">
+       <div class="col-12 col-xl-8 col-lg-9">
             <!-- Formulario para escanear el producto -->
-            <form class="form-escaneo"  id="form-escaneo">
-                <div class="row d-flex align-items-center flex-nowrap">
-                    <p class="col-lg-3 col-md-3 col-2 mb-0" >Producto: </p>
-                    <input class="col-lg-6 col-md-6 col-6" type="number" name="producto" id="producto">
-                    <i class="bi bi-search col-lg-1 col-md-1 col-2" style="font-size: 30px;" id="buscar"></i>
-                    <i class="bi bi-camera col-lg-1" style="font-size: 30px;" id="escanear"></i>
+            <form class="form-escaneo" id="form-escaneo">
+                <!-- Producto -->
+                <div class="row gx-2 gy-1 align-items-center">
+                    <label class="col-12 col-sm-3 col-form-label fs-5 fs-sm-6">Producto:</label>
+                    <div class="col-12 col-sm-6">
+                        <input type="number" class="form-control" id="producto" name="producto" />
+                    </div>
+                    <i class="bi bi-search fs-3 col-6 col-sm-1" id="buscar"></i>
+                    <i class="bi bi-camera fs-3 col-6 col-sm-1" id="escanear"></i>
+                    
                 </div>
-                <div class="row d-flex align-items-center">
-                    <p class="col-3 mb-0 " >Cantidad: </p>
-                    <input class="col-6" type="number" name="cantidad" id="cantidad" value="1" min="1">
-                    <button id="enter" class="col-lg-2 col-md-2 col-2" type="button">Enter</button>
+
+                <!-- Cantidad -->
+                <div class="row gx-2 gy-1 align-items-center">
+                <label class="col-12 col-sm-3 col-form-label fs-5 fs-sm-6">Cantidad:</label>
+                <div class="col-12 col-sm-6">
+                    <input type="number" class="form-control" id="cantidad" name="cantidad" value="1" min="1" />
                 </div>
-                <div class=" row flex-nowrap d-flex align-items-center ">
-                    <label class="col-3 mb-0">Cliente: </label>
-                    <input class="col-6" type="text" name="cliente" id="cliente" placeholder="telefono">
-                    <button class="col-2" id="nuevocliente" type="button">Nuevo</button>
-                </div><br>
-                <div id="sugerencias-telefono" class="sugerencias-box"></div>
+                <div class="col-12 col-sm-2">
+                    <button id="enter" type="button" class="btn btn-secondary w-100">Enter</button>
+                </div>
+                </div>
+
+                <!-- Cliente -->
+                <div class="row gx-2 gy-1 align-items-center">
+                <label class="col-12 col-sm-3 col-form-label fs-5 fs-sm-6">Cliente:</label>
+                <div class="col-12 col-sm-6">
+                    <input type="text" class="form-control" id="cliente" name="cliente" placeholder="Teléfono" />
+                </div>
+                <div class="col-12 col-sm-2">
+                    <button id="nuevocliente" type="button" class="btn btn-secondary w-100">Nuevo</button>
+                </div>
+                </div>
+
+                <!-- Sugerencias -->
+                <div id="sugerencias-telefono" class="sugerencias-box mt-2"></div>
             </form>
-            
-            <!-- Tabla para mostrar los productos -->
-            <table class="container-fluid tabla-principal" id="tabla-principal">
-                <thead>
-                    <tr class="row">
-                        <th class="col-3 text-center">Clave</th>
-                        <th class="col-3 text-center">Descripcion</th>
-                        <th class="col-3 text-center">Cantidad</th>
-                        <th class="col-3 text-center">Precio</th>
+
+            <!-- Tabla -->
+            <div class="table-responsive">
+                <table class="tabla-principal w-100">
+                    <thead>
+                    <tr class="row text-center">
+                        <th class="col-3">Clave</th>
+                        <th class="col-3">Descripción</th>
+                        <th class="col-3">Cantidad</th>
+                        <th class="col-3">Precio</th>
                     </tr>
-                </thead>
-                <tbody class="tbody" id="productos-body">
-                    <!-- Aqui se mostraran los productos -->
-                </tbody>
-                <tfoot >
-                    <tr class="row">
+                    </thead>
+                    <tbody class="tbody" id="productos-body">
+                    <!-- Aquí van los productos -->
+                    </tbody>
+                    <tfoot>
+                    <tr class="row text-center ">
                         <td class="col-4">Subtotal</td>
                         <td class="col-4">Descuento</td>
-                        <td class="col-4">Total neto <p id="total-neto"></p></td>
+                        <td class="col-4">
+                        Total neto
+                        <p id="total-neto"></p>
+                        </td>
                     </tr>
-                </tfoot>
-            </table>
-            <div class="row d-flex align-content-center  flex-nowrap container-fluid">
-                <button class="col-6 boton-venta " id="btn-eliminar" style="margin-left: 10px; border-radius: 10px 0px 0px 10px;border-radius: none;"><i class="icono-x bi bi-x-lg "></i>Eliminar Producto</button>
-                <button id="aplicar-venta" class="col-6 boton-venta" style="margin-right: 10px ;border-radius: 0px 10px 10px 0px;border-left: 5px;"><i class="bi bi-cart"></i>Aplicar venta</button>    
-            </div>  
-        </div>
-        <!-- Modal para mostrar el QR del ticket -->
-        <div id="modal-ticket" class="modal-qr">
-            <div class="modal-content-qr">
-            <span id="cerrar-modal-ticket" class="close-qr">&times;</span>
-            <h3>Ticket generado</h3>
-            <p>Escanea el QR o <a id="descargar-ticket" href="#" download target="_blank">descarga el ticket</a></p>
-            <img id="qr-image-ticket" src="" alt="QR del ticket" />
+                    </tfoot>
+                </table>
+                </div>
+
+            <!-- Botones de acción -->
+            <div class="row mt-3 gx-2">
+                <div class="col-12 col-md-6 mb-2 mb-md-0">
+                    <button class="btn btn-danger w-100 py-2 py-md-3 fs-5 fs-lg-4" id="btn-eliminar">
+                    <i class="bi bi-x-lg"></i> Eliminar Producto
+                    </button>
+                </div>
+                <div class="col-12 col-md-6">
+                    <button class="btn btn-success w-100 py-2 py-md-3 fs-5 fs-lg-4" id="aplicar-venta">
+                    <i class="bi bi-cart"></i> Aplicar venta
+                    </button>
+                </div>
             </div>
+
+
         </div>
+
+        
         <!-- Alerta flotante -->
         <div id="alerta" class="alerta-venta" style="display:none;">
             <span id="alerta-mensaje"></span>
@@ -135,6 +163,15 @@
            </div>
         </div>
     </div>
+    <!-- Modal para mostrar el QR del ticket -->
+        <div id="modal-ticket" class="modal-qr">
+            <div class="modal-content-qr">
+            <span id="cerrar-modal-ticket" class="close-qr">&times;</span>
+            <h3>Ticket generado</h3>
+            <p>Escanea el QR o <a id="descargar-ticket" href="#" download target="_blank">descarga el ticket</a></p>
+            <img id="qr-image-ticket" src="" alt="QR del ticket" />
+            </div>
+        </div>
     <!-- Contenedor donde aparecerá la cámara -->
    <div class="modal fade" id="scannerModal" tabindex="-1" aria-labelledby="scannerModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -149,61 +186,71 @@
             </div>
         </div>
     </div>
-    <!--Ventana modal para confirmacion de pago-->
-    <div class="contenedor-pago p-3">
-        <!-- Fila pago -->
-         <div class="row container-fluid ">
-            <form class="col-lg-9 col-md-9 col-6 container-fluid datos" action="" >
-                <div class="row align-items-center"><p class="col-6 " >Cliente: </p><p class="col-6" id="nombre-cliente"></p></div><br>
-                <div class="row align-items-center"><p class="col-6 " >Importe: </p><p class="col-6" type="number" name="importe" id="importe"></p></div><br>
-                <div class="row align-items-center"><p class="col-6" >$Pagado: </p><p class="col-6" type="number" name="pagado" id="pagado"></p></div><br>
-                <div class="row align-items-center"><p class="col-6" >$Por Pagar: </p><p class="col-6" type="number" name="porpagar" id="porpagar"></p></div><br>
-                <div class="row align-items-center"><p style="color:red" class="col-6" >Cambio: </p><p class="col-6" type="number" name="cambio" id="cambio"></p></div><br>
-                <!-- <div class="row align-items-center"><p class="col-6" >Efectivo: </p><input class="col-6"  name="efectivo" id="input-efectivo"></div><br> -->
-            </form>
-            <div class="col-lg-3 col-md-3 col-6 container-fluid b-derecha">
-                <div > 
-                    <button  id="boton-confirmar">Aplicar Venta</button>
-                    <button id="cancelar-venta" >Cancelar</button>
-                </div>
-                <div >
-                    <p class="fecha">Fecha</p>
-                    <p class="hora">Hora</p>
-                </div>
-                
-            </div>
-         </div>
+   <!--Ventana modal para confirmacion de pago-->
+        <div class="contenedor-pago p-3">
+            <!-- Fila pago -->
+            <div class="row">
+                <form class="col-lg-9 col-md-8 col-12 datos">
+                    <div class="row align-items-center mb-2">
+                        <p class="col-6">Cliente: </p><p class="col-6" id="nombre-cliente"></p>
+                    </div>
+                    <div class="row align-items-center mb-2">
+                        <p class="col-6">Importe: </p><p class="col-6" id="importe"></p>
+                    </div>
+                    <div class="row align-items-center mb-2">
+                        <p class="col-6">$Pagado: </p><p class="col-6" id="pagado"></p>
+                    </div>
+                    <div class="row align-items-center mb-2">
+                        <p class="col-6">$Por Pagar: </p><p class="col-6" id="porpagar"></p>
+                    </div>
+                    <div class="row align-items-center mb-2">
+                        <p style="color:red" class="col-6">Cambio: </p><p class="col-6" id="cambio"></p>
+                    </div>
+                </form>
 
-        <!-- Fila tabla tipo de pago -->
-         <div class="row">
-            <table class="col-9">
-                <thead class="container">
-                    <tr class="row">
-                        <th class="col-4">Clave</th>
-                        <th class="col-4">Descripcion</th>
-                        <th class="col-4">Importe</th>
-                    </tr>
-                </thead>
-                <tbody id="body-pago">
-                    <tr class="row" id="efectivo"> 
-                        <td class="col-4">1</td>
-                        <td class="col-4">Efectivo</td>
-                        <td class="col-4"><input type="text" id="input-efectivo" placeholder="0.0"></td>
-                    </tr>
-                    <tr class="row">
-                        <td class="col-4">2</td>
-                        <td class="col-4">Tarjeta</td>
-                        <td class="col-4" ><input type="text" id="input-tarjeta" placeholder="0.0"></td>
-                    </tr>
-                    <tr class="row">
-                        <td class="col-4">2</td>
-                        <td class="col-4">Mercado Pago</td>
-                        <td class="col-4" ><input type="text" id="mercado-pago" placeholder="0.0"></td>
-                    </tr>
-                </tbody>
-            </table>
-         </div>
-    </div>
+                <div class="col-lg-3 col-md-4 col-12 b-derecha text-center">
+                    <div class="mb-3">
+                        <button id="boton-confirmar" class="btn btn-success w-100 mb-2">Aplicar Venta</button>
+                        <button id="cancelar-venta" class="btn btn-danger w-100">Cancelar</button>
+                    </div>
+                    <div>
+                        <p class="fecha">Fecha</p>
+                        <p class="hora">Hora</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Fila tabla tipo de pago -->
+            <div class="row">
+                <table class="col-9">
+                    <thead class="container">
+                        <tr class="row">
+                            <th class="col-4">Clave</th>
+                            <th class="col-4">Descripcion</th>
+                            <th class="col-4">Importe</th>
+                        </tr>
+                    </thead>
+                    <tbody id="body-pago">
+                        <tr class="row" id="efectivo"> 
+                            <td class="col-4">1</td>
+                            <td class="col-4">Efectivo</td>
+                            <td class="col-4"><input type="text" id="input-efectivo" placeholder="0.0"></td>
+                        </tr>
+                        <tr class="row">
+                            <td class="col-4">2</td>
+                            <td class="col-4">Tarjeta</td>
+                            <td class="col-4" ><input type="text" id="input-tarjeta" placeholder="0.0"></td>
+                        </tr>
+                        <tr class="row">
+                            <td class="col-4">2</td>
+                            <td class="col-4">Mercado Pago</td>
+                            <td class="col-4" ><input type="text" id="mercado-pago" placeholder="0.0"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
     <!--Modal para el qr-->
     <!-- Modal para QR de Mercado Pago -->
     <div class="modal fade" id="qrModal" tabindex="-1" aria-labelledby="qrModalLabel" aria-hidden="true">
@@ -235,68 +282,100 @@
             <button id="btn-cancelar-cliente" class="col-6">Cancelar</button><button id="btn-confirmar-cliente" class="col-6">Confirmar</button>
         </div>
     </div>
-    <!-- Ventana modal para buscar producto -->
-    <div class="buscar-producto">
-        <i class="bi bi-x-lg position-absolute top-0 end-0"  id="cerrar-busqueda"></i>
-        <div class="row pt-5 d-flex align-items-center justify-content-center">
-            <p class="col-2 mb-0" style="font-weight: bold;">Producto: </p><input class="col-9" type="text" name="producto" id="busqueda-producto">
-        </div>
-        <table class="container-fluid tabla-principal">
+    <!-- Modal para buscar productos -->
+    <div class="modal fade" id="modalBusquedaProducto" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-transparent border-0"> <!-- Quitar fondo/estilo de modal para usar el tuyo -->
+        <div class="buscar-producto position-relative">
+            <i class="bi bi-x-lg position-absolute top-0 end-0 m-2" id="cerrar-busqueda" data-bs-dismiss="modal" style="cursor: pointer;"></i>
+
+            <div class="row pt-5 d-flex align-items-center justify-content-center">
+            <p class="col-2 mb-0 fw-bold">Producto: </p>
+            <input class="col-9" type="text" name="producto" id="busqueda-producto" />
+            </div>
+
+            <table class="container-fluid tabla-principal">
             <thead>
                 <tr class="row">
-                    <th class="col-3 text-center">Clave</th>
-                    <th class="col-3 text-center">Descripcion</th>
-                    <th class="col-3 text-center">Stock</th>
-                    <th class="col-3 text-center">Precio</th>
+                <th class="col-3 text-center">Clave</th>
+                <th class="col-3 text-center">Descripción</th>
+                <th class="col-3 text-center">Stock</th>
+                <th class="col-3 text-center">Precio</th>
                 </tr>
             </thead>
-            <tbody class="overflow-y-scroll overflow-x-hidden " id="tabla-busqueda">
-                <!-- Aqui se mostraran los productos -->
+            <tbody id="tabla-busqueda">
+                <!-- Aquí se mostrarán los productos -->
             </tbody>
-        </table>
+            </table>
+        </div>
+        </div>
     </div>
+    </div>
+
+
     
     <!--Ventana para realizar el retiro-->
-    <div id="retiro">
-        <h2 >Retiro</h2>
-        <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Cantidad: </label><input class="col-6" type="number" name="cantidad" id="cantidad-retiro">
-        </div>
-        <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Motivo: </label><input class="col-6" type="text" name="motivo" id="motivo-retiro">
-        </div>
-        <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Cajero: </label><input class="col-6" type="text" name="cajero" id="cajero-retiro">
-        </div><br>
-        <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Contraseña: </label><input class="col-6" type="password" name="contraseña" id="contraseña-retiro">
-        </div>
-        <div class="row d-flex align-items-center">
-            <label class="col-6 mb-0">Confirmar contraseña: </label><input class="col-6" type="password" name="conf-contraseña" id="conf-contraseña-retiro">
-        </div>
-        <div class="row d-flex align-items-center justify-content-center flex-nowrap">
-            <button id="btn-cancelar-retiro" class="col-6">Cancelar</button><button id="btn-confirmar-retiro" class="col-6">Confirmar</button>
-        </div>
-    </div>
-    <!--Ventana modal para ver las existencias-->
-        <div id="existencias">
-            <table class="container-fluid tabla-principal" >
-                <thead>
-                    <tr class="row">
-                        <th class="col-3 text-center">Clave</th>
-                        <th class="col-3 text-center">Descripcion</th>
-                        <th class="col-3 text-center">Stock</th>
-                        <th class="col-3 text-center">Precio</th>
-                    </tr>
-                </thead>
-                <tbody class="overflow-y-scroll tbody " id="tabla-existencias">
-                    <!-- Aqui se mostraran los productos -->
-                </tbody>
-            </table>
-            <div class="row d-flex align-items-center justify-content-center flex-nowrap">
-                <button id="btn-cancelar-existencias" class="col-6">Salir</button><button id="btn-imprimir-existencias" class="col-6">Imprimir</button>
+    <div class="modal fade" id="modalRetiro" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content bg-transparent border-0">
+            <div id="retiro" class="position-relative">
+                <h2>Retiro</h2>
+                <div class="row d-flex align-items-center">
+                <label class="col-6 mb-0">Cantidad: </label>
+                <input class="col-6" type="number" name="cantidad" id="cantidad-retiro">
+                </div>
+                <div class="row d-flex align-items-center">
+                <label class="col-6 mb-0">Motivo: </label>
+                <input class="col-6" type="text" name="motivo" id="motivo-retiro">
+                </div>
+                <div class="row d-flex align-items-center">
+                <label class="col-6 mb-0">Cajero: </label>
+                <input class="col-6" type="text" name="cajero" id="cajero-retiro">
+                </div><br>
+                <div class="row d-flex align-items-center">
+                <label class="col-6 mb-0">Contraseña: </label>
+                <input class="col-6" type="password" name="contraseña" id="contraseña-retiro">
+                </div>
+                <div class="row d-flex align-items-center">
+                <label class="col-6 mb-0">Confirmar contraseña: </label>
+                <input class="col-6" type="password" name="conf-contraseña" id="conf-contraseña-retiro">
+                </div>
+                <div class="row d-flex align-items-center justify-content-center flex-nowrap mt-3">
+                <button id="btn-cancelar-retiro" class="col-6 btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button id="btn-confirmar-retiro" class="col-6 btn btn-success">Confirmar</button>
+                </div>
+            </div>
             </div>
         </div>
+    </div>
+
+    <!--Ventana modal para ver las existencias-->
+    <div class="modal fade" id="modalExistencias" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content bg-transparent border-0">
+            <div id="existencias" class="position-relative">
+                <table class="container-fluid tabla-principal">
+                <thead>
+                    <tr class="row">
+                    <th class="col-3 text-center">Clave</th>
+                    <th class="col-3 text-center">Descripción</th>
+                    <th class="col-3 text-center">Stock</th>
+                    <th class="col-3 text-center">Precio</th>
+                    </tr>
+                </thead>
+                <tbody class="overflow-y-scroll" id="tabla-existencias">
+                    <!-- Aquí se mostrarán los productos -->
+                </tbody>
+                </table>
+                <div class="row d-flex align-items-center justify-content-center flex-nowrap">
+                <button id="btn-cancelar-existencias" class="col-6 btn btn-secondary" data-bs-dismiss="modal">Salir</button>
+                <button id="btn-imprimir-existencias" class="col-6 btn btn-primary">Imprimir</button>
+                </div>
+            </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Contenedor invisible para el contenido a imprimir -->
     <div id="contenido-pdf" style="display:none;">
     <h2>Lista de Productos</h2>

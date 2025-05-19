@@ -1,8 +1,9 @@
-*{
+* {
     margin: 0;
     padding: 0;
 }
-#nuevocliente{
+
+#nuevocliente {
     font-weight: bold;
     background-color: #50956e;
     color: rgb(0, 0, 0);
@@ -11,13 +12,15 @@
     padding: 2px;
     height: 40px;
 }
-#nuevocliente:hover{
+
+#nuevocliente:hover {
     background-color: #000000;
     transition: 0.3s;
     color: white;
 }
+
 /* Contenedor pago */
-.contenedor-pago{
+.contenedor-pago {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
@@ -27,125 +30,181 @@
     display: none;
     flex-direction: column;
     z-index: 1000;
-    background-color:#5db282;
+    background-color: #5db282;
     border-radius: 10px;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
     overflow-x: hidden;
     overflow-y: auto;
+    padding: 1rem;
 }
-.contenedor-pago form{
+
+.contenedor-pago form {
     background-color: lightgray;
     border-radius: 5px;
     min-height: 300px;
-    
+    padding: 1rem;
 }
-.b-derecha button, .b-derecha p{
+
+.b-derecha button,
+.b-derecha p {
     background-color: #ffffff;
     width: 100%;
     padding: 20px;
-    margin: 10px;
+    margin: 10px 0;
     border-radius: 5px;
     color: rgb(0, 0, 0);
-    
 }
-.b-derecha button:hover{
+
+.b-derecha button:hover {
     transition: 0.3s;
     background-color: #97010E;
     color: rgb(255, 255, 255);
 }
-#boton-confirmar:hover{
-    background-color:#478763 ;
-}
-/*Tabla de tipos de pago*/
 
-.contenedor-pago table{
+#boton-confirmar:hover {
+    background-color: #478763;
+}
+
+/* Tabla de tipos de pago */
+.contenedor-pago table {
     width: 100%;
     margin-top: 10px;
 }
-.contenedor-pago thead th{
+
+.contenedor-pago thead th {
     text-align: center;
 }
-.contenedor-pago > thead .row{
+
+.contenedor-pago > thead .row {
     background-color: #b1b2b5;
     border-radius: 10px;
-    margin: 5px 10px 5px 10px;
+    margin: 5px 10px;
     text-align: center;
-} 
-.contenedor-pago tbody{
+}
+
+.contenedor-pago tbody {
     border: 3px solid black;
     min-height: 100%;
     border-radius: 10px;
-    margin: 10px;
+    margin: 10px 0;
     display: block;
     background-color: white;
     text-align: center;
     overflow: hidden;
 }
-.datos>div{
+
+.datos > div {
     flex-wrap: nowrap;
 }
 
-.datos div input{
+.datos div input {
     width: 50%;
     height: 40px;
     padding: 5px;
 }
-.datos p{
+
+.datos p {
     all: unset;
     padding: 10px;
     width: 50%;
     font-weight: bold;
 }
-.datos input{
+
+.datos input {
     all: unset;
     border-radius: 5px;
     margin: 5px;
-    background-color:rgb(170, 170, 170) ;
+    background-color: rgb(170, 170, 170);
+    padding: 5px;
+    width: 100%;
 }
-.pago-seleccionado{
-    background-color:rgb(170, 170, 170) ;
+
+.pago-seleccionado {
+    background-color: rgb(170, 170, 170);
     cursor: pointer;
 }
 
-#mercado-pago{
+#mercado-pago,
+#input-efectivo,
+#input-tarjeta {
     all: unset;
-}
-#input-efectivo{
-    all: unset;
-}
-#input-tarjeta{
-    all: unset;
+    width: 100%;
+    padding: 5px;
+    border-radius: 5px;
+    text-align: center;
 }
 
+/* QR modal estilos */
 .qr-modal .modal-content {
     padding: 20px;
     border-radius: 15px;
     background-color: #f8f9fa;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
-  }
-  
-  .qr-modal img {
+}
+
+.qr-modal img {
     border: 3px solid #198754;
     border-radius: 12px;
     padding: 5px;
-  }
-  
-@media screen and  (max-width: 980px) {
-    .contenedor-pago{
-        height: 85vh;
+}
+
+/* RESPONSIVE RULES */
+@media screen and (max-width: 980px) {
+    .contenedor-pago {
         width: 90vw;
-        
+        height: 90vh;
+        padding: 1rem;
     }
-  }
-  @media screen and  (max-width: 400px) {
-    .contenedor-pago{
-        height: 85vh;
-        width: 90vw;
-        
-    }
-    .datos>div{
+
+    .datos > div {
         flex-wrap: wrap;
     }
-  }
+
+    .b-derecha {
+        margin-top: 20px;
+    }
+
+    .datos p,
+    .datos div input {
+        width: 100%;
+        text-align: center;
+    }
+
+    .contenedor-pago form {
+        min-height: auto;
+    }
+
+    .contenedor-pago tbody {
+        overflow-x: auto;
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .contenedor-pago {
+        width: 95vw;
+        height: 90vh;
+        padding: 0.5rem;
+    }
+
+    .datos > div {
+        flex-wrap: wrap;
+    }
+
+    .datos p,
+    .datos div input {
+        width: 100%;
+    }
+
+    .b-derecha button,
+    .b-derecha p {
+        padding: 15px;
+        font-size: 0.9rem;
+    }
+
+    .qr-modal .modal-content {
+        padding: 10px;
+    }
+}
+
 
   

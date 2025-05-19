@@ -1,3 +1,25 @@
+import { cerrarSidebar } from './reportes.js';
+import { cerrarTodosLosModales } from './reportes.js';
+import { resaltarActivo} from './reportes.js';
+
+//Funcion para ocultar o abrir
+function abrirCollapse(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  const instance = bootstrap.Collapse.getOrCreateInstance(el);
+  instance.show();
+}
+
+export function cerrarCollapse(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  const instance = bootstrap.Collapse.getOrCreateInstance(el);
+  instance.hide();
+}
+
+
 document.getElementById('boton-cierre').addEventListener('click', async () => {
   try {
     const response = await fetch('http://localhost:3000/resumen-dia', {
@@ -54,10 +76,7 @@ document.getElementById('boton-cierre').addEventListener('click', async () => {
 
       if (data.success) {
         alert('✅ Cierre registrado correctamente');
-        const collapse = new bootstrap.Collapse(document.getElementById('cierreDelDia'), {
-          toggle: true
-        });
-        collapse.hide();
+        cerrarCollapse("cierreDelDia");
         document.getElementById('efectivo-cierre').value = null;
         document.getElementById('tarjeta-cierre').value = null;
         document.getElementById('mp-cierre').value = null;
@@ -73,7 +92,8 @@ document.getElementById('boton-cierre').addEventListener('click', async () => {
 
   document.getElementById('form-autenticacion-corte').addEventListener('submit', async function (e) {
     e.preventDefault();
-  
+    cerrarSidebar();
+    cerrarTodosLosModales();
     const usuario = document.getElementById('usuarioCorte').value;
     const contrasena = document.getElementById('contrasenaCorte').value;
   
@@ -91,11 +111,9 @@ document.getElementById('boton-cierre').addEventListener('click', async () => {
         
         const modalAutenticacion = bootstrap.Modal.getInstance(document.getElementById('modal-autenticacion-corte'));
         if (modalAutenticacion) modalAutenticacion.hide();
-        // Abrir el modal de corte por cajero
-        const collapse = new bootstrap.Collapse(document.getElementById('cierreDelDia'), {
-          toggle: true
-        });
-
+        // Abrir el modal de cierre del dia
+        abrirCollapse("cierreDelDia");
+        resaltarActivo("boton-cierre-del-dia");
       } else {
         alert(data.error || 'Error al autenticar');
       }

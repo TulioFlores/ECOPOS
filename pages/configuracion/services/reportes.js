@@ -1,5 +1,28 @@
+import {cerrarCollapse} from './cierre-del-dia.js';
+//Funcion para salir
+document.getElementById("Salir").addEventListener("click", async () => {
+    try {
+      const response = await fetch("http://localhost:3000/logout", {
+        method: "POST",
+        credentials: "include" // Incluye la cookie de sesión
+      });
 
-
+      if (response.ok) {
+        // Redirige al inicio (ajusta si tu página de inicio es distinta)
+        window.location.href = "/";
+      } else {
+        alert("Error al cerrar sesión");
+      }
+    } catch (error) {
+      console.error("Error en logout:", error);
+      alert("No se pudo cerrar sesión");
+    }
+  });
+export function cerrarSidebar() {
+  const sidebarElement = document.getElementById("sidebar");
+  const sidebarInstance = bootstrap.Offcanvas.getInstance(sidebarElement);
+  if (sidebarInstance) sidebarInstance.hide();
+}
 // Referencias a todos los modales
 const modalVentaPorDia = document.getElementById("venta-por-dia");
 const modalVentaPorEmpleado = document.getElementById("venta-por-empleado");
@@ -16,38 +39,47 @@ const btnCancelarEmpleado = document.getElementById("btn-cancelar-empleado");
 const btnConfirmarEmpleado = document.getElementById("btn-confirmar-empleado");
 
 // Función para cerrar todos los modales
-function cerrarTodosLosModales() {
+ export function cerrarTodosLosModales() {
     modalVentaPorDia.style.display = "none";
     modalVentaPorEmpleado.style.display = "none";
     modalEmpleado.style.display = "none";
     modalProducto.style.display = "none";
+    cerrarCollapse("cierreDelDia");
 }
 
 // Abrir modal de Venta por Día
 btnAbrirVentaPorDia.addEventListener("click", () => {
     const yaVisible = modalVentaPorDia.style.display === "flex";
+    resaltarActivo("boton-venta-por-dia");
     cerrarTodosLosModales();
     if (!yaVisible) modalVentaPorDia.style.display = "flex";
+    cerrarSidebar();
 });
 
 // Abrir modal de Venta por Empleado
 btnAbrirVentaPorEmpleado.addEventListener("click", () => {
     const yaVisible = modalVentaPorEmpleado.style.display === "flex";
+    resaltarActivo("boton-venta-por-empleado");
     cerrarTodosLosModales();
     if (!yaVisible) modalVentaPorEmpleado.style.display = "flex";
+    cerrarSidebar();
 });
 
 // Abrir modal de Alta de Empleado
 btnAbrirEmpleado.addEventListener("click", () => {
     const yaVisible = modalEmpleado.style.display === "flex";
+    resaltarActivo("abrir-empleado");
     cerrarTodosLosModales();
     if (!yaVisible) modalEmpleado.style.display = "flex";
+    cerrarSidebar();
 });
 // Abrir modal de Alta de Producto
 btnAbrirProducto.addEventListener("click", () => {
     const yaVisible = modalProducto.style.display === "flex";
+    resaltarActivo("boton-agregar-producto");
     cerrarTodosLosModales();
     if (!yaVisible) modalProducto.style.display = "flex";
+    cerrarSidebar();
 });
 
 // También cierra el modal si se presiona Cancelar o Confirmar
@@ -59,59 +91,60 @@ btnCancelarEmpleado.addEventListener("click", () => {
 
 // Evento para abrir el modal para login local de captura de venta
 
-document.getElementById('abrirCapturaVenta').addEventListener('click', () => {
-    const modal = new bootstrap.Modal(document.getElementById('modalAccesoVenta'));
-    modal.show();
-  });
+document.getElementById('abrirCapturaVenta').addEventListener('click', async () => {
+  try {
+    const response = await fetch('http://localhost:3000/abrir-captura-venta', {
+      method: 'GET',
+      credentials: 'include' // para enviar la cookie de sesión
+    });
 
-  document.getElementById('formAccesoVenta').addEventListener('submit', async function (e) {
-    e.preventDefault();
+    const data = await response.json();
 
-    const usuario = document.getElementById('usuarioVenta').value.trim();
-    const contrasena = document.getElementById('contrasenaVenta').value;
-
-    try {
-      const response = await fetch('http://localhost:3000/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ username: usuario, contrasena: contrasena })
-      });
-
-      const data = await response.json();
-      if (response.ok && data.success) {
-        // Guarda los datos del cajero en localStorage
-        localStorage.setItem('cajero', JSON.stringify({
-          id: data.empleado.id_empleado,
-          username: data.empleado.username,
-          nombre: data.empleado.nombre_completo
-        }));
+    if (response.ok && data.success) {
+      // Guarda en localStorage si quieres
+      localStorage.setItem('cajero', JSON.stringify(data.empleado));
       
-        // Redirige al punto de venta
-        window.location.href = '/pointofsale';
-      }else {
-        alert(data.error || 'Credenciales inválidas');
-      }
-    } catch (error) {
-      console.error(error);
-      alert('Error al conectar con el servidor');
+      // Redirige al punto de venta
+      window.location.href = '/pointofsale';
+    } else {
+      alert(data.error || 'Error al abrir captura');
     }
-  });
+  } catch (error) {
+    console.error('Error al conectar con el servidor:', error);
+    alert('Error al conectar con el servidor');
+  }
+});
 
   const currentPath = window.location.pathname;
+  
+export function resaltarActivo(id) {
+  const link = document.getElementById(id);
 
-  function resaltarActivo(id) {
-      const link = document.getElementById(id);
-      link.classList.remove("text-white");
-      link.classList.add("bg-white", "text-black", "fw-bold", "px-3", "py-2", "rounded-3", "shadow-sm");
+  const estaResaltado = link.classList.contains("bg-white") && link.classList.contains("text-black");
+
+  // Si ya está resaltado, lo desmarca
+  if (estaResaltado) {
+    link.classList.remove("bg-white", "text-black", "fw-bold", "px-3", "py-2", "rounded-3", "shadow-sm");
+    link.classList.add("text-white");
+  } else {
+    // Desmarcar todos los otros botones activos
+    const botonesResaltados = document.querySelectorAll(".bg-white.text-black");
+    botonesResaltados.forEach(boton => {
+      boton.classList.remove("bg-white", "text-black", "fw-bold", "px-3", "py-2", "rounded-3", "shadow-sm");
+      boton.classList.add("text-white");
+    });
+
+    // Marcar el actual
+    link.classList.remove("text-white");
+    link.classList.add("bg-white", "text-black", "fw-bold", "px-3", "py-2", "rounded-3", "shadow-sm");
   }
+}
+
+
+
   
   if (currentPath.includes("captura")) resaltarActivo("abrirCapturaVenta");
-  if (currentPath === "/configuracion/") resaltarActivo("linkConfig");
-  if (currentPath === "/reportes") resaltarActivo("linkReportes");
-  if (currentPath === "/pages/punto-de-venta/pointofsale.html") resaltarActivo("linkChecador");
-
+  if (currentPath === ("/reportes")) resaltarActivo("linkConfig");
 
   //Boton para ver la venta por dia
   document.getElementById('btn-buscar-ventas').addEventListener('click', () => {
