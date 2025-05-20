@@ -59,597 +59,651 @@
             <h5 class="offcanvas-title" id="sidebarLabel">Menú</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
           </div>
-
+    
           <div class="offcanvas-body">
             <h6 class="sidebar-heading px-3 mb-1">
               <a class="nav-link text-white" href="#" id="abrirCapturaVenta">
                 <i class="bi bi-pc-display-horizontal"></i> Captura de venta
               </a>
             </h6><br>
-
+    
             <h6 class="sidebar-heading px-3 mb-1">
               <a class="nav-link text-white" href="/reportes" id="linkConfig">
                 <i class="bi bi-gear-fill"></i> Configuración
               </a>
             </h6><br>
-
+    
             <h6 class="sidebar-heading px-3 mb-1">
               <a class="nav-link text-white" type="button" data-bs-toggle="modal" data-bs-target="#modalAsistencia">
                 <i class="bi bi-clock"></i> Checador
               </a>
             </h6><br>
-
+    
             <h6 class="sidebar-heading px-3 mb-1">
               <a class="nav-link text-white" id="boton-venta-por-dia" href="#boton-venta-por-dia">
                 <i class="bi bi-clipboard-data"></i> Venta del día
               </a>
             </h6><br>
-
+    
             <h6 class="sidebar-heading px-3 mb-1">
               <a class="nav-link text-white" id="boton-venta-por-empleado" href="#boton-venta-por-dia">
                 <i class="bi bi-person-lines-fill"></i> Venta por empleado
               </a>
             </h6><br>
-
+    
             <h6 class="sidebar-heading px-3 mb-1">
               <a class="nav-link text-white" id="abrir-empleado" href="#boton-venta-por-dia">
                 <i class="bi bi-person-fill-up"></i> Alta de empleado
               </a>
             </h6><br>
-
+    
             <h6 class="sidebar-heading px-3 mb-1">
               <a class="nav-link text-white" id="boton-agregar-producto" href="#boton-venta-por-dia">
                 <i class="bi bi-cart-plus"></i> Alta de producto
               </a>
             </h6><br>
-
+    
             <h6 class="sidebar-heading px-3 mb-1">
               <a class="nav-link text-white" id="boton-provedores" href="">
                 <i class="bi bi-cart-plus"></i> Provedores
               </a>
             </h6><br>
-
+    
             <h6 class="sidebar-heading px-3 mb-1">
-              <a class="nav-link text-white" type="button" data-bs-toggle="modal" data-bs-target="#modal-autenticacion-corte" id="boton-cierre-del-dia">
+              <a class="nav-link text-white" type="button" data-bs-toggle="modal"
+                data-bs-target="#modal-autenticacion-corte" id="boton-cierre-del-dia">
                 <i class="bi bi-cloud-moon-fill"></i> Cierre del Día
               </a>
             </h6><br>
-
+    
             <div class="px-3 pt-3 text-muted small">Logged in as: Start Bootstrap</div>
           </div>
         </div>
-        
+    
         <main class="col-md-9 col-lg-10 ms-sm-auto  px-md-4 container-fluid">
-           
-            <!-- Ventana modal para ver venta por dia-->
-            <div id="venta-por-dia" class="container bg-light rounded shadow p-4 my-4">
-              <h3 class="mb-4 text-center">Venta por Día</h3>
-
-              <div class="row mb-3">
-                <div class="col-md-6 mb-2">
-                  <label for="fecha-inicio" class="form-label">Inicio:</label>
-                  <input type="date" id="fecha-inicio" class="form-control">
-                </div>
-                <div class="col-md-6 mb-2">
-                  <label for="fecha-fin" class="form-label">Fin:</label>
-                  <input type="date" id="fecha-fin" class="form-control">
-                </div>
+    
+          <!-- Ventana modal para ver venta por dia-->
+          <div id="venta-por-dia" class="container bg-light rounded shadow p-4 my-4">
+            <h3 class="mb-4 text-center">Venta por Día</h3>
+    
+            <div class="row mb-3">
+              <div class="col-md-6 mb-2">
+                <label for="fecha-inicio" class="form-label">Inicio:</label>
+                <input type="date" id="fecha-inicio" class="form-control">
               </div>
-
-              <div class="row mb-3">
-                <div class="col-md-4 mb-2">
-                  <label for="efectivo-dia" class="form-label">Efectivo:</label>
-                  <input type="number" id="efectivo-dia" class="form-control" readonly>
-                </div>
-                <div class="col-md-4 mb-2">
-                  <label for="tarjeta-dia" class="form-label">Tarjeta:</label>
-                  <input type="number" id="tarjeta-dia" class="form-control" readonly>
-                </div>
-                <div class="col-md-4 mb-2">
-                  <label for="mp-dia" class="form-label">Mercado Pago:</label>
-                  <input type="number" id="mp-dia" class="form-control" readonly>
-                </div>
-                <div class="col-md-4 mb-2">
-                  <label for="total-dia" class="form-label">Total:</label>
-                  <input type="number" id="total-dia" class="form-control" readonly>
-                </div>
-              </div>
-
-              <div class="d-flex justify-content-center">
-                <button id="btn-buscar-ventas" class="btn btn-primary mt-2">
-                  <i class="bi bi-search"></i> Buscar
-                </button>
+              <div class="col-md-6 mb-2">
+                <label for="fecha-fin" class="form-label">Fin:</label>
+                <input type="date" id="fecha-fin" class="form-control">
               </div>
             </div>
-
-            <!-- Ventana modal para ver venta por vendedor-->
-            <div id="venta-por-empleado" class="container bg-light rounded shadow p-4 my-4">
-              <h3 class="mb-4 text-center">Venta por Empleado</h3>
-
-              <div class="row mb-3">
-                <div class="col-md-12 mb-2">
-                  <label for="usuario-empleado" class="form-label">Usuario del empleado:</label>
-                  <input type="text" id="usuario-empleado" class="form-control" placeholder="Ej. juan.perez">
-                </div>
+    
+            <div class="row mb-3">
+              <div class="col-md-4 mb-2">
+                <label for="efectivo-dia" class="form-label">Efectivo:</label>
+                <input type="number" id="efectivo-dia" class="form-control" readonly>
               </div>
-
-              <div class="row mb-3">
-                <div class="col-md-6 mb-2">
-                  <label for="fecha-inicio-empleado" class="form-label">Inicio:</label>
-                  <input type="date" id="fecha-inicio-empleado" class="form-control">
-                </div>
-                <div class="col-md-6 mb-2">
-                  <label for="fecha-fin-empleado" class="form-label">Fin:</label>
-                  <input type="date" id="fecha-fin-empleado" class="form-control">
-                </div>
+              <div class="col-md-4 mb-2">
+                <label for="tarjeta-dia" class="form-label">Tarjeta:</label>
+                <input type="number" id="tarjeta-dia" class="form-control" readonly>
               </div>
-
-              <div class="row mb-3">
-                <div class="col-md-4 mb-2">
-                  <label for="efectivo-empleado" class="form-label">Efectivo:</label>
-                  <input type="number" id="efectivo-empleado" class="form-control" readonly>
-                </div>
-                <div class="col-md-4 mb-2">
-                  <label for="tarjeta-empleado" class="form-label">Tarjeta:</label>
-                  <input type="number" id="tarjeta-empleado" class="form-control" readonly>
-                </div><div class="col-md-4 mb-2">
-                  <label for="mp-empleado" class="form-label">Mercado Pago:</label>
-                  <input type="number" id="mp-empleado" class="form-control" readonly>
-                </div>
-                <div class="col-md-4 mb-2">
-                  <label for="total-empleado" class="form-label">Total:</label>
-                  <input type="number" id="total-empleado" class="form-control" readonly>
-                </div>
+              <div class="col-md-4 mb-2">
+                <label for="mp-dia" class="form-label">Mercado Pago:</label>
+                <input type="number" id="mp-dia" class="form-control" readonly>
               </div>
-
-              <div class="d-flex justify-content-center">
-                <button id="btn-buscar-empleado" class="btn btn-primary mt-2">
-                  <i class="bi bi-search"></i> Buscar
-                </button>
+              <div class="col-md-4 mb-2">
+                <label for="total-dia" class="form-label">Total:</label>
+                <input type="number" id="total-dia" class="form-control" readonly>
               </div>
             </div>
-
-
-            <!-- Formulario para agregar producto -->
-            <div class="container mt-5" id="agregar-producto">
-              <h3 class="mb-4">Agregar Producto</h3>
-              <form>
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label for="nombre-producto" class="form-label">Nombre del producto</label>
-                    <input type="text" class="form-control" id="nombre-producto" name="nombre-producto" required maxlength="100">
-                  </div>
-                  <div class="col-md-6 mb-3">
-                    <label for="precio" class="form-label">Precio</label>
-                    <input type="number" step="0.01" class="form-control" id="precio" name="precio" required>
-                  </div>
-                </div>
-
-                <div class="row">
-                  <div class="col-md-6 mb-3">
-                    <label for="stock" class="form-label">Stock</label>
-                    <input type="number" class="form-control" id="stock" name="stock" required>
-                  </div>
-                </div>
-
-                <div class="mb-3">
-                  <label for="descripcion" class="form-label">Descripción</label>
-                  <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
-                </div>
-                <button type="submit" class="btn btn-success">Guardar producto</button>
-              </form>
+    
+            <div class="d-flex justify-content-center">
+              <button id="btn-buscar-ventas" class="btn btn-primary mt-2">
+                <i class="bi bi-search"></i> Buscar
+              </button>
             </div>
-
-            <!--Ventana modal para agregar un empleado-->
-            <div id="alta-empleado" class="">
-                <h1 class="text-al">Alta de Empleado</h1><br>
-                <h2 >Fecha</h2><br>
-                <form id="form-empleado">
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="primer-nombre" class="form-label">Primer Nombre</label>
-                            <input type="text" class="form-control" id="primer-nombre" name="primer_nombre" required>
-                        </div>
-                        <div class="col-6">
-                            <label for="segundo-nombre" class="form-label">Segundo Nombre</label>
-                            <input type="text" class="form-control" id="segundo-nombre" name="segundo_nombre">
-                        </div>
-                    </div>
-            
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="primer-apellido" class="form-label">Primer Apellido</label>
-                            <input type="text" class="form-control" id="primer-apellido" name="primer_apellido" required>
-                        </div>
-                        <div class="col-6">
-                            <label for="segundo-apellido" class="form-label">Segundo Apellido</label>
-                            <input type="text" class="form-control" id="segundo-apellido" name="segundo_apellido">
-                        </div>
-                    </div>
-            
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <div class="col-6">
-                            <label for="telefono" class="form-label">Teléfono</label>
-                            <input type="tel" class="form-control" id="telefono" name="telefono" pattern="[0-9]{10}" required>
-                        </div>
-                    </div>
-            
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="puesto" class="form-label">Puesto</label>
-                            <input type="text" class="form-control" id="puesto" name="puesto" placeholder="Empleado"  readonly>
-                        </div>
-                    </div>
-            
-                    <div class="row">
-                        <div class="col-6">
-                            <label for="contrasena" class="form-label">Contraseña</label>
-                            <input type="password" class="form-control" id="contrasena" name="contrasena" required>
-                        </div>
-                        <div class="col-6">
-                            <label for="confirmar-contrasena" class="form-label">Confirmar Contraseña</label>
-                            <input type="password" class="form-control" id="confirmar-contrasena" name="confirmar_contrasena" required>
-                        </div>
-                    </div>
-            
-                    <div class="row">
-                        <h4>Ingrese constraseña del responsable</h4>
-                        <div class="col-6">
-                            <label for="contrasena-responsable" class="form-label">Constraseña</label>
-                            <input type="password" class="form-control" id="contrasena-responsable" name="contrasena-responsable" required>
-                        </div>
-                        <div class="col-6">
-                            <label for="contrasena-responsable-conf" class="form-label">Confirmar constraseña</label>
-                            <input type="password" class="form-control" id="contrasena-responsable-conf" name="contrasena_responsable-conf" required>
-                        </div>
-                    </div>
-            
-                    <div class="row d-flex justify-content-end">
-                        <button type="button" class="col-5 btn-cancelar" id="btn-cancelar-empleado">Cancelar</button>
-                        <button type="submit" class="col-5 btn-confirmar" id="btn-confirmar-empleado">Dar de alta</button>
-                    </div>
-                </form>
-            </div>
-            <!-- Modal de confirmación -->
-            <div class="modal fade" id="modalMensaje" tabindex="-1" aria-labelledby="modalMensajeLabel" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                  <div class="modal-header">
-                    <h5 class="modal-title" id="modalMensajeLabel">Resultado</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                  </div>
-                  <div class="modal-body" id="modalMensajeBody">
-                    <!-- Aquí irá el mensaje dinámico -->
-                  </div>
-                  <div class="modal-footer">
-                    <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <!-- Modal de autenticación -->
-            <div class="modal fade" id="modalAccesoVenta" tabindex="-1" aria-labelledby="modalAccesoVentaLabel" aria-hidden="true">
-              <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                  <div class="modal-header bg-dark text-white">
-                    <h5 class="modal-title" id="modalAccesoVentaLabel">Acceso a Captura de Venta</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                  </div>
-                  <div class="modal-body">
-                    <form id="formAccesoVenta">
-                      <div class="mb-3">
-                        <label for="usuarioVenta" class="form-label">Usuario</label>
-                        <input type="text" class="form-control" id="usuarioVenta" required>
-                      </div>
-                      <div class="mb-3">
-                        <label for="contrasenaVenta" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control" id="contrasenaVenta" required>
-                      </div>
-                      <div class="text-end">
-                        <button type="submit" class="btn btn-success" >Acceder</button>
-                      </div>
-                    </form>
-                  </div>
-                </div>
-              </div>
-            </div>
-              <!-- Contenedor colapsable cierre del dia -->
-              <div class="collapse" id="cierreDelDia">
-                <div class="card card-body bg-success text-white">
-              
-                  <h3 class="text-center mb-4">Cierre del día</h3>
-              
-                  <div class="d-flex justify-content-center gap-3 mb-3">
-                    <p  class="form-control cierre-input w-auto fecha"   style="width: 150px;"></p>
-                    <p class="form-control cierre-input w-auto hora"   style="width: 150px;"></p>
-                    <button class="btn btn-dark" id="boton-cierre">Iniciar Cierre</button>
-                  </div>
-              
-                  <!-- <div class="row mb-4 align-items-center">
-                    <div class="col-6 label-text">VENTA NETA:</div>
-                    <div class="col-6">
-                      <input type="text" class="form-control cierre-input text-end" id="ventaNeta" value="$0.00" >
-                    </div>
-                  </div> -->
-
-              
-                  <div class="text-warning text-center fw-bold mb-3">**** DESGLOSE TIPOS DE COBRO ****</div>
-              
-                  <div class="row mb-2 align-items-center">
-                    <div class="col-auto label-fixed">EFECTIVO:</div>
-                    <div class="col-auto">
-                      <input type="text" id="efectivo-cierre" class="form-control cierre-input" style="width: 140px;">
-                    </div>
-                  </div>
-                  <div class="row mb-2 align-items-center">
-                    <div class="col-auto label-fixed">TARJETA:</div>
-                    <div class="col-auto">
-                      <input type="text" id="tarjeta-cierre" class="form-control cierre-input" style="width: 140px;">
-                    </div>
-                  </div>
-                  <div class="row mb-2 align-items-center">
-                    <div class="col-auto label-fixed">MERCADO PAGO:</div>
-                    <div class="col-auto">
-                      <input type="text" id="mp-cierre" class="form-control cierre-input" style="width: 140px;">
-                    </div>
-                  </div>
-                  <div class="row mb-4 align-items-center">
-                    <div class="col-auto label-fixed">MONTO TOTAL:</div>
-                    <div class="col-auto">
-                      <input type="text" id="monto-cierre" class="form-control cierre-input" style="width: 140px;">
-                    </div>
-                  </div>
-
-              
-                  <div class="d-flex justify-content-end gap-2">
-                    <button class="btn btn-light text-dark fw-bold" id="aplicar-cierre">Aplicar Cierre</button>
-                    <button class="btn btn-secondary">Salir</button>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Modal de Autenticación para cierre del dia-->
-            <div class="modal fade" id="modal-autenticacion-corte" tabindex="-1" aria-labelledby="modalCorteCajeroLabel" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content">
-                    
-                    <div class="modal-header">
-                    <h5 class="modal-title" id="modalCorteCajeroLabel">Autenticación para Corte</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                    </div>
-                    
-                    <div class="modal-body">
-                    <form id="form-autenticacion-corte">
-                        <div class="mb-3">
-                        <label for="usuarioCorte" class="form-label">Usuario</label>
-                        <input type="text" class="form-control" id="usuarioCorte" name="usuario" required>
-                        </div>
-                        <div class="mb-3">
-                        <label for="contrasenaCorte" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control" id="contrasenaCorte" name="contrasena" required>
-                        </div>
-                    </form>
-                    </div>
-                    
-                    <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
-                    <button type="submit" form="form-autenticacion-corte" class="btn btn-success" >Confirmar</button>
-                    </div>
-                    
-                </div>
-                </div>
-            </div>
-            <!--Modal para el checador-->
-            <div class="modal fade " id="modalAsistencia" tabindex="-1" aria-labelledby="modalAsistenciaLabel" aria-hidden="true">
-              <div class="modal-dialog modal-lg " > <!-- Puedes ajustar el tamaño con modal-sm, modal-lg, etc. -->
-                  <div class="modal-content bg-success bg-primary">
-                  <div class="modal-header">
-                      <h1 class="modal-title fs-5" id="modalAsistenciaLabel">Registro De Asistencia</h1>
-                      <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-                  </div>
-                  <div class="modal-body">
-                      <div class="mb-3 d-flex justify-content-between">
-                      <span class="fecha"></span>
-                      <span class="hora"></span>
-                      </div>
-                      <div class="mb-3">
-                      <label for="numEmpleado" class="form-label">Teclee el usuario:</label>
-                      <input type="text" class="form-control" id="numEmpleado">
-                      </div>
-                      <div class="mb-3">
-                      <label for="nombreEmpleado" class="form-label">Nombre del empleado:</label>
-                      <input type="text" class="form-control" id="nombreEmpleado">
-                      </div>
-                      <div class="mb-3">
-                      <input type="text" class="form-control" id="apellidoP" placeholder="Apellido paterno">
-                      </div>
-                      <div class="mb-3">
-                      <input type="text" class="form-control" id="apellidoM" placeholder="Apellido materno">
-                      </div>
-                      <div class="mb-3">
-                      <label for="tipoAsistencia" class="form-label">Tipo de asistencia:</label>
-                      <select id="tipoAsistencia" class="form-select">
-                          <option value="Entrada">Entrada</option>
-                          <option value="Salida">Salida</option>
-                      </select>
-                      </div>
-                  </div>
-                  <div class="modal-footer">
-                      <button id="registrar" class="btn btn-success">Registrar</button>
-                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                  </div>
-                  </div>
-              </div>
           </div>
+    
+          <!-- Ventana modal para ver venta por vendedor-->
+          <div id="venta-por-empleado" class="container bg-light rounded shadow p-4 my-4">
+            <h3 class="mb-4 text-center">Venta por Empleado</h3>
+    
+            <div class="row mb-3">
+              <div class="col-md-12 mb-2">
+                <label for="usuario-empleado" class="form-label">Usuario del empleado:</label>
+                <input type="text" id="usuario-empleado" class="form-control" placeholder="Ej. juan.perez">
+              </div>
+            </div>
+    
+            <div class="row mb-3">
+              <div class="col-md-6 mb-2">
+                <label for="fecha-inicio-empleado" class="form-label">Inicio:</label>
+                <input type="date" id="fecha-inicio-empleado" class="form-control">
+              </div>
+              <div class="col-md-6 mb-2">
+                <label for="fecha-fin-empleado" class="form-label">Fin:</label>
+                <input type="date" id="fecha-fin-empleado" class="form-control">
+              </div>
+            </div>
+    
+            <div class="row mb-3">
+              <div class="col-md-4 mb-2">
+                <label for="efectivo-empleado" class="form-label">Efectivo:</label>
+                <input type="number" id="efectivo-empleado" class="form-control" readonly>
+              </div>
+              <div class="col-md-4 mb-2">
+                <label for="tarjeta-empleado" class="form-label">Tarjeta:</label>
+                <input type="number" id="tarjeta-empleado" class="form-control" readonly>
+              </div>
+              <div class="col-md-4 mb-2">
+                <label for="mp-empleado" class="form-label">Mercado Pago:</label>
+                <input type="number" id="mp-empleado" class="form-control" readonly>
+              </div>
+              <div class="col-md-4 mb-2">
+                <label for="total-empleado" class="form-label">Total:</label>
+                <input type="number" id="total-empleado" class="form-control" readonly>
+              </div>
+            </div>
+    
+            <div class="d-flex justify-content-center">
+              <button id="btn-buscar-empleado" class="btn btn-primary mt-2">
+                <i class="bi bi-search"></i> Buscar
+              </button>
+            </div>
+          </div>
+    
+    
+          <!-- Formulario para agregar producto -->
+          <div class="container mt-5" id="agregar-producto">
+            <h3 class="mb-4">Agregar Producto</h3>
+            <form>
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="nombre-producto" class="form-label">Nombre del producto</label>
+                  <input type="text" class="form-control" id="nombre-producto" name="nombre-producto" required
+                    maxlength="100">
+                </div>
+                <div class="col-md-6 mb-3">
+                  <label for="precio" class="form-label">Precio</label>
+                  <input type="number" step="0.01" class="form-control" id="precio" name="precio" required>
+                </div>
+              </div>
+    
+              <div class="row">
+                <div class="col-md-6 mb-3">
+                  <label for="stock" class="form-label">Stock</label>
+                  <input type="number" class="form-control" id="stock" name="stock" required>
+                </div>
+              </div>
+    
+              <div class="mb-3">
+                <label for="descripcion" class="form-label">Descripción</label>
+                <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
+              </div>
+              <button type="submit" class="btn btn-success">Guardar producto</button>
+            </form>
+          </div>
+    
+          <!--Ventana modal para agregar un empleado-->
+          <div id="alta-empleado" class="">
+            <h1 class="text-al">Alta de Empleado</h1><br>
+            <h2>Fecha</h2><br>
+            <form id="form-empleado">
+              <div class="row">
+                <div class="col-6">
+                  <label for="primer-nombre" class="form-label">Primer Nombre</label>
+                  <input type="text" class="form-control" id="primer-nombre" name="primer_nombre" required>
+                </div>
+                <div class="col-6">
+                  <label for="segundo-nombre" class="form-label">Segundo Nombre</label>
+                  <input type="text" class="form-control" id="segundo-nombre" name="segundo_nombre">
+                </div>
+              </div>
+    
+              <div class="row">
+                <div class="col-6">
+                  <label for="primer-apellido" class="form-label">Primer Apellido</label>
+                  <input type="text" class="form-control" id="primer-apellido" name="primer_apellido" required>
+                </div>
+                <div class="col-6">
+                  <label for="segundo-apellido" class="form-label">Segundo Apellido</label>
+                  <input type="text" class="form-control" id="segundo-apellido" name="segundo_apellido">
+                </div>
+              </div>
+    
+              <div class="row">
+                <div class="col-6">
+                  <label for="email" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="col-6">
+                  <label for="telefono" class="form-label">Teléfono</label>
+                  <input type="tel" class="form-control" id="telefono" name="telefono" pattern="[0-9]{10}" required>
+                </div>
+              </div>
+    
+              <div class="row">
+                <div class="col-6">
+                  <label for="puesto" class="form-label">Puesto</label>
+                  <input type="text" class="form-control" id="puesto" name="puesto" placeholder="Empleado" readonly>
+                </div>
+              </div>
+    
+              <div class="row">
+                <div class="col-6">
+                  <label for="contrasena" class="form-label">Contraseña</label>
+                  <input type="password" class="form-control" id="contrasena" name="contrasena" required>
+                </div>
+                <div class="col-6">
+                  <label for="confirmar-contrasena" class="form-label">Confirmar Contraseña</label>
+                  <input type="password" class="form-control" id="confirmar-contrasena" name="confirmar_contrasena"
+                    required>
+                </div>
+              </div>
+    
+              <div class="row">
+                <h4>Ingrese constraseña del responsable</h4>
+                <div class="col-6">
+                  <label for="contrasena-responsable" class="form-label">Constraseña</label>
+                  <input type="password" class="form-control" id="contrasena-responsable" name="contrasena-responsable"
+                    required>
+                </div>
+                <div class="col-6">
+                  <label for="contrasena-responsable-conf" class="form-label">Confirmar constraseña</label>
+                  <input type="password" class="form-control" id="contrasena-responsable-conf"
+                    name="contrasena_responsable-conf" required>
+                </div>
+              </div>
+    
+              <div class="row d-flex justify-content-end">
+                <button type="button" class="col-5 btn-cancelar" id="btn-cancelar-empleado">Cancelar</button>
+                <button type="submit" class="col-5 btn-confirmar" id="btn-confirmar-empleado">Dar de alta</button>
+                  <button type="button" class="col-3 btn btn-secondary" id="btn-buscar-empleado">Buscar</button>
+                  <button type="submit" class="col-4 btn btn-primary" id="btn-confirmar-empleado">Dar de alta</button>
+                  <button type="button" class="col-3 btn btn-danger d-none" id="btn-eliminar-empleado">Eliminar</button>
+                
 
+              </div>
+            </form>
+          </div>
+          <!-- Modal de confirmación -->
+          <div class="modal fade" id="modalMensaje" tabindex="-1" aria-labelledby="modalMensajeLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modalMensajeLabel">Resultado</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body" id="modalMensajeBody">
+                  <!-- Aquí irá el mensaje dinámico -->
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-success" data-bs-dismiss="modal">Aceptar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Modal de autenticación -->
+          <div class="modal fade" id="modalAccesoVenta" tabindex="-1" aria-labelledby="modalAccesoVentaLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                  <h5 class="modal-title" id="modalAccesoVentaLabel">Acceso a Captura de Venta</h5>
+                  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                    aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                  <form id="formAccesoVenta">
+                    <div class="mb-3">
+                      <label for="usuarioVenta" class="form-label">Usuario</label>
+                      <input type="text" class="form-control" id="usuarioVenta" required>
+                    </div>
+                    <div class="mb-3">
+                      <label for="contrasenaVenta" class="form-label">Contraseña</label>
+                      <input type="password" class="form-control" id="contrasenaVenta" required>
+                    </div>
+                    <div class="text-end">
+                      <button type="submit" class="btn btn-success">Acceder</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Contenedor colapsable cierre del dia -->
+          <div class="collapse" id="cierreDelDia">
+            <div class="card card-body bg-success text-white">
+    
+              <h3 class="text-center mb-4">Cierre del día</h3>
+    
+              <div class="d-flex justify-content-center gap-3 mb-3">
+                <p class="form-control cierre-input w-auto fecha" style="width: 150px;"></p>
+                <p class="form-control cierre-input w-auto hora" style="width: 150px;"></p>
+                <button class="btn btn-dark" id="boton-cierre">Iniciar Cierre</button>
+              </div>
+    
+              <!-- <div class="row mb-4 align-items-center">
+                        <div class="col-6 label-text">VENTA NETA:</div>
+                        <div class="col-6">
+                          <input type="text" class="form-control cierre-input text-end" id="ventaNeta" value="$0.00" >
+                        </div>
+                      </div> -->
+    
+    
+              <div class="text-warning text-center fw-bold mb-3">**** DESGLOSE TIPOS DE COBRO ****</div>
+    
+              <div class="row mb-2 align-items-center">
+                <div class="col-auto label-fixed">EFECTIVO:</div>
+                <div class="col-auto">
+                  <input type="text" id="efectivo-cierre" class="form-control cierre-input" style="width: 140px;">
+                </div>
+              </div>
+              <div class="row mb-2 align-items-center">
+                <div class="col-auto label-fixed">TARJETA:</div>
+                <div class="col-auto">
+                  <input type="text" id="tarjeta-cierre" class="form-control cierre-input" style="width: 140px;">
+                </div>
+              </div>
+              <div class="row mb-2 align-items-center">
+                <div class="col-auto label-fixed">MERCADO PAGO:</div>
+                <div class="col-auto">
+                  <input type="text" id="mp-cierre" class="form-control cierre-input" style="width: 140px;">
+                </div>
+              </div>
+              <div class="row mb-4 align-items-center">
+                <div class="col-auto label-fixed">MONTO TOTAL:</div>
+                <div class="col-auto">
+                  <input type="text" id="monto-cierre" class="form-control cierre-input" style="width: 140px;">
+                </div>
+              </div>
+    
+    
+              <div class="d-flex justify-content-end gap-2">
+                <button class="btn btn-light text-dark fw-bold" id="aplicar-cierre">Aplicar Cierre</button>
+                <button class="btn btn-secondary">Salir</button>
+              </div>
+            </div>
+          </div>
+    
+          <!-- Modal de Autenticación para cierre del dia-->
+          <div class="modal fade" id="modal-autenticacion-corte" tabindex="-1" aria-labelledby="modalCorteCajeroLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+    
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modalCorteCajeroLabel">Autenticación para Corte</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+    
+                <div class="modal-body">
+                  <form id="form-autenticacion-corte">
+                    <div class="mb-3">
+                      <label for="usuarioCorte" class="form-label">Usuario</label>
+                      <input type="text" class="form-control" id="usuarioCorte" name="usuario" required>
+                    </div>
+                    <div class="mb-3">
+                      <label for="contrasenaCorte" class="form-label">Contraseña</label>
+                      <input type="password" class="form-control" id="contrasenaCorte" name="contrasena" required>
+                    </div>
+                  </form>
+                </div>
+    
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="submit" form="form-autenticacion-corte" class="btn btn-success">Confirmar</button>
+                </div>
+    
+              </div>
+            </div>
+          </div>
+          <!--Modal para el checador-->
+          <div class="modal fade " id="modalAsistencia" tabindex="-1" aria-labelledby="modalAsistenciaLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg "> <!-- Puedes ajustar el tamaño con modal-sm, modal-lg, etc. -->
+              <div class="modal-content bg-success bg-primary">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="modalAsistenciaLabel">Registro De Asistencia</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                  <div class="mb-3 d-flex justify-content-between">
+                    <span class="fecha"></span>
+                    <span class="hora"></span>
+                  </div>
+                  <div class="mb-3">
+                    <label for="numEmpleado" class="form-label">Teclee el usuario:</label>
+                    <input type="text" class="form-control" id="numEmpleado">
+                  </div>
+                  <div class="mb-3">
+                    <label for="nombreEmpleado" class="form-label">Nombre del empleado:</label>
+                    <input type="text" class="form-control" id="nombreEmpleado">
+                  </div>
+                  <div class="mb-3">
+                    <input type="text" class="form-control" id="apellidoP" placeholder="Apellido paterno">
+                  </div>
+                  <div class="mb-3">
+                    <input type="text" class="form-control" id="apellidoM" placeholder="Apellido materno">
+                  </div>
+                  <div class="mb-3">
+                    <label for="tipoAsistencia" class="form-label">Tipo de asistencia:</label>
+                    <select id="tipoAsistencia" class="form-select">
+                      <option value="Entrada">Entrada</option>
+                      <option value="Salida">Salida</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button id="registrar" class="btn btn-success">Registrar</button>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+    
           <div id="abrir-provedores">
-              <section id="proveedores-registrados" class="mt-5">
-                <h2>Proveedores Registrados</h2>
-                <div class="row row-cols-1 row-cols-md-3 g-4" id="lista-proveedores">
-                    <!-- Proveedores cargados dinámicamente -->
-                </div>
+            <section id="proveedores-registrados" class="mt-5">
+              <h2>Proveedores Registrados</h2>
+              <div class="row row-cols-1 row-cols-md-3 g-4" id="lista-proveedores">
+                <!-- Proveedores cargados dinámicamente -->
+              </div>
             </section>
-            
+    
             <section id="productos-agotarse" class="mt-5">
-                <h2>Productos a Punto de Agotarse</h2>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Producto</th>
-                                <th>Proveedor</th>
-                                <th>Stock</th>
-                                <th>Estado</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabla-productos">
-                            <!-- Productos cargados dinámicamente -->
-                        </tbody>
-                    </table>
-                </div>
+              <h2>Productos a Punto de Agotarse</h2>
+              <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Producto</th>
+                      <th>Proveedor</th>
+                      <th>Stock</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabla-productos">
+                    <!-- Productos cargados dinámicamente -->
+                  </tbody>
+                </table>
+              </div>
             </section>
-            
+    
             <section id="agenda-visitas" class="mt-5">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h2 class="mb-0">Agenda de Visitas</h2>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalRegistroVisita">
-                        <i class="bi bi-plus"></i> Nueva Visita
-                    </button>
-                </div>
-                <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead class="table-dark">
-                            <tr>
-                                <th>Proveedor</th>
-                                <th>Fecha</th>
-                                <th>Hora</th>
-                                <th>Motivo</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabla-visitas">
-                            <!-- Visitas cargadas dinámicamente -->
-                        </tbody>
-                    </table>
-                </div>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="mb-0">Agenda de Visitas</h2>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalRegistroVisita">
+                  <i class="bi bi-plus"></i> Nueva Visita
+                </button>
+              </div>
+              <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                  <thead class="table-dark">
+                    <tr>
+                      <th>Proveedor</th>
+                      <th>Fecha</th>
+                      <th>Hora</th>
+                      <th>Motivo</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody id="tabla-visitas">
+                    <!-- Visitas cargadas dinámicamente -->
+                  </tbody>
+                </table>
+              </div>
             </section>
-            
+    
             <section id="registro" class="mt-5">
-                <h2>Registro de Proveedor</h2>
-                <form id="registro-proveedor">
-                    <input type="hidden" id="proveedor-id">
-                    
-                    <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre</label>
-                        <input type="text" id="nombre" class="form-control" required 
-                              pattern="[A-Za-zÁÉÍÓÚáéíóúñÑüÜ\s]{2,50}" 
-                              title="Solo letras y espacios (2-50 caracteres)">
-                        <div class="invalid-feedback">Por favor ingrese un nombre válido (solo letras, 2-50 caracteres)</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="correo" class="form-label">Correo</label>
-                        <input type="email" id="correo" class="form-control" required
-                              pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
-                              title="Ingrese un correo electrónico válido">
-                        <div class="invalid-feedback">Por favor ingrese un correo electrónico válido</div>
-                    </div>
-                      
-                    <div class="mb-3">
-                        <label for="telefono" class="form-label">Teléfono</label>
-                        <input type="tel" id="telefono" class="form-control" required
-                              pattern="[0-9]{10,15}" 
-                              title="Solo números (10-15 dígitos)">
-                        <div class="invalid-feedback">Por favor ingrese un teléfono válido (solo números, 10-15 dígitos)</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="productos" class="form-label">Productos Principales</label>
-                        <input type="text" id="productos" class="form-control"
-                              pattern="[A-Za-zÁÉÍÓÚáéíóúñÑüÜ0-9\s.,-]{0,100}"
-                              title="Máximo 100 caracteres (letras, números, espacios y ,.-)">
-                        <div class="invalid-feedback">Máximo 100 caracteres (letras, números, espacios y ,.-)</div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label for="logo-url" class="form-label">Logo del Proveedor (URL)</label>
-                        <input type="url" id="logo-url" class="form-control" 
-                              placeholder="https://ejemplo.com/logo.png"
-                              pattern="https?://.+\.(jpg|jpeg|png|gif|svg)$"
-                              title="Ingrese una URL válida de imagen (jpg, jpeg, png, gif o svg)">
-                        <div class="form-text">Pegue aquí la URL de la imagen copiada de Google</div>
-                        <div class="invalid-feedback">Ingrese una URL válida de imagen (jpg, jpeg, png, gif o svg)</div>
-                        <div id="logo-preview" class="mt-2" style="max-width: 200px;"></div>
-                    </div>
-                    
-                    <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary">Guardar</button>
-                        <button type="button" id="btn-modificar" class="btn btn-warning btn-disabled">Modificar</button>
-                        <button type="button" id="btn-eliminar" class="btn btn-danger btn-disabled">Eliminar</button>
-                        <button type="button" id="btn-limpiar" class="btn btn-secondary">Limpiar</button>
-                    </div>
-                </form>
-            </section>
-            </div>
-        </main>
-        
-        <!-- Modal para Visitas -->
-        <div class="modal fade" id="modalRegistroVisita" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Nueva Visita</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="form-registro-visita">
-                            <div class="mb-3">
-                                <label for="visita-proveedor" class="form-label">Proveedor</label>
-                                <select id="visita-proveedor" class="form-select" required>
-                                    <option value="">Seleccione...</option>
-                                </select>
-                                <div class="invalid-feedback">Por favor seleccione un proveedor</div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="visita-fecha" class="form-label">Fecha</label>
-                                <input type="date" id="visita-fecha" class="form-control" required
-                                      min="<?= date('Y-m-d') ?>">
-                                <div class="invalid-feedback">Por favor ingrese una fecha válida</div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="visita-hora" class="form-label">Hora</label>
-                                <input type="time" id="visita-hora" class="form-control" required
-                                      min="08:00" max="18:00">
-                                <div class="invalid-feedback">Por favor ingrese una hora entre 8:00 y 18:00</div>
-                            </div>
-                            <div class="mb-3">
-                                <label for="visita-motivo" class="form-label">Motivo</label>
-                                <textarea id="visita-motivo" class="form-control" rows="3" required
-                                          maxlength="200"></textarea>
-                                <div class="invalid-feedback">Por favor ingrese un motivo (máximo 200 caracteres)</div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" id="btn-guardar-visita" class="btn btn-primary">Guardar</button>
-                    </div>
+              <h2>Registro de Proveedor</h2>
+              <form id="registro-proveedor">
+                <input type="hidden" id="proveedor-id">
+    
+                <div class="mb-3">
+                  <label for="nombre" class="form-label">Nombre</label>
+                  <input type="text" id="nombre" class="form-control" required pattern="[A-Za-zÁÉÍÓÚáéíóúñÑüÜ\s]{2,50}"
+                    title="Solo letras y espacios (2-50 caracteres)">
+                  <div class="invalid-feedback">Por favor ingrese un nombre válido (solo letras, 2-50 caracteres)</div>
                 </div>
-            </div>
+    
+                <div class="mb-3">
+                  <label for="correo" class="form-label">Correo</label>
+                  <input type="email" id="correo" class="form-control" required
+                    pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Ingrese un correo electrónico válido">
+                  <div class="invalid-feedback">Por favor ingrese un correo electrónico válido</div>
+                </div>
+    
+                <div class="mb-3">
+                  <label for="telefono" class="form-label">Teléfono</label>
+                  <input type="tel" id="telefono" class="form-control" required pattern="[0-9]{10,15}"
+                    title="Solo números (10-15 dígitos)">
+                  <div class="invalid-feedback">Por favor ingrese un teléfono válido (solo números, 10-15 dígitos)</div>
+                </div>
+    
+                <div class="mb-3">
+                  <label for="productos" class="form-label">Productos Principales</label>
+                  <input type="text" id="productos" class="form-control" pattern="[A-Za-zÁÉÍÓÚáéíóúñÑüÜ0-9\s.,-]{0,100}"
+                    title="Máximo 100 caracteres (letras, números, espacios y ,.-)">
+                  <div class="invalid-feedback">Máximo 100 caracteres (letras, números, espacios y ,.-)</div>
+                </div>
+    
+                <div class="mb-3">
+                  <label for="logo-url" class="form-label">Logo del Proveedor (URL)</label>
+                  <input type="url" id="logo-url" class="form-control" placeholder="https://ejemplo.com/logo.png"
+                    pattern="https?://.+\.(jpg|jpeg|png|gif|svg)$"
+                    title="Ingrese una URL válida de imagen (jpg, jpeg, png, gif o svg)">
+                  <div class="form-text">Pegue aquí la URL de la imagen copiada de Google</div>
+                  <div class="invalid-feedback">Ingrese una URL válida de imagen (jpg, jpeg, png, gif o svg)</div>
+                  <div id="logo-preview" class="mt-2" style="max-width: 200px;"></div>
+                </div>
+    
+                <div class="d-flex gap-2">
+                  <button type="submit" class="btn btn-primary">Guardar</button>
+                  <button type="button" id="btn-modificar" class="btn btn-warning btn-disabled">Modificar</button>
+                  <button type="button" id="btn-eliminar" class="btn btn-danger btn-disabled">Eliminar</button>
+                  <button type="button" id="btn-limpiar" class="btn btn-secondary">Limpiar</button>
+                </div>
+              </form>
+            </section>
           </div>
-          <footer class="pt-4 my-md-5 pt-md-5 border-top">
-            <div class="row">
-              <div class="col-12 col-md">
-                <small class="d-block mb-3 text-muted">&copy; 2023 Your Website</small>
-                <a href="#">Privacy Policy</a> &middot; <a href="#">Terms & Conditions</a>
+    
+    
+          <!-- Modal para Visitas -->
+          <div class="modal fade" id="modalRegistroVisita" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title">Nueva Visita</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <form id="form-registro-visita">
+                    <div class="mb-3">
+                      <label for="visita-proveedor" class="form-label">Proveedor</label>
+                      <select id="visita-proveedor" class="form-select" required>
+                        <option value="">Seleccione...</option>
+                      </select>
+                      <div class="invalid-feedback">Por favor seleccione un proveedor</div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="visita-fecha" class="form-label">Fecha</label>
+                      <input type="date" id="visita-fecha" class="form-control" required min="<?= date('Y-m-d') ?>">
+                      <div class="invalid-feedback">Por favor ingrese una fecha válida</div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="visita-hora" class="form-label">Hora</label>
+                      <input type="time" id="visita-hora" class="form-control" required min="08:00" max="18:00">
+                      <div class="invalid-feedback">Por favor ingrese una hora entre 8:00 y 18:00</div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="visita-motivo" class="form-label">Motivo</label>
+                      <textarea id="visita-motivo" class="form-control" rows="3" required maxlength="200"></textarea>
+                      <div class="invalid-feedback">Por favor ingrese un motivo (máximo 200 caracteres)</div>
+                    </div>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                  <button type="button" id="btn-guardar-visita" class="btn btn-primary">Guardar</button>
+                </div>
               </div>
             </div>
-          </footer>
-        
+          </div>
+        </main>
+        <footer class="bg-dark text-white pt-5 pb-4">
+          <div class="container text-md-left">
+            <div class="row text-md-left">
+              <!-- Logo y descripción -->
+              <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
+                <h5 class="text-uppercase mb-4 font-weight-bold text-warning">ECOPOS</h5>
+                <p>
+                  Plataforma tecnológica dedicada a soluciones sostenibles para el punto de venta. Nuestro objetivo es la innovación ecológica.
+                </p>
+              </div>
+
+              <!-- Contacto -->
+              <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
+                <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Contacto</h5>
+                <p><i class="fas fa-home mr-3"></i> Calle Ficticia 123, Ciudad, País</p>
+                <p><i class="fas fa-envelope mr-3"></i> contacto@ecopos.com</p>
+                <p><i class="fas fa-phone mr-3"></i> +123 456 7890</p>
+                <p><i class="fas fa-print mr-3"></i> +123 456 7891</p>
+              </div>
+
+              <!-- Enlaces útiles -->
+              <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
+                <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Enlaces</h5>
+                <p><a href="#" class="text-white" style="text-decoration: none;">Inicio</a></p>
+                <p><a href="#" class="text-white" style="text-decoration: none;">Servicios</a></p>
+                <p><a href="#" class="text-white" style="text-decoration: none;">Sobre nosotros</a></p>
+                <p><a href="#" class="text-white" style="text-decoration: none;">Contacto</a></p>
+                <p><a href="/ayuda" class="text-white" style="text-decoration: none;">Ayuda</a></p>
+              </div>
+
+              <!-- Redes sociales -->
+              <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mt-3">
+                <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Síguenos</h5>
+                <a href="#" class="text-white me-4"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="text-white me-4"><i class="fab fa-twitter"></i></a>
+                <a href="#" class="text-white me-4"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="text-white me-4"><i class="fab fa-linkedin"></i></a>
+              </div>
+            </div>
+
+            <!-- Línea divisoria -->
+            <hr class="mb-4">
+
+            <!-- Copyright -->
+            <div class="row align-items-center">
+              <div class="col-md-7 col-lg-8">
+                <p>&copy; 2025 ECOPOS - Todos los derechos reservados</p>
+              </div>
+              <div class="col-md-5 col-lg-4">
+                <p class="text-end">Diseñado por <a href="#" class="text-warning" style="text-decoration: none;">ECOPOS Team</a></p>
+              </div>
+            </div>
+          </div>
+        </footer>
+    
       </div>
     </div>
 

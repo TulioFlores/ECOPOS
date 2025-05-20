@@ -1,134 +1,28 @@
-<<<<<<< HEAD:pages/inicio/index.html
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ECOPOS</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link rel="stylesheet" href="/inicio/index.css">
-    <link rel="icon" href="/public/logos/LogoBlanco.svg" type="image/x-icon">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-</head>
-<body>
-    <header>
-        <div class="header-left">
-            <img src="/logos/LogoBlanco.svg" alt="Logo de Eco Punto" class="logo slide-in">
-        </div>
-        <div class="header-center">
-            <h1 class="fade-in">ECOPOS</h1>
-            <p class="fade-in">Reduciendo dispositivos y ayudando al medio ambiente</p>
-            <div class="header-buttons">
-                <button onclick="location.href='/login'" class="btn bounce">Inicio de sesión</button>
-                <button onclick="location.href='/register'" class="btn bounce">Comenzar</button>
-            </div>
-        </div>
-    </header>
-    <main>
-        <section class="fade-in">
-            <h2>Optimiza tus procesos de venta</h2>
-            <p>En Ecopunto, transformamos la manera en que gestionas tu negocio. 🚀 Nuestra plataforma de punto de venta móvil no solo simplifica y optimiza tus procesos de venta, <br>
-                sino que también te ayuda a reducir costos y a operar de manera más eficiente.<br>
-
-                🔹 Accede desde cualquier dispositivo – Olvídate de hardware costoso, con Ecopunto puedes gestionar tu negocio desde tu computadora, tablet o smartphone.<br>
-                
-                🔹 Ahorra tiempo y mejora la productividad – Automatizamos tareas repetitivas y centralizamos tu inventario, ventas y reportes en un solo lugar.<br>
-                
-                🔹 Eco-Friendly y sostenible 🌱 – Di adiós al exceso de papel y reduce tu impacto ambiental con nuestra solución 100% digital.<br>
-                
-                Con Ecopunto, vender nunca había sido tan fácil, eficiente y ecológico. 🌍✨</p>
-        </section>
-        <section class="fade-in">
-            <h2>Beneficios</h2>
-            <ul>
-                <li onclick="mostrarExplicacion('reduccion')">Reducción de dispositivos</li>
-                <li onclick="mostrarExplicacion('optimizacion')">Optimización de procesos</li>
-                <li onclick="mostrarExplicacion('contribucion')">Contribución al medio ambiente</li>
-            </ul>
-        </section>
-        <section class="stats-container">
-            <h2 class="fade-in">Interactividad</h2>
-            <div class="stats">
-                <div class="stat zoom-in">
-                    <h3>Usuarios Registrados</h3>
-                    <p id="usuarios-registrados">0</p>
-                </div>
-                <div class="stat zoom-in">
-                    <h3>Procesos Optimizados</h3>
-                    <p>200+</p>
-                </div>
-                <div class="stat zoom-in">
-                    <h3>Equipos Reducidos</h3>
-                    <p>150+</p>
-                </div>
-            </div>
-        </section>
-        <section class="fade-in">
-            <h2>¿Por qué elegirnos?</h2>
-            <p class="slide-in">Eco Punto no solo es un punto de venta, es una solución integral para negocios modernos y ecológicos. Con nuestra plataforma, obtienes:</p>
-            <ul>
-                <li>✅ Reportes en tiempo real</li>
-                <li>✅ Seguridad en tus transacciones</li>
-                <li>✅ Soporte 24/7</li>
-                <li>✅ Facilidad de integración</li>
-            </ul>
-        </section>
-    </main>
-    
-    <!-- Ventanas emergentes -->
-    <div id="ventana-reduccion" class="ventana-emergente">
-        <div class="ventana-contenido">
-            <span class="cerrar" onclick="cerrarVentana('ventana-reduccion')">&times;</span>
-            <h2>Reducción de dispositivos</h2>
-            <p>En Eco Punto, reducimos la cantidad de dispositivos necesarios para tus operaciones, lo que disminuye los costos y el impacto ambiental.</p>
-        </div>
-    </div>
-    <div id="ventana-optimizacion" class="ventana-emergente">
-        <div class="ventana-contenido">
-            <span class="cerrar" onclick="cerrarVentana('ventana-optimizacion')">&times;</span>
-            <h2>Optimización de procesos</h2>
-            <p>Nuestros sistemas están diseñados para optimizar cada paso de tus procesos de venta, mejorando la eficiencia y reduciendo el tiempo de operación.</p>
-        </div>
-    </div>
-    <div id="ventana-contribucion" class="ventana-emergente">
-        <div class="ventana-contenido">
-            <span class="cerrar" onclick="cerrarVentana('ventana-contribucion')">&times;</span>
-            <h2>Contribución al medio ambiente</h2>
-            <p>Al reducir el uso de dispositivos y optimizar los procesos, contribuimos significativamente a la reducción de residuos electrónicos y al ahorro de energía.</p>
-        </div>
-    </div>
-    </div>
-    
-    <script src="script1.js"></script>
-    <script>
-        gsap.from(".fade-in", {opacity: 0, duration: 1, y: -20, stagger: 0.3});
-        gsap.from(".slide-in", {x: -50, opacity: 0, duration: 1, stagger: 0.3});
-        gsap.from(".zoom-in", {scale: 0.8, opacity: 0, duration: 1, stagger: 0.3, scrollTrigger: {trigger: ".zoom-in", start: "top 80%"}});
-        gsap.from(".bounce", {y: -10, repeat: -1, yoyo: true, duration: 0.5, ease: "power1.inOut"});
-        gsap.from(".scale-in", {scale: 0, duration: 0.5, ease: "back.out(1.7)", opacity: 0});
-    </script>
-</body>
-</html>
-=======
 <!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ECO POS</title>
-<link rel="stylesheet" href="style.css">
+<title>ECOPOS</title>
+<link rel="stylesheet" href="inicio/index.css">
+<!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<!-- Font Awesome para íconos -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<!--FAVICON-->
+<link rel="icon" href="/logos/LogoBlanco.svg" type="image/svg+xml" sizes="any">
+<link rel="icon" type="image/png" href="/favicon-32x32.png">
 </head>
 <body>
 <header>
     <div class="header-container">
         <div class="logo">
-            <img src="icons/logo.svg" alt="Logo" class="logo-image" style="height: 45px; margin-right: 15px;">
+            <img src="/logos/LogoBlanco.svg" alt="Logo" class="logo-image" style="height: 45px; margin-right: 15px;">
             <span class="eco" style="font-size: 1.2em;">ECO</span><span class="pos" style="font-size: 1.2em;">POS</span>
         </div>
       
       <nav class="desktop-nav">
-        <a href="#" class="nav-btn">INICIAR SESIÓN</a>
+        <a href="/login" class="nav-btn">INICIAR SESIÓN</a>
         <a href="#" class="nav-btn">CONTACTO</a>
       </nav>
       
@@ -140,20 +34,20 @@
     </div>
     
     <nav class="mobile-nav">
-      <a href="#" class="nav-btn">INICIA SESIÓN</a>
+      <a href="/login" class="nav-btn">INICIA SESIÓN</a>
       <a href="#" class="nav-btn">CONTACTO</a>
     </nav>
   </header>
 <!-- Sección de imagen completa -->
 <section class="full-width-image" style="overflow: hidden;">
-    <img src="icons/inicio2.png" alt="Eco POS Banner" style="width: 100%; height: auto; max-height: 680px; object-fit: cover;" />
+    <img src="/img/inicio2.png" alt="Eco POS Banner" style="width: 100%; height: auto; max-height: 680px; object-fit: cover;" />
 </section>
 
   <!-- Sección de botones debajo de la imagen -->
   <section class="buttons-section">
     <div class="container">
       
-      <a href="#" class="btn-login">INICIA SESIÓN</a>
+      <a href="/login" class="btn-login">INICIA SESIÓN</a>
       <a href="#" class="btn-primary">CONOCE ECOPOS</a>
       <a href="#" class="btn-contact">CONTACTANOS 😊</a>
     </div>
@@ -177,12 +71,6 @@
       <p>Se adapta a cualquier tipo de negocio: tiendas, papelerías, ferreterías y más ...</p>
     </div>
   </section>
-
-
-
-
-
-
   <section class="alternating-benefits">
     <!-- Fila 1 - Imagen DERECHA / Texto IZQUIERDA -->
     <div class="benefit-row">
@@ -191,14 +79,14 @@
         <p>ANDROID o IOS, la página web se puede acceder desde cualquier navegador. Compatible con smartphones, tablets y computadoras.</p>
       </div>
       <div class="image-content">
-        <img src="img/devices.png" alt="Multiplataforma">
+        <img src="/img/devices.png" alt="Multiplataforma">
       </div>
     </div>
   
     <!-- Fila 2 - Imagen IZQUIERDA / Texto DERECHA -->
     <div class="benefit-row reversed">
       <div class="image-content">
-        <img src="img/payments.png" alt="Métodos de pago">
+        <img src="/img/payments.png" alt="Métodos de pago">
       </div>
       <div class="text-content">
         <h2>Acepta pagos con tarjeta</h2>
@@ -213,14 +101,14 @@
         <p>Acceso remoto desde cualquier lugar. Monitorea ventas, inventario y empleados en tiempo real desde tu celular o computadora.</p>
       </div>
       <div class="image-content">
-        <img src="img/remote.png" alt="Monitoreo remoto">
+        <img src="/img/remote.png" alt="Monitoreo remoto">
       </div>
     </div>
   
     <!-- Fila 4 - Imagen IZQUIERDA / Texto DERECHA -->
     <div class="benefit-row reversed">
       <div class="image-content">
-        <img src="img/support.png" alt="Soporte personalizado">
+        <img src="/img/support.png" alt="Soporte personalizado">
       </div>
       <div class="text-content">
         <h2>Asesoría personalizada</h2>
@@ -235,14 +123,14 @@
         <p>Sin costos ocultos ni sorpresas. Tarifa plana mensual que incluye todas las funcionalidades, actualizaciones y soporte.</p>
       </div>
       <div class="image-content">
-        <img src="img/pricing.png" alt="Pagos fijos">
+        <img src="/img/pricing.png" alt="Pagos fijos">
       </div>
     </div>
   </section>
 <!-- Fila 6 - Imagen IZQUIERDA / Texto DERECHA -->
 <div class="benefit-row reversed">
     <div class="image-content">
-      <img src="img/interfaz.png" alt="Interfaz intuitiva">
+      <img src="/img/interfaz.png" alt="Interfaz intuitiva">
     </div>
     <div class="text-content">
       <h2>Interfaz intuitiva</h2>
@@ -250,86 +138,126 @@
     </div>
   </div>
 
-
-
-
-
-
-
-
-
-
-
-
   <section class="features">
     <div class="feature">
-      <img src="icons/catalogo.png" alt="Diseña tu catalogo" />
+      <img src="/img/catalogo.png" alt="Diseña tu catalogo" />
       <p>Diseña tu catálogo de productos</p>
     </div>
     
     <div class="feature">
-        <img src="icons/pagos.png" alt="Recibe pagos" />
+        <img src="/img/pagos.png" alt="Recibe pagos" />
         <p>Recibe pagos con tarjeta, efectivo o QR</p>
       </div>
 
       <div class="feature">
-        <img src="icons/proveedores.png" alt="Gestión de proveedores" />
+        <img src="/img/proveedores.png" alt="Gestión de proveedores" />
         <p>Gestiona tus proveedores fácilmente</p>
       </div>
 
       <div class="feature">
-        <img src="icons/reportes.png" alt="Reportes automáticos" />
+        <img src="/img/reportes.png" alt="Reportes automáticos" />
         <p>Genera reportes automáticos de ingresos y egresos</p>
       </div>
 
       <div class="feature">
-        <img src="icons/clientes.png" alt="Clientes frecuentes" />
+        <img src="/img/clientes.png" alt="Clientes frecuentes" />
         <p>Registra y premia a tus clientes frecuentes</p>
       </div>
 
       <div class="feature">
-        <img src="icons/turnos.png" alt="Gestión de turnos" />
+        <img src="/img/turnos.png" alt="Gestión de turnos" />
         <p>Administra horarios y turnos del personal</p>
       </div>
 
       <div class="feature">
-        <img src="icons/promociones.png" alt="Promociones" />
+        <img src="/img/promociones.png" alt="Promociones" />
         <p>Crea promociones y descuentos fácilmente</p>
       </div>
       
 
     <div class="feature">
-      <img src="icons/ticket.png" alt="Imprime tickets" />
+      <img src="/img/ticket.png" alt="Imprime tickets" />
       <p>Imprime tickets</p>
     </div>
 
     <div class="feature">
-      <img src="icons/empleados.png" alt="Supervisa empleados" />
+      <img src="/img/empleados.png" alt="Supervisa empleados" />
       <p>Supervisa tus empleados</p>
     </div>
 
     <div class="feature">
-      <img src="icons/ventas.png" alt="Analiza ventas" />
+      <img src="/img/ventas.png" alt="Analiza ventas" />
       <p>Analiza tus ventas</p>
     </div>
 
     <div class="feature">
-      <img src="icons/gastos.png" alt="Administra gastos" />
+      <img src="/img/gastos.png" alt="Administra gastos" />
       <p>Administra tus gastos</p>
     </div>
 
     <div class="feature">
-      <img src="icons/inventario.png" alt="Controla inventario" />
+      <img src="/img/inventario.png" alt="Controla inventario" />
       <p>Controla tu inventario</p>
     </div>
 
   </section>
 
-  <footer>
-    <p>&copy; 2025 ECOPOS - Todos los derechos reservados</p>
+  <footer class="bg-dark text-white pt-5 pb-4">
+    <div class="container text-md-left">
+      <div class="row text-md-left">
+        <!-- Logo y descripción -->
+        <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
+          <h5 class="text-uppercase mb-4 font-weight-bold text-warning">ECOPOS</h5>
+          <p>
+            Plataforma tecnológica dedicada a soluciones sostenibles para el punto de venta. Nuestro objetivo es la innovación ecológica.
+          </p>
+        </div>
+
+        <!-- Contacto -->
+        <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
+          <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Contacto</h5>
+          <p><i class="fas fa-home mr-3"></i> Calle Ficticia 123, Ciudad, País</p>
+          <p><i class="fas fa-envelope mr-3"></i> contacto@ecopos.com</p>
+          <p><i class="fas fa-phone mr-3"></i> +123 456 7890</p>
+          <p><i class="fas fa-print mr-3"></i> +123 456 7891</p>
+        </div>
+
+        <!-- Enlaces útiles -->
+        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
+          <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Enlaces</h5>
+          <p><a href="#" class="text-white" style="text-decoration: none;">Inicio</a></p>
+          <p><a href="#" class="text-white" style="text-decoration: none;">Servicios</a></p>
+          <p><a href="#" class="text-white" style="text-decoration: none;">Sobre nosotros</a></p>
+          <p><a href="#" class="text-white" style="text-decoration: none;">Contacto</a></p>
+          <p><a href="/ayuda" class="text-white" style="text-decoration: none;">Ayuda</a></p>
+        </div>
+
+        <!-- Redes sociales -->
+        <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mt-3">
+          <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Síguenos</h5>
+          <a href="#" class="text-white me-4"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" class="text-white me-4"><i class="fab fa-twitter"></i></a>
+          <a href="#" class="text-white me-4"><i class="fab fa-instagram"></i></a>
+          <a href="#" class="text-white me-4"><i class="fab fa-linkedin"></i></a>
+        </div>
+      </div>
+
+      <!-- Línea divisoria -->
+      <hr class="mb-4">
+
+      <!-- Copyright -->
+      <div class="row align-items-center">
+        <div class="col-md-7 col-lg-8">
+          <p>&copy; 2025 ECOPOS - Todos los derechos reservados</p>
+        </div>
+        <div class="col-md-5 col-lg-4">
+          <p class="text-end">Diseñado por <a href="#" class="text-warning" style="text-decoration: none;">ECOPOS Team</a></p>
+        </div>
+      </div>
+    </div>
   </footer>
+
 
   <script src="script1.js"></script>
 </body>
 </html>
->>>>>>> 8847c320570fa246e741c78e55c710e3dd535625:index.html

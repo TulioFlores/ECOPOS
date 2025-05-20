@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let productos = [];
     let visitas = [];
     let editandoProveedor = false;
-    const apiBaseUrl = 'http://localhost:3001/api';
+    const apiBaseUrl = 'http://localhost:3000/api';
 
     // Elementos del DOM
     const formProveedor = document.getElementById('registro-proveedor');

@@ -4,6 +4,9 @@
 }
 #abrir-provedores{
   display: none;
+  transition: all 0.3s ease-in-out;
+  animation: slideFadeIn 0.4s ease-out;
+  z-index: 1000;
 }
 /* Contenedor de botones */
 .botones-reportes {

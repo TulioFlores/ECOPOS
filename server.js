@@ -1,5 +1,8 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
-import mysql from 'mysql2';
+import mysql from 'mysql2/promise';
 import cors from 'cors';
 import path from 'path';
 import bcrypt from 'bcrypt';
@@ -10,64 +13,71 @@ import PDFDocument from 'pdfkit';
 import QRCode from 'qrcode';
 import http from 'http';
 import { Server } from 'socket.io';
-import session  from 'express-session';
+import session from 'express-session';
 import { body, param, validationResult } from 'express-validator';
-// const bodyParser = require('body-parser');
+
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-
-
+// HTTP Server y WebSocket
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "*" // 👈 Permitir conexión de todos lados en pruebas
+    origin: "*"
   }
 });
-// Middleware para permitir peticiones desde el navegador
+
+// Middlewares
 app.use(cors({
-  origin: "http://localhost:3000", // o el puerto donde esté tu frontend
-  credentials: true // <- Necesario para permitir cookies
+  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  credentials: true
 }));
 app.use(express.json());
 app.use(session({
-  name: "sid", // puedes usar otro nombre si deseas
+  name: "sid",
   secret: "clave_secreta_segura",
   resave: false,
   saveUninitialized: false,
   cookie: {
-    httpOnly: true,       // No accesible por JS del cliente
-    secure: false,        // true si usas HTTPS en producción
-    sameSite: "lax",      // Protege contra CSRF básico
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
   }
 }));
-// Configurar la conexión a MySQL
-const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'negocio_1'
+
+// MySQL Pool
+const pool = mysql.createPool({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
 });
 
-// WebSocket conexión
+// Verificar conexión inicial
+pool.getConnection()
+  .then(conn => {
+    console.log('✅ Conectado a MySQL');
+    conn.release();
+  })
+  .catch(err => {
+    console.error('❌ Error de conexión a MySQL:', err);
+  });
+
+// WebSocket
 io.on('connection', (socket) => {
   console.log('✅ Cliente conectado a WebSocket');
 
   socket.on('disconnect', () => {
-      console.log('❌ Cliente desconectado');
+    console.log('❌ Cliente desconectado');
   });
 });
 
-// Exporta io para usarlo en tu webhook
+// Exportar WebSocket
 export { io };
-
-connection.connect(err => {
-    if (err) {
-        console.error('Error de conexión a MySQL:', err);
-        return;
-    }
-    console.log('Conectado a MySQL');
-});
-
 //Ruteo
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -100,6 +110,9 @@ function soloGerentes(req, res, next) {
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages','inicio', 'index.html'));
 });
+app.get('/ayuda', (req, res) => {
+    res.sendFile(path.join(__dirname, 'pages','configuracion', 'ayuda.html'));
+});
 app.get('/pointofsale', verificarAutenticacion, (req, res) => {
   res.sendFile(path.join(__dirname, 'pages','punto-de-venta', 'pointofsale.html'));
 });
@@ -122,6 +135,7 @@ app.get('/reportes', verificarAutenticacion, soloGerentes, (req, res) => {
   res.sendFile(path.join(__dirname, 'pages', 'configuracion', 'reportes-admin.html'));
 });
 app.use('/tickets', express.static(path.join(__dirname, 'tickets'))); // Carpeta para exponer PDFs
+
 
 // Iniciar servidor
 server.listen(3000, '0.0.0.0',() => {
@@ -996,7 +1010,7 @@ const handleValidationErrors = (req, res, next) => {
 // Rutas para Proveedores
 app.get('/api/proveedores', async (req, res) => {
     try {
-        const [rows] = await pool.query('SELECT * FROM Proveedores WHERE activo = TRUE');
+        const [rows] = await connection.query('SELECT * FROM Proveedores WHERE activo = 1');
         res.json(rows);
     } catch (error) {
         console.error('Error al obtener proveedores:', error);
@@ -1028,7 +1042,7 @@ app.post('/api/proveedores',
         try {
             const { nombre, correo, telefono, logo_url, productos_principales } = req.body;
 
-            const [result] = await pool.query(
+            const [result] = await connection.query(
                 'INSERT INTO Proveedores (nombre, correo, telefono, logo_url, productos_principales) VALUES (?, ?, ?, ?, ?)',
                 [nombre, correo, telefono, logo_url || null, productos_principales || null]
             );
@@ -1079,7 +1093,7 @@ app.put('/api/proveedores/:id',
             const { nombre, correo, telefono, logo_url, productos_principales } = req.body;
 
             // Verificar si el proveedor existe
-            const [proveedor] = await pool.query(
+            const [proveedor] = await connection.query(
                 'SELECT id_proveedor FROM Proveedores WHERE id_proveedor = ? AND activo = TRUE',
                 [id]
             );
@@ -1120,7 +1134,7 @@ app.delete('/api/proveedores/:id',
             const { id } = req.params;
 
             // Verificar si el proveedor existe
-            const [proveedor] = await pool.query(
+            const [proveedor] = await connection.query(
                 'SELECT id_proveedor FROM Proveedores WHERE id_proveedor = ? AND activo = TRUE',
                 [id]
             );
@@ -1150,7 +1164,7 @@ app.delete('/api/proveedores/:id',
 // Rutas para Visitas
 app.get('/api/visitas', async (req, res) => {
     try {
-        const [rows] = await pool.query(`
+        const [rows] = await connection.query(`
             SELECT v.*, p.nombre as nombre_proveedor 
             FROM Visitas_Proveedores v
             JOIN Proveedores p ON v.id_proveedor = p.id_proveedor
@@ -1191,7 +1205,7 @@ app.post('/api/visitas',
             const { id_proveedor, fecha_visita, hora_visita, motivo, id_empleado_responsable } = req.body;
 
             // Verificar si el proveedor existe
-            const [proveedor] = await pool.query(
+            const [proveedor] = await connection.query(
                 'SELECT id_proveedor FROM Proveedores WHERE id_proveedor = ? AND activo = TRUE',
                 [id_proveedor]
             );
@@ -1200,7 +1214,7 @@ app.post('/api/visitas',
                 return res.status(404).json({ error: 'Proveedor no encontrado' });
             }
 
-            const [result] = await pool.query(
+            const [result] = await connection.query(
                 'INSERT INTO Visitas_Proveedores (id_proveedor, fecha_visita, hora_visita, motivo, id_empleado_responsable) VALUES (?, ?, ?, ?, ?)',
                 [id_proveedor, fecha_visita, hora_visita, motivo, id_empleado_responsable || null]
             );
@@ -1227,7 +1241,7 @@ app.delete('/api/visitas/:id',
             const { id } = req.params;
 
             // Verificar si la visita existe y no está cancelada
-            const [visita] = await pool.query(
+            const [visita] = await connection.query(
                 'SELECT id_visita FROM Visitas_Proveedores WHERE id_visita = ? AND estado != "Cancelada"',
                 [id]
             );
@@ -1256,7 +1270,7 @@ app.delete('/api/visitas/:id',
 // Rutas para Productos
 app.get('/api/productos/bajo-stock', async (req, res) => {
     try {
-        const [rows] = await pool.query(`
+        const [rows] = await connection.query(`
             SELECT p.*, pr.nombre as nombre_proveedor 
             FROM Productos p
             JOIN Proveedores pr ON p.id_proveedor = pr.id_proveedor
@@ -1269,3 +1283,21 @@ app.get('/api/productos/bajo-stock', async (req, res) => {
         res.status(500).json({ error: 'Error al obtener productos bajo stock' });
     }
 });
+
+// Middleware para manejo de errores
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Error interno del servidor' });
+});
+
+
+// // RUTA 404 - debe ir al final
+// app.use((req, res) => {
+//   // Si la petición viene de fetch o es JSON, responde con JSON de error
+//   if (req.xhr || req.headers.accept.indexOf('json') > -1) {
+//     res.status(404).json({ error: 'Recurso no encontrado' });
+//   } else {
+//     // Si es navegación normal, devuelve la página 404
+//     res.status(404).sendFile(path.join(__dirname, 'pages', 'configuracion', '404.html'));
+//   }
+// });

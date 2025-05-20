@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página de Ayuda</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!--FAVICON-->
+     <link rel="icon" href="/logos/LogoBlanco.svg" type="image/svg+xml" sizes="any">
+     <link rel="icon" type="image/png" href="/favicon-32x32.png">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .accordion-button {
+            background-color: #5db282;
+            color: white;
+        }
+        .accordion-button:not(.collapsed) {
+            background-color: #4a9b6f;
+        }
+        .accordion-body {
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center gap-2 mb-0 p-0" href="/">
+          <img src="/logos/LogoBlanco.svg" alt="Logo Ecopos" height="60px" />
+          <span>ECOPOS</span>
+        </a>
+
+        <!-- Ícono de usuario con dropdown siempre visible -->
+        <div class="dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user fa-fw"></i>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="/login">Iniciar Sesion</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <div class="container py-5">
+        <h2 class="text-center mb-4">Página de Ayuda - ECOPOS</h2>
+
+        <div class="accordion" id="ayudaAccordion">
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading1">
+                    <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">
+                        🔍 No encuentro una opción o página específica
+                    </button>
+                </h2>
+                <div id="collapse1" class="accordion-collapse collapse show" data-bs-parent="#ayudaAccordion">
+                    <div class="accordion-body">
+                        Usa el menú lateral o superior para navegar entre secciones. Si está colapsado, haz clic en el ícono ☰. También puedes usar el buscador con palabras clave como "ventas" o "clientes".
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading2">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">
+                        🧾 No puedo registrar una venta
+                    </button>
+                </h2>
+                <div id="collapse2" class="accordion-collapse collapse" data-bs-parent="#ayudaAccordion">
+                    <div class="accordion-body">
+                        Asegúrate de agregar al menos un producto y seleccionar cliente si es requerido. Verifica que el monto cubra el total. Revisa la conexión a internet o captura el error y contacta soporte.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading3">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">
+                        📦 No aparecen los productos al buscarlos
+                    </button>
+                </h2>
+                <div id="collapse3" class="accordion-collapse collapse" data-bs-parent="#ayudaAccordion">
+                    <div class="accordion-body">
+                        Verifica que el nombre esté bien escrito. Intenta con parte del nombre (ej. "Coca"). Revisa si el producto está desactivado o sin stock.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading4">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">
+                        💵 No se calcula el cambio correctamente
+                    </button>
+                </h2>
+                <div id="collapse4" class="accordion-collapse collapse" data-bs-parent="#ayudaAccordion">
+                    <div class="accordion-body">
+                        Ingresa correctamente el efectivo en su campo. Revisa errores en el formulario. Si el problema continúa, recarga la página.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading5">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse5">
+                        🧍‍♂️ No puedo iniciar sesión
+                    </button>
+                </h2>
+                <div id="collapse5" class="accordion-collapse collapse" data-bs-parent="#ayudaAccordion">
+                    <div class="accordion-body">
+                        Verifica tu usuario y contraseña. Si los olvidaste, pide ayuda al administrador para restablecerlos. Asegúrate de haber sido registrado si eres nuevo.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading6">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse6">
+                        🗂 No se guarda la información correctamente
+                    </button>
+                </h2>
+                <div id="collapse6" class="accordion-collapse collapse" data-bs-parent="#ayudaAccordion">
+                    <div class="accordion-body">
+                        Llena todos los campos obligatorios. Revisa errores antes de guardar. Si sigue fallando, refresca la página y reintenta.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading7">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse7">
+                        📱 Se ve raro en mi celular o pantalla pequeña
+                    </button>
+                </h2>
+                <div id="collapse7" class="accordion-collapse collapse" data-bs-parent="#ayudaAccordion">
+                    <div class="accordion-body">
+                        Gira tu celular para ver mejor. Usa el zoom si es necesario. Para mejor experiencia usa una tablet o computadora.
+                    </div>
+                </div>
+            </div>
+
+            <div class="accordion-item">
+                <h2 class="accordion-header" id="heading8">
+                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapse8">
+                        ❓ No encuentro lo que necesito
+                    </button>
+                </h2>
+                <div id="collapse8" class="accordion-collapse collapse" data-bs-parent="#ayudaAccordion">
+                    <div class="accordion-body">
+                        Usa el buscador de esta página. Contacta soporte vía WhatsApp, correo o chat. Consulta los manuales rápidos en PDF si están disponibles.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <footer class="bg-dark text-white pt-5 pb-4">
+    <div class="container text-md-left">
+        <div class="row text-md-left">
+        <!-- Logo y descripción -->
+        <div class="col-md-3 col-lg-3 col-xl-3 mx-auto mt-3">
+            <h5 class="text-uppercase mb-4 font-weight-bold text-warning">ECOPOS</h5>
+            <p>
+            Plataforma tecnológica dedicada a soluciones sostenibles para el punto de venta. Nuestro objetivo es la innovación ecológica.
+            </p>
+        </div>
+
+        <!-- Contacto -->
+        <div class="col-md-4 col-lg-3 col-xl-3 mx-auto mt-3">
+            <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Contacto</h5>
+            <p><i class="fas fa-home mr-3"></i> Calle Ficticia 123, Ciudad, País</p>
+            <p><i class="fas fa-envelope mr-3"></i> contacto@ecopos.com</p>
+            <p><i class="fas fa-phone mr-3"></i> +123 456 7890</p>
+            <p><i class="fas fa-print mr-3"></i> +123 456 7891</p>
+        </div>
+
+        <!-- Enlaces útiles -->
+        <div class="col-md-2 col-lg-2 col-xl-2 mx-auto mt-3">
+            <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Enlaces</h5>
+            <p><a href="#" class="text-white" style="text-decoration: none;">Inicio</a></p>
+            <p><a href="#" class="text-white" style="text-decoration: none;">Servicios</a></p>
+            <p><a href="#" class="text-white" style="text-decoration: none;">Sobre nosotros</a></p>
+            <p><a href="#" class="text-white" style="text-decoration: none;">Contacto</a></p>
+            <p><a href="" class="text-white" style="text-decoration: none;">Ayuda</a></p>
+        </div>
+
+        <!-- Redes sociales -->
+        <div class="col-md-3 col-lg-4 col-xl-3 mx-auto mt-3">
+            <h5 class="text-uppercase mb-4 font-weight-bold text-warning">Síguenos</h5>
+            <a href="#" class="text-white me-4"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="text-white me-4"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="text-white me-4"><i class="fab fa-instagram"></i></a>
+            <a href="#" class="text-white me-4"><i class="fab fa-linkedin"></i></a>
+        </div>
+        </div>
+
+        <!-- Línea divisoria -->
+        <hr class="mb-4">
+
+        <!-- Copyright -->
+        <div class="row align-items-center">
+        <div class="col-md-7 col-lg-8">
+            <p>&copy; 2025 ECOPOS - Todos los derechos reservados</p>
+        </div>
+        <div class="col-md-5 col-lg-4">
+            <p class="text-end">Diseñado por <a href="#" class="text-warning" style="text-decoration: none;">ECOPOS Team</a></p>
+        </div>
+        </div>
+    </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

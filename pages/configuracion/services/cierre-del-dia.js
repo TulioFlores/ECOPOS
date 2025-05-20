@@ -15,9 +15,13 @@ export function cerrarCollapse(elementId) {
   const el = document.getElementById(elementId);
   if (!el) return;
 
-  const instance = bootstrap.Collapse.getOrCreateInstance(el);
-  instance.hide();
+  const instance = bootstrap.Collapse.getInstance(el);
+  if (instance) {
+    instance.hide();
+  }
 }
+
+
 
 
 document.getElementById('boton-cierre').addEventListener('click', async () => {
