@@ -223,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Cargar productos bajo stock
     async function cargarProductosBajoStock() {
         try {
-            const response = await fetch(`${apiBaseUrl}/productos/bajo-stock`);
+            const response = await fetch(`/productos/bajo-stock`);
             if (!response.ok) throw new Error('Error al cargar productos');
             
             productos = await response.json();

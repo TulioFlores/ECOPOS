@@ -29,12 +29,14 @@
 
           <form id="loginForm">
             <div class="mb-3">
-              <input type="email" id="email" name="email" class="form-control" placeholder="Correo electronico o nombre de usuario" required />
+              <input id="email" name="email" class="form-control" placeholder="Correo electronico o nombre de usuario" required />
             </div>
             <div class="mb-3">
               <input type="password" id="password" name="password" class="form-control" placeholder="Ingrese su contraseña" required />
             </div>
             <button type="submit" class="btn btn-primary w-100">Iniciar sesión</button>
+
+            <div id="login-message" class="text-center text-danger my-2" style="min-height:1.5em;"></div>
 
             <div class="d-flex align-items-center my-4">
               <hr class="flex-grow-1" />
@@ -54,6 +56,10 @@
 
     form.addEventListener("submit", async function (e) {
       e.preventDefault();
+
+      // Limpiar mensaje previo
+      const msgDiv = document.getElementById("login-message");
+      msgDiv.textContent = "";
 
       const correo = document.getElementById("email").value;
       const contraseña = document.getElementById("password").value;
@@ -75,14 +81,14 @@
           } else if (data.rol === "Empleado") {
             window.location.href = "/reportes-emp";
           } else {
-            alert("Rol no reconocido");
+            msgDiv.textContent = "Rol no reconocido";
           }
         } else {
-          alert(data.mensaje || "Credenciales incorrectas.");
+          msgDiv.textContent = data.mensaje || "Credenciales incorrectas.";
         }
       } catch (error) {
         console.error("Error al iniciar sesión:", error);
-        alert("No se pudo conectar al servidor.");
+        msgDiv.textContent = "No se pudo conectar al servidor.";
       }
     });
   </script>

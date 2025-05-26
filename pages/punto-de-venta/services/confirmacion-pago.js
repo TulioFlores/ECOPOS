@@ -21,7 +21,6 @@ document.getElementById("aplicar-venta").addEventListener("click", () => {
 
   // Recorre las filas de la tabla con productos
   const filas = document.querySelectorAll("#tabla-principal tbody tr");
-
   filas.forEach(fila => {
       const subtotalTexto = fila.querySelector(".col-total")?.textContent.trim() || "0";
       const subtotal = parseFloat(subtotalTexto.replace('$', ''));
@@ -160,12 +159,8 @@ botonConfirmar.addEventListener('click', async () => {
   const pagado = parseFloat(document.getElementById("pagado").textContent);
   const porPagar = parseFloat(document.getElementById("porpagar").textContent);
   const cambio = parseFloat(document.getElementById("cambio").textContent);
-  const empleadoData = JSON.parse(localStorage.getItem("cajero"));
-  const id_empleado = empleadoData?.id;  
-  if (!id_empleado) {
-    mostrarAlerta("Error: No se pudo identificar al empleado.");
-    return;
-  }
+  
+
   if (pagado <= 0) return mostrarAlerta("Debes ingresar al menos un pago.");
   if (pagado < importe) return mostrarAlerta("El monto pagado es insuficiente para completar la venta.");
 
@@ -185,17 +180,16 @@ botonConfirmar.addEventListener('click', async () => {
     productos.push({ id, nombre, precio, cantidad, total });
   });
 
-  const venta = {
-    productos,
-    total: importe,
-    cliente: parseInt(localStorage.getItem("id_cliente")),
-    pagado,
-    porPagar,
-    cambio,
-    tipoPago,
-    empleado: id_empleado,
-    nom_cliente: localStorage.getItem("nom_cliente") || 'General'
-  };
+    const venta = {
+      productos,
+      total: importe,
+      cliente: parseInt(localStorage.getItem("id_cliente")),
+      pagado,
+      porPagar,
+      cambio,
+      tipoPago,
+      nom_cliente: localStorage.getItem("nom_cliente") || 'General'
+    };
   try {
     const response = await fetch('http://localhost:3000/ventas', {
       method: 'POST',
@@ -213,8 +207,6 @@ botonConfirmar.addEventListener('click', async () => {
       montoEfectivo = 0;            //Muy importante
       montoTarjeta = 0;
       montoPagoMercado = 0;
-      localStorage.removeItem('nom_cliente');
-      localStorage.removeItem('id_cliente');
 
     } else {
       mostrarAlerta("Error al guardar la venta");

@@ -62,7 +62,7 @@
     
           <div class="offcanvas-body">
             <h6 class="sidebar-heading px-3 mb-1">
-              <a class="nav-link text-white" href="#" id="abrirCapturaVenta">
+              <a class="nav-link text-white" href="#"  data-bs-toggle="modal" data-bs-target="#modalAccesoVenta">
                 <i class="bi bi-pc-display-horizontal"></i> Captura de venta
               </a>
             </h6><br>
@@ -104,7 +104,7 @@
             </h6><br>
     
             <h6 class="sidebar-heading px-3 mb-1">
-              <a class="nav-link text-white" id="boton-provedores" href="">
+              <a class="nav-link text-white" id="boton-provedores" href="#boton-provedores">
                 <i class="bi bi-cart-plus"></i> Provedores
               </a>
             </h6><br>
@@ -212,36 +212,58 @@
           </div>
     
     
-          <!-- Formulario para agregar producto -->
+         <!-- Formulario para agregar/modificar producto -->
           <div class="container mt-5" id="agregar-producto">
-            <h3 class="mb-4">Agregar Producto</h3>
-            <form>
+            <h3 class="mb-4">Gestión de Productos</h3>
+            <form id="form-producto">
               <div class="row">
                 <div class="col-md-6 mb-3">
+                  <label for="codigo-barras" class="form-label">Código de barras</label>
+                  <input type="text" class="form-control" id="codigo-barras" name="codigo-barras" required>
+                </div>
+                <div class="col-md-6 mb-3">
                   <label for="nombre-producto" class="form-label">Nombre del producto</label>
-                  <input type="text" class="form-control" id="nombre-producto" name="nombre-producto" required
-                    maxlength="100">
+                  <input type="text" class="form-control" id="nombre-producto" name="nombre" required maxlength="100">
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="precio" class="form-label">Precio</label>
                   <input type="number" step="0.01" class="form-control" id="precio" name="precio" required>
                 </div>
               </div>
-    
+
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label for="stock" class="form-label">Stock</label>
                   <input type="number" class="form-control" id="stock" name="stock" required>
                 </div>
+                <div class="col-md-6 mb-3">
+                  <label for="stock-minimo" class="form-label">Stock mínimo</label>
+                  <input type="number" class="form-control" id="stock-minimo" name="stock_minimo" required>
+                </div>
               </div>
-    
+
+              <div class="mb-3">
+                <label for="id-proveedor" class="form-label">ID del proveedor</label>
+                <input type="number" class="form-control" id="id-proveedor" name="id_proveedor">
+              </div>
+
               <div class="mb-3">
                 <label for="descripcion" class="form-label">Descripción</label>
                 <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
               </div>
-              <button type="submit" class="btn btn-success">Guardar producto</button>
+
+              <div class="row mt-3">
+                <div class="col">
+                  <button type="submit" class="btn btn-success">Guardar producto</button>
+                  <button type="button" class="btn btn-warning" id="btn-modificar-producto">Modificar</button>
+                  <button type="button" class="btn btn-secondary" id="btn-buscar-producto">Buscar</button>
+                  <button type="button" class="btn btn-danger" id="btn-baja-producto">Dar de baja</button>
+                  <button type="button" class="btn btn-primary" id="btn-alta-producto">Dar de alta</button>
+                </div>
+              </div>
             </form>
           </div>
+
     
           <!--Ventana modal para agregar un empleado-->
           <div id="alta-empleado" class="">
@@ -314,15 +336,14 @@
                 </div>
               </div>
     
-              <div class="row d-flex justify-content-end">
-                <button type="button" class="col-5 btn-cancelar" id="btn-cancelar-empleado">Cancelar</button>
-                <button type="submit" class="col-5 btn-confirmar" id="btn-confirmar-empleado">Dar de alta</button>
-                  <button type="button" class="col-3 btn btn-secondary" id="btn-buscar-empleado">Buscar</button>
-                  <button type="submit" class="col-4 btn btn-primary" id="btn-confirmar-empleado">Dar de alta</button>
-                  <button type="button" class="col-3 btn btn-danger d-none" id="btn-eliminar-empleado">Eliminar</button>
-                
-
+              <div class="row d-flex justify-content-end gap-2">
+                <button type="button" class="btn-base btn-cancelar" id="btn-cancelar-empleado">Cancelar</button>
+                <button type="submit" class="btn-base btn-confirmar" id="btn-confirmar-empleado">Dar de alta</button>
+                <button type="button" class="btn-base btn-baja d-none" id="btn-baja-empleado">Dar de baja</button>
+                <button type="button" class="btn-base btn-buscar" id="btn-buscar-empleados">Buscar</button>
+                <button type="button" class="btn-base btn-modificar" id="btn-modificar-empleado">Modificar</button>
               </div>
+
             </form>
           </div>
           <!-- Modal de confirmación -->
@@ -342,6 +363,28 @@
               </div>
             </div>
           </div>
+            <!-- Modal tipo prompt con validación -->
+            <div class="modal fade" id="modalPrompt" tabindex="-1" aria-labelledby="modalPromptLabel" aria-hidden="true">
+              <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modalPromptLabel">Ingrese un valor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                  </div>
+                  <div class="modal-body">
+                    <p id="modalPromptMensaje"></p>
+                    <input type="text" id="modalPromptInput" class="form-control" />
+                    <div class="text-danger mt-2 d-none" id="modalPromptError">Este campo es obligatorio.</div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" id="btnPromptCancelar">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="btnPromptAceptar">Aceptar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
           <!-- Modal de autenticación -->
           <div class="modal fade" id="modalAccesoVenta" tabindex="-1" aria-labelledby="modalAccesoVentaLabel"
             aria-hidden="true">
@@ -363,7 +406,7 @@
                       <input type="password" class="form-control" id="contrasenaVenta" required>
                     </div>
                     <div class="text-end">
-                      <button type="submit" class="btn btn-success">Acceder</button>
+                      <button type="submit" class="btn btn-success" id="abrirCapturaVenta">Acceder</button>
                     </div>
                   </form>
                 </div>
@@ -501,7 +544,7 @@
             </div>
           </div>
     
-          <div id="abrir-provedores">
+          <div id="abrir-provedores" class="panel-proveedores oculto">
             <section id="proveedores-registrados" class="mt-5">
               <h2>Proveedores Registrados</h2>
               <div class="row row-cols-1 row-cols-md-3 g-4" id="lista-proveedores">
@@ -574,7 +617,7 @@
     
                 <div class="mb-3">
                   <label for="telefono" class="form-label">Teléfono</label>
-                  <input type="tel" id="telefono" class="form-control" required pattern="[0-9]{10,15}"
+                  <input type="tel" id="telefono-proveedor" class="form-control" required pattern="[0-9]{10,15}"
                     title="Solo números (10-15 dígitos)">
                   <div class="invalid-feedback">Por favor ingrese un teléfono válido (solo números, 10-15 dígitos)</div>
                 </div>
@@ -605,49 +648,47 @@
               </form>
             </section>
           </div>
-    
-    
-          <!-- Modal para Visitas -->
-          <div class="modal fade" id="modalRegistroVisita" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title">Nueva Visita</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                  <form id="form-registro-visita">
-                    <div class="mb-3">
-                      <label for="visita-proveedor" class="form-label">Proveedor</label>
-                      <select id="visita-proveedor" class="form-select" required>
-                        <option value="">Seleccione...</option>
-                      </select>
-                      <div class="invalid-feedback">Por favor seleccione un proveedor</div>
-                    </div>
-                    <div class="mb-3">
-                      <label for="visita-fecha" class="form-label">Fecha</label>
-                      <input type="date" id="visita-fecha" class="form-control" required min="<?= date('Y-m-d') ?>">
-                      <div class="invalid-feedback">Por favor ingrese una fecha válida</div>
-                    </div>
-                    <div class="mb-3">
-                      <label for="visita-hora" class="form-label">Hora</label>
-                      <input type="time" id="visita-hora" class="form-control" required min="08:00" max="18:00">
-                      <div class="invalid-feedback">Por favor ingrese una hora entre 8:00 y 18:00</div>
-                    </div>
-                    <div class="mb-3">
-                      <label for="visita-motivo" class="form-label">Motivo</label>
-                      <textarea id="visita-motivo" class="form-control" rows="3" required maxlength="200"></textarea>
-                      <div class="invalid-feedback">Por favor ingrese un motivo (máximo 200 caracteres)</div>
-                    </div>
-                  </form>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                  <button type="button" id="btn-guardar-visita" class="btn btn-primary">Guardar</button>
+            <!-- Modal para Visitas -->
+            <div class="modal fade" id="modalRegistroVisita" tabindex="-1" aria-hidden="true">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Nueva Visita</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <form id="form-registro-visita">
+                      <div class="mb-3">
+                        <label for="visita-proveedor" class="form-label">Proveedor</label>
+                        <select id="visita-proveedor" class="form-select" required>
+                          <option value="">Seleccione...</option>
+                        </select>
+                        <div class="invalid-feedback">Por favor seleccione un proveedor</div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="visita-fecha" class="form-label">Fecha</label>
+                        <input type="date" id="visita-fecha" class="form-control" required min="<?= date('Y-m-d') ?>">
+                        <div class="invalid-feedback">Por favor ingrese una fecha válida</div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="visita-hora" class="form-label">Hora</label>
+                        <input type="time" id="visita-hora" class="form-control" required min="08:00" max="18:00">
+                        <div class="invalid-feedback">Por favor ingrese una hora entre 8:00 y 18:00</div>
+                      </div>
+                      <div class="mb-3">
+                        <label for="visita-motivo" class="form-label">Motivo</label>
+                        <textarea id="visita-motivo" class="form-control" rows="3" required maxlength="200"></textarea>
+                        <div class="invalid-feedback">Por favor ingrese un motivo (máximo 200 caracteres)</div>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" id="btn-guardar-visita" class="btn btn-primary">Guardar</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
         </main>
         <footer class="bg-dark text-white pt-5 pb-4">
           <div class="container text-md-left">

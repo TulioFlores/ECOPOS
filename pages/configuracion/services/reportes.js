@@ -46,7 +46,6 @@ const btnConfirmarEmpleado = document.getElementById("btn-confirmar-empleado");
     modalVentaPorEmpleado.style.display = "none";
     modalEmpleado.style.display = "none";
     modalProducto.style.display = "none";
-    modalProvedores.style.display = "none";
         cerrarCollapse("cierreDelDia");
 }
 
@@ -86,12 +85,11 @@ btnAbrirProducto.addEventListener("click", () => {
 });
 // Abrir Provedores
 btnAbrirProvedores.addEventListener("click", () => {
-    const yaVisible = modalProvedores.style.display === "flex";
-    resaltarActivo("boton-provedores");
-    cerrarTodosLosModales();
-    if (!yaVisible) modalProvedores.style.display = "flex";
-    cerrarSidebar();
-});
+    modalProvedores.classList.remove("oculto"); // Mostrar el panel
+    setTimeout(() => {
+      modalProvedores.classList.add("visible"); // Luego aplicar animación
+    }, 10); // Pequeño retraso (10-50 ms funciona bien)
+  });
 
 // También cierra el modal si se presiona Cancelar o Confirmar
 btnCancelarEmpleado.addEventListener("click", () => {
@@ -99,32 +97,36 @@ btnCancelarEmpleado.addEventListener("click", () => {
     document.querySelector('form').reset();
 });
 
-
-// Evento para abrir el modal para login local de captura de venta
-
-document.getElementById('abrirCapturaVenta').addEventListener('click', async () => {
-  try {
-    const response = await fetch('http://localhost:3000/abrir-captura-venta', {
-      method: 'GET',
-      credentials: 'include' // para enviar la cookie de sesión
-    });
-
-    const data = await response.json();
-
-    if (response.ok && data.success) {
-      // Guarda en localStorage si quieres
-      localStorage.setItem('cajero', JSON.stringify(data.empleado));
-      
-      // Redirige al punto de venta
-      window.location.href = '/pointofsale';
-    } else {
-      alert(data.error || 'Error al abrir captura');
+// Reemplazo: autenticación para Captura de Venta
+const formAccesoVenta = document.getElementById('formAccesoVenta');
+if (formAccesoVenta) {
+  formAccesoVenta.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const usuario = document.getElementById('usuarioVenta').value.trim();
+    const contrasena = document.getElementById('contrasenaVenta').value;
+    if (!usuario || !contrasena) {
+      alert('Por favor, ingresa usuario y contraseña');
+      return;
     }
-  } catch (error) {
-    console.error('Error al conectar con el servidor:', error);
-    alert('Error al conectar con el servidor');
-  }
-});
+    try {
+      const response = await fetch('http://localhost:3000/abrir-captura-venta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ usuario, contrasena })
+      });
+      const data = await response.json();
+      if (response.ok && data.success) {
+        window.location.href = '/pointofsale';
+      } else {
+        alert(data.error || 'Error al abrir captura');
+      }
+    } catch (error) {
+      console.error('Error al conectar con el servidor:', error);
+      alert('Error al conectar con el servidor');
+    }
+  });
+}
 
   const currentPath = window.location.pathname;
   

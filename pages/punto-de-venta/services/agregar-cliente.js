@@ -12,7 +12,9 @@ document.getElementById('cliente').addEventListener('keypress', async (event) =>
         
         try {
             // Realizar la solicitud fetch con el nombre ingresado
-            const response = await fetch(`http://localhost:3000/cliente/${telefono}`);
+            const response = await fetch(`http://localhost:3000/cliente/${telefono}`,{
+                credentials: 'include',
+            });
             
             // Verificar si la respuesta fue exitosa
             if (!response.ok) {
@@ -21,10 +23,6 @@ document.getElementById('cliente').addEventListener('keypress', async (event) =>
             
             
             const data = await response.json(); 
-            if (!data.error) {
-                localStorage.setItem('id_cliente', data.id_cliente,);  // debes retornar id_cliente en el backend
-                localStorage.setItem('nom_cliente', data.nombre);  // debes retornar id_cliente en el backend
-            }
             console.log('Datos recibidos desde el servidor:', data);
 
             // Llamamos a la función para mostrar los resultados
@@ -35,8 +33,6 @@ document.getElementById('cliente').addEventListener('keypress', async (event) =>
     }
 });
 function mostrarCliente(cliente){
-    const telefono = document.getElementById("cliente");
-    telefono.value = cliente.telefono;
     const nombre = document.getElementById("nombre-cliente");
     nombre.innerText = cliente.nombre;
 

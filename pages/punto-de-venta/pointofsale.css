@@ -82,7 +82,7 @@ form input {
 }
 
 /* ===== Tabla principal ===== */
-.tabla-principal thead tr {
+#tabla-principal thead tr {
     background-color: #b1b2b5;
     border-radius: 10px 10px 0 0;
     margin: 5px 10px 0 10px;
@@ -99,7 +99,7 @@ form input {
     overflow: hidden;
 }
 
-.tabla-principal tfoot .row {
+#tabla-principal tfoot .row {
     height: 100px;
     background-color: #b1b2b5;
     border-radius: 10px;
@@ -107,11 +107,11 @@ form input {
 }
 
 /* ===== Colores alternados ===== */
-.tabla-principal tbody tr:nth-child(odd) {
+#tabla-principal tbody tr:nth-child(odd) {
     background-color: #f2f2f2;
 }
 
-.tabla-principal tbody tr:nth-child(even) {
+#tabla-principal tbody tr:nth-child(even) {
     background-color: #e0e0e0;
 }
 

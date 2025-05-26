@@ -88,10 +88,19 @@ app.use(express.static(path.join(__dirname, 'pages')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 function verificarAutenticacion(req, res, next) {
-  if (req.session && req.session.usuario) {
-    return next(); // Está autenticado, continúa
+  if (req.session.usuario) {
+    // Si la ruta es /pointofsale, requiere puntoVentaAutenticado
+    if (req.path === '/pointofsale') {
+      if (req.session.usuario.puntoVentaAutenticado) {
+        return next();
+      } else {
+        return res.redirect('/login');
+      }
+    }
+    // Para otras rutas, basta con que exista la sesión
+    return next();
   } else {
-    return res.redirect('/login'); // Redirigir a la página de login
+    return res.redirect('/login');
   }
 }
 //  Funcion para verificar que es gerente
@@ -113,7 +122,7 @@ app.get('/', (req, res) => {
 app.get('/ayuda', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages','configuracion', 'ayuda.html'));
 });
-app.get('/pointofsale', verificarAutenticacion, (req, res) => {
+app.get('/pointofsale', (req, res) => {
   res.sendFile(path.join(__dirname, 'pages','punto-de-venta', 'pointofsale.html'));
 });
 app.get('/configuracion', verificarAutenticacion, (req, res) => {
@@ -146,317 +155,144 @@ const ticketsPath = path.join(__dirname, 'tickets');
 if (!fs.existsSync(ticketsPath)) {
   fs.mkdirSync(ticketsPath);
 }
-// Endpoint para obtener un producto por ID usando el Stored Procedure
-app.get('/producto/:id', (req, res) => {
-    const idProducto = req.params.id;
-    const query = 'CALL sp_obtenerProductos(?)';
-    connection.query(query, [idProducto], (err, results) => {
-        if (err) {
-            console.error('Error al llamar al Stored Procedure:', err);
-            return res.status(500).json({ error: 'Error al obtener el producto' });
-        }
-
-        const resultado = results[0][0];
-
-        if (resultado) {
-            if (resultado.mensaje === 'SIN STOCK') {
-                return res.status(409).json({ error: 'Sin stock disponible' });
-            } else if (resultado.mensaje === 'PRODUCTO NO ENCONTRADO') {
-                return res.status(404).json({ error: 'Producto no encontrado' });
-            } else {
-                const producto = {
-                    id: resultado.id_producto,
-                    descripcion: resultado.nombre,
-                    precio: resultado.precio,
-                    stock: resultado.stock  // 👈️ Incluye el stock
-                };
-                return res.json(producto);
-            }
-        } else {
-            return res.status(404).json({ error: 'Producto no encontrado' });
-        }
-    });
-});
-
-
-
-app.get('/buscar/:nombre', (req, res) => {
-    const nombreBuscado = req.params.nombre;
-    const query = 'CALL sp_buscarProductos(?)';
-    connection.query(query, [nombreBuscado], (err, results) => {
-        if (err) {
-            console.error('Error al llamar al Stored Procedure:', err);
-            res.status(500).json({ error: 'Error al buscar productos' });
-            return;
-        }
-
-        if (results[0].length > 0) {
-            // Formatear la respuesta
-            const productos = results[0].map(producto => ({
-                id: producto.id_producto,
-                descripcion: producto.nombre,
-                stock: producto.stock,
-                precio: producto.precio
-            }));
-            res.json(productos);
-        } else {
-            res.status(404).json({ error: 'No se encontraron productos' });
-        }
-    });
-});
-
-
-
-app.get('/empleado/:id', (req, res) => {
-    const idEmpleado = req.params.id;
-    const query = 'CALL sp_obtenerNombre(?)';
-    connection.query(query, [idEmpleado], (err, results) => {
-        if (err) {
-            console.error('Error al llamar al Stored Procedure:', err);
-            res.status(500).json({ error: 'Error al obtener el empleado' });
-            return;
-        }
-        
-        if (results[0].length > 0) {
-            // Aquí asumimos que el nombre está en la primera fila y columna
-            const empleado = {
-                nombre: results[0][0].nombre_completo
-            };
-            res.json(empleado);
-        } else {
-            res.status(404).json({ error: 'Empleado no encontrado' });
-        }
-    });
-});
-// Endpoint para obtener un cliente por numero de telefono
-app.get('/cliente/:telefono', (req, res) => {
-    const telefono = req.params.telefono;
-    const query = 'CALL sp_obtenerTelefono(?)';
-    connection.query(query, [telefono], (err, results) => {
-        if (err) {
-            console.error('Error al llamar al Stored Procedure:', err);
-            res.status(500).json({ error: 'Error al obtener el cliente' });
-            return;
-        }
-        if (results[0].length > 0) {
-            const cliente = {
-                nombre: results[0][0].nombre_completo,
-                telefono: results[0][0].telefono,
-                id_cliente: results[0][0].id_cliente
-            };
-            res.json(cliente);
-        } else {
-            res.status(404).json({ error: 'Producto no encontrado' });
-        }
-    });
-});
-app.get('/clientes/sugerencias/:telefono', (req, res) => {
-    const telefono = req.params.telefono;
-
-    const query = `SELECT nombre_completo AS nombre, telefono FROM Clientes WHERE telefono LIKE ? LIMIT 5`;
-    connection.query(query, [`%${telefono}%`], (err, results) => {
-        if (err) {
-            console.error('Error al buscar sugerencias:', err);
-            res.status(500).json({ error: 'Error al buscar sugerencias' });
-            return;
-        }
-
-        res.json(results);
-    });
-});
-
-
-
-
-
-app.post('/ventas', async (req, res) => {
-  const { productos, total, cliente, pagado, porPagar, cambio, tipoPago, empleado,  nom_cliente } = req.body;
-  if (!tipoPago || productos.length === 0 || pagado <= 0) {
-    return res.status(400).json({ error: 'Datos incompletos para registrar la venta.' });
+// Producto por ID
+app.get('/producto/:id', async (req, res) => {
+  const idProducto = req.params.id;
+  try {
+    const [results] = await pool.execute('CALL sp_obtenerProductos(?)', [idProducto]);
+    const resultado = results[0][0];
+    if (resultado) {
+      if (resultado.mensaje === 'SIN STOCK') {
+        return res.status(409).json({ error: 'Sin stock disponible' });
+      } else if (resultado.mensaje === 'PRODUCTO NO ENCONTRADO') {
+        return res.status(404).json({ error: 'Producto no encontrado' });
+      } else {
+        return res.json({
+          id: resultado.id_producto,
+          descripcion: resultado.nombre,
+          precio: resultado.precio,
+          stock: resultado.stock
+        });
+      }
+    } else {
+      return res.status(404).json({ error: 'Producto no encontrado' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener el producto' });
   }
-
-  connection.beginTransaction(err => {
-    if (err) return res.status(500).json({ error: 'Error al iniciar transacción.' });
-
-    const ventaQuery = `
-      INSERT INTO ventas (total, pagado, por_pagar, cambio, id_cliente, id_empleado)
-      VALUES (?, ?, ?, ?, ?, ?)
-    `;
-
-    connection.query(ventaQuery, [total, pagado, porPagar, cambio, cliente , empleado, ], (err, result) => {
-      if (err) return connection.rollback(() => res.status(500).json({ error: 'Error al insertar venta.' }));
-
-      const id_venta = result.insertId;
-      const detalleValues = productos.map(p => [id_venta, p.id, p.cantidad, p.precio]);
-
-      connection.query(`INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio_unitario) VALUES ?`, [detalleValues], (err) => {
-        if (err) return connection.rollback(() => res.status(500).json({ error: 'Error al insertar detalle de venta.' }));
-
-        const updateStock = productos.map(p => new Promise((resolve, reject) => {
-          connection.query(
-            `UPDATE productos SET stock = stock - ? WHERE id_producto = ? AND stock >= ?`,
-            [p.cantidad, p.id, p.cantidad],
-            (err, result) => {
-              if (err || result.affectedRows === 0) return reject(`Error al actualizar stock para ${p.id}`);
-              resolve();
-            }
-          );
-        }));
-
-        Promise.all(updateStock)
-          .then(() => {
-            const pagos = Array.isArray(tipoPago) ? tipoPago : [{ metodo: tipoPago, monto: pagado }];
-            const insertarPagos = pagos.map(tp => new Promise((resolve, reject) => {
-              connection.query('SELECT id_tipo_pago FROM tipo_pago WHERE descripcion = ?', [tp.metodo], (err, results) => {
-                if (err || !results.length) return reject(`No se encontró el tipo de pago: ${tp.metodo}`);
-                connection.query(`INSERT INTO pagos (id_venta, id_tipo_pago, monto) VALUES (?, ?, ?)`,
-                  [id_venta, results[0].id_tipo_pago, tp.monto], (err) => {
-                    if (err) return reject('Error al insertar pago.');
-                    resolve();
-                  });
-              });
-            }));
-
-            Promise.all(insertarPagos)
-              .then(async () => {
-                connection.commit(async err => {
-                  if (err) return connection.rollback(() => res.status(500).json({ error: 'Error al confirmar venta.' }));
-                
-                  const ticketDir = path.join(__dirname, 'tickets');
-                  if (!fs.existsSync(ticketDir)) fs.mkdirSync(ticketDir);
-                
-                  const pdfPath = path.join(ticketDir, `ticket-${id_venta}.pdf`);
-                  const doc = new PDFDocument({ margin: 20, size: [250, 600] });
-                  doc.pipe(fs.createWriteStream(pdfPath));
-                
-                  doc.fontSize(14).text('ECO POS', { align: 'center' });
-                  doc.fontSize(10).text('RFC: ECO123456789', { align: 'center' });
-                  doc.text('Calle Principal #123', { align: 'center' });
-                  doc.text('Tel: 312-123-4567', { align: 'center' });
-                  doc.moveDown();
-                
-                  doc.text(`Fecha: ${new Date().toLocaleString('es-MX')}`);
-                  doc.text(`Ticket No: ${id_venta}`);
-                  doc.text(`Cliente: ${nom_cliente}`);
-                  doc.moveDown().text('------------------------------------------');
-                
-                  productos.forEach(p => {
-                    const line = `${p.nombre} x${p.cantidad} $${parseFloat(p.precio).toFixed(2)}`;
-                    const total = `$${(p.precio * p.cantidad).toFixed(2)}`;
-                    doc.text(line, { continued: true }).text(total, { align: 'right' });
-                  });
-                
-                  doc.moveDown().text('------------------------------------------');
-
-                  const subtotal = total / 1.16;
-                  const iva = total - subtotal;
-
-                  doc.text(`Subtotal: $${subtotal.toFixed(2)}`, { align: 'right' });
-                  doc.text(`IVA (16%): $${iva.toFixed(2)}`, { align: 'right' });
-                  doc.text(`Total (con IVA): $${total.toFixed(2)}`, { align: 'right' });
-                  doc.text(`Pagado: $${pagado.toFixed(2)}`, { align: 'right' });
-                  doc.text(`Cambio: $${cambio.toFixed(2)}`, { align: 'right' });
-
-                
-                  // 🔄 Consultar métodos de pago REALES desde BD
-                  connection.query(`
-                    SELECT tp.descripcion AS metodo, p.monto
-                    FROM pagos p
-                    JOIN tipo_pago tp ON p.id_tipo_pago = tp.id_tipo_pago
-                    WHERE p.id_venta = ?
-                  `, [id_venta], async (err, pagosRegistrados) => {
-                    if (err) return res.status(500).json({ error: 'Error al obtener métodos de pago' });
-                
-                    doc.moveDown().text('Métodos de pago:', { underline: true });
-                    pagosRegistrados.forEach(p => {
-                      doc.text(`${p.metodo}: $${parseFloat(p.monto).toFixed(2)}`);
-                    });
-                
-                    doc.moveDown().fontSize(11).text('¡Gracias por su compra!', { align: 'center' });
-                
-                    const ticketUrl = `http://localhost:3000/tickets/ticket-${id_venta}.pdf`;
-                    const qrImage = await QRCode.toDataURL(ticketUrl);
-                    const base64 = qrImage.replace(/^data:image\/png;base64,/, '');
-                    const buffer = Buffer.from(base64, 'base64');
-                    doc.image(buffer, { width: 100, align: 'center' });
-                
-                    doc.end();
-                
-                    res.json({ success: true, id_venta, ticketUrl, qrImage });
-                  });
-                });
-              })
-              .catch(error => connection.rollback(() => res.status(400).json({ error: error.toString() })));
-          })
-          .catch(error => connection.rollback(() => res.status(400).json({ error: error.toString() })));
-      });
-    });
-  });
 });
 
+// Buscar productos por nombre
+app.get('/buscar/:nombre', async (req, res) => {
+  const nombreBuscado = req.params.nombre;
+  try {
+    const [results] = await pool.execute('CALL sp_buscarProductos(?)', [nombreBuscado]);
+    if (results[0].length > 0) {
+      const productos = results[0].map(producto => ({
+        id: producto.id_producto,
+        descripcion: producto.nombre,
+        stock: producto.stock,
+        precio: producto.precio
+      }));
+      res.json(productos);
+    } else {
+      res.status(404).json({ error: 'No se encontraron productos' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al buscar productos' });
+  }
+});
 
+// Empleado por ID
+app.get('/empleado/:id', async (req, res) => {
+  const idEmpleado = req.params.id;
+  try {
+    const [results] = await pool.execute('CALL sp_obtenerNombre(?)', [idEmpleado]);
+    if (results[0].length > 0) {
+      res.json({ nombre: results[0][0].nombre_completo });
+    } else {
+      res.status(404).json({ error: 'Empleado no encontrado' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener el empleado' });
+  }
+});
 
-// Endpoint para obtener la fecha y hora del servidor
-app.get('/hora-servidor', (req, res) => {
-    const fechaHora = new Date();
-  
-    const dia = String(fechaHora.getDate()).padStart(2, '0');
-    const mes = String(fechaHora.getMonth() + 1).padStart(2, '0'); // +1 porque enero es 0
-    const anio = fechaHora.getFullYear();
-  
-    const hora = fechaHora.toLocaleTimeString('es-MX', {
-      hour: '2-digit', minute: '2-digit', second: '2-digit'
+// Cliente por teléfono
+app.get('/cliente/:telefono', async (req, res) => {
+  const telefono = req.params.telefono;
+  try {
+    const [results] = await pool.execute('CALL sp_obtenerTelefono(?)', [telefono]);
+    if (results[0].length > 0) {
+      const cliente = results[0][0];
+
+    // Guardar como cookies seguras
+    res.cookie('id_cliente', cliente.id_cliente, {
+      httpOnly: true,
+      sameSite: 'Lax',
+      maxAge: 60 * 60 * 1000, // 1 hora
     });
-  
-    res.json({
-      fecha: `${dia}/${mes}/${anio}`,
-      hora: hora
+    res.cookie('nom_cliente', cliente.nombre_completo, {
+      httpOnly: true,
+      sameSite: 'Lax',
+      maxAge: 60 * 60 * 1000,
     });
-  });
+      res.json({
+        nombre: cliente.nombre_completo
+      });
+    } else {
+      res.status(404).json({ error: 'Cliente no encontrado' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al obtener el cliente' });
+  }
+});
 
-  
-  // Registrar nuevo cliente
-// Ruta para registrar un nuevo cliente
-app.post('/cliente', (req, res) => {
+// Sugerencias de clientes
+app.get('/clientes/sugerencias/:telefono', async (req, res) => {
+  const telefono = req.params.telefono;
+  try {
+    const [results] = await pool.execute(
+      'SELECT nombre_completo AS nombre, telefono FROM Clientes WHERE telefono LIKE ? LIMIT 5',
+      [`%${telefono}%`]
+    );
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al buscar sugerencias' });
+  }
+});
+
+// Registrar nuevo cliente
+app.post('/cliente', async (req, res) => {
   const { nombre_completo, telefono, correo } = req.body;
-
   if (!nombre_completo || !telefono || !correo) {
-      return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+    return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
   }
 
-  // Verificar si el teléfono ya existe
-  const checkQuery = 'SELECT id_cliente FROM clientes WHERE telefono = ?';
-  connection.query(checkQuery, [telefono], (checkErr, checkResults) => {
-      if (checkErr) {
-          console.error('Error al verificar teléfono:', checkErr);
-          return res.status(500).json({ error: 'Error al verificar el teléfono.' });
-      }
+  try {
+    const [checkResults] = await pool.execute('SELECT id_cliente FROM clientes WHERE telefono = ?', [telefono]);
+    if (checkResults.length > 0) {
+      return res.status(409).json({ error: 'El número de teléfono ya está registrado.' });
+    }
 
-      if (checkResults.length > 0) {
-          return res.status(409).json({ error: 'El número de teléfono ya está registrado.' });
-      }
+    const [results] = await pool.execute(
+      'INSERT INTO clientes (nombre_completo, telefono, correo, fecha_registro) VALUES (?, ?, ?, NOW())',
+      [nombre_completo, telefono, correo]
+    );
 
-      // Insertar nuevo cliente
-      const insertQuery = 'INSERT INTO clientes (nombre_completo, telefono, correo, fecha_registro) VALUES (?, ?, ?, NOW())';
-      const values = [nombre_completo, telefono, correo];
-
-      connection.query(insertQuery, values, (insertErr, results) => {
-          if (insertErr) {
-              console.error('Error al insertar cliente:', insertErr);
-              return res.status(500).json({ error: 'Error al registrar cliente.' });
-          }
-
-          res.status(201).json({ mensaje: 'Cliente registrado exitosamente', id_cliente: results.insertId });
-      });
-  });
+    res.status(201).json({ mensaje: 'Cliente registrado exitosamente', id_cliente: results.insertId });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al registrar cliente.' });
+  }
 });
 
-
-
-
-
-//Dar de alta un empleado
-// Ruta para alta de empleado
+// Alta de empleado
 app.post('/altaempleados', async (req, res) => {
   const {
     primer_nombre,
@@ -471,143 +307,313 @@ app.post('/altaempleados', async (req, res) => {
     contrasena_responsable_conf
   } = req.body;
 
-  // Validar coincidencia de contraseñas
   if (contrasena_responsable !== contrasena_responsable_conf) {
     return res.status(400).json({ error: 'Las contraseñas no coinciden' });
   }
 
+  const conn = await pool.getConnection();
   try {
-    // Buscar al gerente activo
-    const [gerente] = await new Promise((resolve, reject) => {
-      connection.query(
-        'SELECT * FROM empleados WHERE cargo = "Gerente" AND activo = 1 LIMIT 1',
-        (err, results) => {
-          if (err) return reject(err);
-          resolve(results);
-        }
-      );
-    });
+    const [gerenteRows] = await conn.execute(
+      'SELECT * FROM empleados WHERE cargo = "Gerente" AND activo = 1 LIMIT 1'
+    );
 
-    if (!gerente) {
+    if (gerenteRows.length === 0) {
       return res.status(401).json({ error: 'No hay ningún gerente activo en el sistema' });
     }
 
+    const gerente = gerenteRows[0];
     const passwordValida = await bcrypt.compare(contrasena_responsable, gerente.contrasena_hash);
     if (!passwordValida) {
       return res.status(401).json({ error: 'Contraseña incorrecta del gerente' });
     }
 
-    // Generar datos para el nuevo empleado
-    const nombreCompleto = `${primer_nombre} ${segundo_nombre || ''} ${primer_apellido} ${segundo_apellido || ''}`.toUpperCase().trim();
     const ultimos3 = telefono.slice(-3);
     const username = `${primer_nombre.toUpperCase()}${ultimos3}`;
     const contrasenaHash = await bcrypt.hash(contrasena, 10);
     const fechaHoy = new Date().toISOString().split('T')[0];
 
-    const query = `
-      INSERT INTO empleados (nombre_completo, cargo, username, correo, telefono, contrasena_hash, fecha_contratacion, activo)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-    const values = [nombreCompleto, puesto, username, correo, telefono, contrasenaHash, fechaHoy, 1];
+    const [result] = await conn.execute(`
+      INSERT INTO empleados 
+      (primer_nom, segundo_nom, primer_ap, segundo_ap, cargo, username, correo, telefono, contrasena_hash, fecha_contratacion, activo)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `, [
+      primer_nombre, segundo_nombre, primer_apellido, segundo_apellido, puesto, username,
+      correo, telefono, contrasenaHash, fechaHoy, 1
+    ]);
 
-    connection.query(query, values, (err, result) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'Error al registrar empleado' });
-      }
-
-      res.status(201).json({
-        message: 'Empleado registrado con éxito',
-        id: result.insertId,
-        username,
-        success:true
-      });
+    res.status(201).json({
+      message: 'Empleado registrado con éxito',
+      id: result.insertId,
+      username,
+      success: true
     });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error en el proceso de alta de empleado' });
+  } finally {
+    conn.release();
   }
 });
 
+// Fecha y hora del servidor
+app.get('/hora-servidor', (req, res) => {
+  const fechaHora = new Date();
+  const dia = String(fechaHora.getDate()).padStart(2, '0');
+  const mes = String(fechaHora.getMonth() + 1).padStart(2, '0');
+  const anio = fechaHora.getFullYear();
+  const hora = fechaHora.toLocaleTimeString('es-MX', {
+    hour: '2-digit', minute: '2-digit', second: '2-digit'
+  });
 
-
-
-  app.get('/abrir-captura-venta', (req, res) => {
-  const usuario = req.session.usuario;
-
-  if (!usuario || !usuario.id) {
-    return res.status(401).json({ error: 'No hay sesión activa' });
-  }
-
-  const hoy = new Date();
-  const inicioDia = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate(), 0, 0, 0);
-
-  const checkQuery = `
-    SELECT m1.id FROM movimientos_caja m1
-    WHERE m1.id_empleado = ? AND m1.id_tipo_movimiento = 1
-    AND NOT EXISTS (
-      SELECT 1 FROM movimientos_caja m2
-      WHERE m2.id_empleado = m1.id_empleado
-        AND m2.id_tipo_movimiento = 2
-        AND m2.fecha > m1.fecha
-    )
-    ORDER BY m1.fecha DESC
-    LIMIT 1
-  `;
-
-  connection.query(checkQuery, [usuario.id], (checkErr, checkResults) => {
-    if (checkErr) return res.status(500).json({ error: 'Error al verificar apertura de caja' });
-
-    if (checkResults.length === 0) {
-      // No hay apertura hoy, insertarla
-      const insertQuery = `
-        INSERT INTO movimientos_caja (id_empleado, id_tipo_movimiento, fecha)
-        VALUES (?, 1, NOW())
-      `;
-      connection.query(insertQuery, [usuario.id], (insertErr) => {
-        if (insertErr) return res.status(500).json({ error: 'Error al registrar apertura de caja' });
-
-        res.json({
-          success: true,
-          apertura_registrada: true,
-          empleado: usuario
-        });
-      });
-    } else {
-      // Ya hay apertura
-      res.json({
-        success: true,
-        apertura_registrada: false,
-        empleado: usuario
-      });
-    }
+  res.json({
+    fecha: `${dia}/${mes}/${anio}`,
+    hora: hora
   });
 });
+app.post('/ventas', async (req, res) => {
+  const { productos, total, cliente, pagado, porPagar, cambio, tipoPago, nom_cliente } = req.body;
+  if (!tipoPago || productos.length === 0 || pagado <= 0) {
+    return res.status(400).json({ error: 'Datos incompletos para registrar la venta.' });
+  }
+  const empleado = req.session.usuario.id;
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
 
+    const ventaQuery = `
+      INSERT INTO ventas (total, pagado, por_pagar, cambio, id_cliente, id_empleado)
+      VALUES (?, ?, ?, ?, ?, ?)
+    `;
 
-  // Ruta para agregar producto
-app.post('/agregar-producto', (req, res) => {
-    const { nombre, precio, stock, descripcion } = req.body;
-  
-    const nuevoProducto = {
-      nombre,
-      descripcion,
-      precio,
-      stock,
-      fecha_creacion: new Date(),
-      activo: 1
-    };
-  
-    const query = 'INSERT INTO productos SET ?';
-    connection.query(query, nuevoProducto, (err, result) => {
-      if (err) {
-        console.error('Error al insertar el producto:', err);
-        return res.status(500).json({ mensaje: 'Error al insertar el producto' });
+    const [ventaResult] = await connection.query(ventaQuery, [total, pagado, porPagar, cambio, cliente, empleado]);
+    const id_venta = ventaResult.insertId;
+
+    const detalleValues = productos.map(p => [id_venta, p.id, p.cantidad, p.precio]);
+    await connection.query('INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio_unitario) VALUES ?', [detalleValues]);
+
+    for (const p of productos) {
+      const [result] = await connection.query(
+        'UPDATE productos SET stock = stock - ? WHERE id_producto = ? AND stock >= ?',
+        [p.cantidad, p.id, p.cantidad]
+      );
+      if (result.affectedRows === 0) {
+        throw new Error(`Error al actualizar stock para ${p.id}`);
       }
-      res.status(201).json({ mensaje: 'Producto agregado con éxito', id: result.insertId });
+    }
+
+    const pagos = Array.isArray(tipoPago) ? tipoPago : [{ metodo: tipoPago, monto: pagado }];
+    for (const tp of pagos) {
+      const [rows] = await connection.query('SELECT id_tipo_pago FROM tipo_pago WHERE descripcion = ?', [tp.metodo]);
+      if (!rows.length) {
+        throw new Error(`No se encontró el tipo de pago: ${tp.metodo}`);
+      }
+      await connection.query(
+        'INSERT INTO pagos (id_venta, id_tipo_pago, monto) VALUES (?, ?, ?)',
+        [id_venta, rows[0].id_tipo_pago, tp.monto]
+      );
+    }
+
+    await connection.commit();
+
+    const ticketDir = path.join(__dirname, 'tickets');
+    if (!fs.existsSync(ticketDir)) fs.mkdirSync(ticketDir);
+
+    const pdfPath = path.join(ticketDir, `ticket-${id_venta}.pdf`);
+    const doc = new PDFDocument({ margin: 20, size: [250, 600] });
+    doc.pipe(fs.createWriteStream(pdfPath));
+
+    doc.fontSize(14).text('ECO POS', { align: 'center' });
+    doc.fontSize(10).text('RFC: ECO123456789', { align: 'center' });
+    doc.text('Calle Principal #123', { align: 'center' });
+    doc.text('Tel: 312-123-4567', { align: 'center' });
+    doc.moveDown();
+
+    doc.text(`Fecha: ${new Date().toLocaleString('es-MX')}`);
+    doc.text(`Ticket No: ${id_venta}`);
+    doc.text(`Cliente: ${nom_cliente}`);
+    doc.moveDown().text('------------------------------------------');
+
+    productos.forEach(p => {
+      const line = `${p.nombre} x${p.cantidad} $${parseFloat(p.precio).toFixed(2)}`;
+      const totalProd = `$${(p.precio * p.cantidad).toFixed(2)}`;
+      doc.text(line, { continued: true }).text(totalProd, { align: 'right' });
     });
-  });
+
+    doc.moveDown().text('------------------------------------------');
+    const subtotal = total / 1.16;
+    const iva = total - subtotal;
+
+    doc.text(`Subtotal: $${subtotal.toFixed(2)}`, { align: 'right' });
+    doc.text(`IVA (16%): $${iva.toFixed(2)}`, { align: 'right' });
+    doc.text(`Total (con IVA): $${total.toFixed(2)}`, { align: 'right' });
+    doc.text(`Pagado: $${pagado.toFixed(2)}`, { align: 'right' });
+    doc.text(`Cambio: $${cambio.toFixed(2)}`, { align: 'right' });
+
+    const [pagosRegistrados] = await connection.query(
+      `SELECT tp.descripcion AS metodo, p.monto
+       FROM pagos p
+       JOIN tipo_pago tp ON p.id_tipo_pago = tp.id_tipo_pago
+       WHERE p.id_venta = ?`,
+      [id_venta]
+    );
+
+    doc.moveDown().text('Métodos de pago:', { underline: true });
+    pagosRegistrados.forEach(p => {
+      doc.text(`${p.metodo}: $${parseFloat(p.monto).toFixed(2)}`);
+    });
+
+    doc.moveDown().fontSize(11).text('¡Gracias por su compra!', { align: 'center' });
+
+    const ticketUrl = `http://localhost:3000/tickets/ticket-${id_venta}.pdf`;
+    const qrImage = await QRCode.toDataURL(ticketUrl);
+    const base64 = qrImage.replace(/^data:image\/png;base64,/, '');
+    const buffer = Buffer.from(base64, 'base64');
+    doc.image(buffer, { width: 100, align: 'center' });
+
+    doc.end();
+
+    res.json({ success: true, id_venta, ticketUrl, qrImage });
+
+  } catch (error) {
+    await connection.rollback();
+    res.status(400).json({ error: error.message });
+  } finally {
+    connection.release();
+  }
+});
+
+// Utilidad para construir el nombre completo
+function construirNombreCompleto(empleado) {
+  return [empleado.primer_nom, empleado.segundo_nom, empleado.primer_ap, empleado.segundo_ap]
+    .filter(Boolean)
+    .join(' ');
+}
+
+app.post('/abrir-captura-venta', async (req, res) => {
+  try {
+    const { usuario, contrasena } = req.body;
+    if (!usuario || !contrasena) {
+      return res.status(400).json({ success: false, error: 'Usuario y contraseña requeridos' });
+    }
+
+    // Buscar empleado por username
+    const [rows] = await pool.query('SELECT id_empleado, username, primer_nom, segundo_nom, primer_ap, segundo_ap, contrasena_hash, correo, cargo FROM empleados WHERE username = ? AND activo = 1', [usuario]);
+    if (rows.length === 0) {
+      return res.status(401).json({ success: false, error: 'Usuario no encontrado o inactivo' });
+    }
+    const empleado = rows[0];
+    const valid = await bcrypt.compare(contrasena, empleado.contrasena_hash);
+    if (!valid) {
+      return res.status(401).json({ success: false, error: 'Contraseña incorrecta' });
+    }
+
+    // Insertar movimiento de apertura de caja
+    await pool.query(
+      'INSERT INTO movimientos_caja (id_tipo_movimiento, fecha, id_empleado) VALUES (1, NOW(), ?)',
+      [empleado.id_empleado]
+    );
+
+    // Actualizar la sesión para permitir acceso a /pointofsale
+    req.session.usuario = {
+      id: empleado.id_empleado,
+      username: empleado.username,
+      nombre: construirNombreCompleto(empleado),
+      correo: empleado.correo,
+      cargo: empleado.cargo,
+      puntoVentaAutenticado: true
+    };
+
+    // Obtener clientes (como antes)
+    const [clientes] = await pool.execute(
+      'SELECT id_cliente, nombre_completo, telefono FROM clientes'
+    );
+
+    res.json({ success: true, empleado: req.session.usuario, clientes });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, error: 'Error al abrir captura de venta' });
+  }
+});
+
+
+
+// Agregar producto
+app.post('/api/productos', async (req, res) => {
+  const { codigo_barras, nombre, descripcion, precio, stock, stock_minimo, id_proveedor } = req.body;
+  try {
+    const [result] = await pool.execute(`
+      INSERT INTO productos (codigo_barras, nombre, descripcion, precio, stock, stock_minimo, id_proveedor, fecha_creacion, activo)
+      VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 1)
+    `, [codigo_barras, nombre, descripcion, precio, stock, stock_minimo, id_proveedor]);
+
+    res.status(201).json({ mensaje: 'Producto agregado', codigo_barras });
+  } catch (err) {
+    console.error('Error al agregar producto:', err);
+    res.status(500).json({ mensaje: 'Error al agregar producto' });
+  }
+});
+
+
+
+// Obtener producto por ID
+app.get('/api/productos/:codigo', async (req, res) => {
+  const { codigo } = req.params;
+  const [rows] = await pool.execute('SELECT * FROM productos WHERE codigo_barras = ?', [codigo]);
+
+  if (rows.length === 0) return res.status(404).json({ mensaje: 'Producto no encontrado' });
+  res.json(rows[0]);
+});
+
+
+// Modificar producto
+app.put('/api/productos/:codigo', async (req, res) => {
+  const { codigo } = req.params;
+  const { nombre, descripcion, precio, stock, stock_minimo, id_proveedor } = req.body;
+
+  try {
+    const [result] = await pool.execute(`
+      UPDATE productos
+      SET nombre = ?, descripcion = ?, precio = ?, stock = ?, stock_minimo = ?, id_proveedor = ?
+      WHERE codigo_barras = ?
+    `, [nombre, descripcion, precio, stock, stock_minimo, id_proveedor, codigo]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ mensaje: 'Producto no encontrado' });
+    }
+
+    res.json({ mensaje: 'Producto actualizado correctamente' });
+  } catch (err) {
+    console.error('Error al actualizar producto:', err);
+    res.status(500).json({ mensaje: 'Error al actualizar producto' });
+  }
+});
+
+
+
+// Dar de baja producto
+app.put('/api/productos/:codigo/baja', async (req, res) => {
+  const { codigo } = req.params;
+  const [result] = await pool.execute(
+    'UPDATE productos SET activo = 0 WHERE codigo_barras = ?',
+    [codigo]
+  );
+  if (result.affectedRows === 0) return res.status(404).json({ mensaje: 'Producto no encontrado' });
+  res.json({ mensaje: 'Producto dado de baja correctamente' });
+});
+
+
+// Dar de alta producto
+app.put('/api/productos/:codigo/alta', async (req, res) => {
+  const { codigo } = req.params;
+  const [result] = await pool.execute(
+    'UPDATE productos SET activo = 1 WHERE codigo_barras = ?',
+    [codigo]
+  );
+  if (result.affectedRows === 0) return res.status(404).json({ mensaje: 'Producto no encontrado' });
+  res.json({ mensaje: 'Producto dado de alta correctamente' });
+});
+
+
   
 
 
@@ -698,127 +704,101 @@ app.post('/webhook', async (req, res) => {
   res.sendStatus(200);
 });
 
-app.post('/retiros', (req, res) => {
+app.post('/retiros', async (req, res) => {
   const { cantidad, motivo, username, contraseña } = req.body;
+  if (!cantidad || !motivo || !username || !contraseña) return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
 
-  if (!cantidad || !motivo || !username || !contraseña) {
-    return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
+  try {
+    const [rows] = await pool.query('SELECT id_empleado, contrasena_hash FROM empleados WHERE username = ?', [username]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Cajero no encontrado.' });
+
+    const empleado = rows[0];
+    const coinciden = await bcrypt.compare(contraseña, empleado.contrasena_hash);
+    if (!coinciden) return res.status(401).json({ error: 'Contraseña incorrecta.' });
+
+    await pool.query('CALL sp_registrar_retiro(?, ?, ?)', [cantidad, motivo, empleado.id_empleado]);
+    res.json({ success: true, message: 'Retiro registrado correctamente.' });
+
+  } catch (err) {
+    res.status(500).json({ error: 'Error en el servidor' });
   }
-
-  // Buscar cajero
-  connection.query('SELECT id_empleado, contrasena_hash FROM empleados WHERE username = ?', [username], (err, results) => {
-    if (err) return res.status(500).json({ error: 'Error en la consulta.' });
-    if (results.length === 0) return res.status(404).json({ error: 'Cajero no encontrado.' });
-
-    const empleado = results[0];
-    
-    // Comparar contraseñas
-    bcrypt.compare(contraseña, empleado.contrasena_hash, (err, coinciden) => {
-      if (err || !coinciden) return res.status(401).json({ error: 'Contraseña incorrecta.' });
-
-      // Ejecutar el SP
-      connection.query('CALL sp_registrar_retiro(?, ?, ?)', [cantidad, motivo, empleado.id_empleado], (err) => {
-        if (err) return res.status(500).json({ error: 'Error al registrar el retiro.' });
-
-        res.json({ success: true, message: 'Retiro registrado correctamente.' });
-      });
-    });
-  });
 });
+
 
 
 //Api para ver todos los productos
-app.get('/productos', (req, res) => {
-  connection.query('SELECT * FROM productos', (err, results) => {
-    if (err) return res.status(500).json({ error: 'Error al obtener productos.' });
-    res.json(results);
-  });
+app.get('/productos', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM productos');
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener productos.' });
+  }
 });
+
 
 // Ruta para autenticar cajero
-app.post('/autenticar-cajero', (req, res) => {
+app.post('/autenticar-cajero', async (req, res) => {
   const { usuario, contrasena } = req.body;
+  if (!usuario || !contrasena) return res.status(400).json({ error: 'Usuario y contraseña requeridos' });
 
-  if (!usuario || !contrasena) {
-    return res.status(400).json({ error: 'Usuario y contraseña requeridos' });
+  try {
+    const [rows] = await pool.query('SELECT * FROM empleados WHERE username = ?', [usuario]);
+    if (rows.length === 0) return res.status(401).json({ error: 'Usuario no encontrado' });
+
+    const empleado = rows[0];
+    const valid = await bcrypt.compare(contrasena, empleado.contrasena_hash);
+    if (!valid) return res.status(401).json({ error: 'Contraseña incorrecta' });
+
+    res.json({ success: true, empleado: { id: empleado.id_empleado, nombre: empleado.nombre } });
+  } catch (err) {
+    res.status(500).json({ error: 'Error en la base de datos' });
   }
-
-  const query = 'SELECT * FROM empleados WHERE username = ?'; // o usa nombre_usuario si así lo tienes
-
-  connection.query(query, [usuario], (err, results) => {
-    if (err) return res.status(500).json({ error: 'Error en la base de datos' });
-    if (results.length === 0) return res.status(401).json({ error: 'Usuario no encontrado' });
-
-    const empleado = results[0];
-
-    bcrypt.compare(contrasena, empleado.contrasena_hash, (err, valid) => {
-      if (err || !valid) return res.status(401).json({ error: 'Contraseña incorrecta' });
-
-      // Si todo está bien, responder con los datos necesarios para el corte
-      res.json({ success: true, empleado: { id: empleado.id_empleado, nombre: empleado.nombre } });
-    });
-  });
 });
+
 //mostrar el resumen del turno
 app.post('/resumen-turno', async (req, res) => {
   const { username } = req.body;
   if (!username) return res.status(400).json({ error: 'Usuario requerido' });
 
   try {
-    connection.query('CALL sp_resumen_turno_usuario(?)', [username], (err, results) => {
-      if (err) {
-        console.error(err);
-        return res.status(500).json({ error: 'Error al ejecutar SP' });
-      }
-
-      // El resultado viene como un arreglo de arreglos
-      const resumen = results[0][0] || {};  // Primer resultado del primer recordset
-
-      res.json({
-        efectivo: resumen.total_efectivo || 0,
-        tarjeta: resumen.total_tarjeta || 0,
-        mercado_pago: resumen.total_mercado_pago || 0,
-        retiros: resumen.total_retiros || 0,
-        total_venta: resumen.total || 0
-      });
+    const [results] = await pool.query('CALL sp_resumen_turno_usuario(?)', [username]);
+    const resumen = results[0][0] || {};
+    res.json({
+      efectivo: resumen.total_efectivo || 0,
+      tarjeta: resumen.total_tarjeta || 0,
+      mercado_pago: resumen.total_mercado_pago || 0,
+      retiros: resumen.total_retiros || 0,
+      total_venta: resumen.total || 0
     });
-
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al ejecutar SP' });
   }
 });
 
-app.post('/api/aplicar-cierre', (req, res) => {
-  const { id_empleado, faltante, sobrante, montoCorrecto } = req.body;
 
+app.post('/api/aplicar-cierre', async (req, res) => {
+  const { id_empleado, faltante, sobrante, montoCorrecto } = req.body;
   if (!id_empleado || montoCorrecto === undefined) {
     return res.status(400).json({ success: false, error: 'Datos incompletos' });
   }
 
-  connection.query(
-    `INSERT INTO movimientos_caja (id_tipo_movimiento, fecha, id_empleado, Faltante, Sobrante, MontoCorrecto)
-     VALUES (2, NOW(), ?, ?, ?, ?)`,
-    [id_empleado, faltante || 0, sobrante || 0, montoCorrecto],
-    (err, result) => {
-      if (err) {
-        console.error('Error al insertar cierre en movimientos_caja:', err);
-        return res.status(500).json({ success: false, error: 'Error al guardar cierre de caja' });
-      }
-
-      // ✅ Solo esta respuesta debe enviarse en éxito
-      return res.json({ success: true, message: 'Cierre de caja registrado correctamente.' });
-    }
-  );
+  try {
+    await pool.query(
+      `INSERT INTO movimientos_caja (id_tipo_movimiento, fecha, id_empleado, Faltante, Sobrante, MontoCorrecto)
+       VALUES (2, NOW(), ?, ?, ?, ?)`,
+      [id_empleado, faltante || 0, sobrante || 0, montoCorrecto]
+    );
+    res.json({ success: true, message: 'Cierre de caja registrado correctamente.' });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Error al guardar cierre de caja' });
+  }
 });
-//Cierre del dia
-app.post('/resumen-dia', (req, res) => {
-  connection.query('CALL sp_resumen_dia()', (error, results) => {
-    if (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Error al obtener resumen del día' });
-    }
 
+//Cierre del dia
+app.post('/resumen-dia', async (req, res) => {
+  try {
+    const [results] = await pool.query('CALL sp_resumen_dia()');
     const data = results[0][0] || {};
     res.json({
       efectivo: data.total_efectivo || 0,
@@ -826,8 +806,11 @@ app.post('/resumen-dia', (req, res) => {
       total_mercado_pago: data.total_mercado_pago || 0,
       total_general: data.total_general || 0
     });
-  });
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener resumen del día' });
+  }
 });
+
 
 
 app.post('/api/aplicar-cierre', (req, res) => {
@@ -853,130 +836,119 @@ app.post('/api/aplicar-cierre', (req, res) => {
 });
 
 // Ruta para manejar el registro de asistencia
-app.post('/registrar-asistencia', (req, res) => {
+app.post('/registrar-asistencia', async (req, res) => {
   const { id_empleado, tipo } = req.body;
+  if (!id_empleado || !tipo) return res.status(400).json({ error: 'Faltan datos requeridos' });
 
-  if (!id_empleado || !tipo) {
-    return res.status(400).json({ error: 'Faltan datos requeridos' });
+  try {
+    await pool.query(
+      'INSERT INTO asistencia (id_empleado, fecha_hora, tipo) VALUES (?, ?, ?)',
+      [id_empleado, new Date(), tipo]
+    );
+    res.json({ mensaje: 'Asistencia registrada correctamente' });
+  } catch (err) {
+    res.status(500).json({ error: 'Error en el servidor' });
   }
-
-  const fecha_hora = new Date();
-
-  const query = 'INSERT INTO asistencia (id_empleado, fecha_hora, tipo) VALUES (?, ?, ?)';
-  db.query(query, [id_empleado, fecha_hora, tipo], (err, result) => {
-    if (err) {
-      console.error('Error al insertar en la base de datos:', err);
-      return res.status(500).json({ error: 'Error en el servidor' });
-    }
-    res.status(200).json({ mensaje: 'Asistencia registrada correctamente' });
-  });
 });
+
 
 // Ruta: api/ventas/resumen-intervalo
-app.get('/api/ventas/resumen-intervalo', (req, res) => {
+app.get('/api/ventas/resumen-intervalo', async (req, res) => {
   const { inicio, fin } = req.query;
+  if (!inicio || !fin) return res.status(400).json({ error: 'Fechas requeridas' });
 
-  if (!inicio || !fin) {
-    return res.status(400).json({ error: 'Fechas de inicio y fin requeridas' });
+  try {
+    const [results] = await pool.query('CALL sp_resumen_por_intervalo(?, ?)', [inicio, fin]);
+    res.json(results[0][0]);
+  } catch (err) {
+    res.status(500).json({ error: 'Error al obtener el resumen' });
   }
-
-  const query = 'CALL sp_resumen_por_intervalo(?, ?)';
-  connection.query(query, [inicio, fin], (err, results) => {
-    if (err) {
-      console.error('Error en resumen de intervalo:', err);
-      return res.status(500).json({ error: 'Error al obtener el resumen' });
-    }
-
-    res.json(results[0][0]); // Devuelve solo el primer objeto del result set
-  });
 });
+
 
 //API venta por empleado
-app.post('/por-empleado', (req, res) => {
+app.post('/por-empleado', async (req, res) => {
   const { inicio, fin, username } = req.body;
+  if (!inicio || !fin || !username) return res.status(400).json({ success: false, error: 'Datos incompletos' });
 
-  if (!inicio || !fin || !username) {
-    return res.status(400).json({ success: false, error: 'Datos incompletos' });
+  try {
+    const [results] = await pool.query('CALL sp_resumen_por_intervalo_empleado(?, ?, ?)', [inicio, fin, username]);
+    res.json({ success: true, datos: results[0][0] || {} });
+  } catch (err) {
+    res.status(500).json({ success: false, error: 'Error al obtener el resumen' });
   }
-
-  const query = 'CALL sp_resumen_por_intervalo_empleado(?, ?, ?)';
-  connection.query(query, [inicio, fin, username], (err, results) => {
-    if (err) {
-      console.error('Error en resumen de intervalo:', err);
-      return res.status(500).json({ success: false, error: 'Error al obtener el resumen' });
-    }
-
-    const resumen = results[0][0] || {};
-    res.json({ success: true, datos: resumen });
-  });
 });
+
 
 // Ruta para el registro
 app.post('/register', async (req, res) => {
-    const { correo, nombre, apellidos, puesto, contraseña } = req.body;
-
-    try {
-        const hashedPassword = await bcrypt.hash(contraseña, 10);
-
-        const query = 'INSERT INTO empleados (nombre_completo, cargo, correo, contraseña) VALUES (?, ?, ?, ?, ?)';
-        connection.query(query, [correo, nombre, apellidos, puesto, hashedPassword], (err, result) => {
-            if (err) {
-                console.error('Error al registrar:', err);
-                return res.status(400).json({ 
-                    success: false, 
-                    mensaje: 'Error al registrar. Tal vez el correo ya existe.' 
-                });
-            }
-
-            res.json({ 
-                success: true, 
-                mensaje: 'Registro exitoso',
-                redirectTo: '/login.html'
-            });
-        });
-    } catch (error) {
-        console.error('Error al encriptar la contraseña:', error);
-        res.status(500).json({ success: false, mensaje: 'Error en el servidor' });
-    }
+  const { correo, nombre, apellidos, puesto, contraseña } = req.body;
+  try {
+    const hashedPassword = await bcrypt.hash(contraseña, 10);
+    await pool.query(
+      'INSERT INTO empleados (nombre_completo, cargo, correo, contraseña) VALUES (?, ?, ?, ?, ?)',
+      [`${nombre} ${apellidos}`, puesto, correo, hashedPassword]
+    );
+    res.json({ success: true, mensaje: 'Registro exitoso', redirectTo: '/login.html' });
+  } catch (err) {
+    res.status(400).json({ success: false, mensaje: 'Error al registrar. Tal vez el correo ya existe.' });
+  }
 });
 
 
 
 
 
-app.post("/login-inicio", (req, res) => {
+
+app.post("/login-inicio", async (req, res) => {
   const { correo, contraseña } = req.body;
 
   if (!correo || !contraseña) {
     return res.status(400).json("Faltan datos");
   }
 
-  connection.query("SELECT * FROM empleados WHERE correo = ?", [correo], async (err, results) => {
-    if (err) return res.status(500).json("Error de servidor");
+  try {
+    // Determinar si es correo o username
+    const esCorreo = /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(correo);
+    let rows;
+    if (esCorreo) {
+      [rows] = await pool.query("SELECT * FROM empleados WHERE correo = ?", [correo]);
+    } else {
+      [rows] = await pool.query("SELECT * FROM empleados WHERE username = ?", [correo]);
+    }
 
-    if (results.length === 0) return res.status(401).json("Usuario no encontrado");
+    if (rows.length === 0) {
+      return res.status(401).json("Usuario no encontrado");
+    }
 
-    const user = results[0];
+    const user = rows[0];
     const esCorrecta = await bcrypt.compare(contraseña, user.contrasena_hash);
 
-    if (!esCorrecta) return res.status(401).json("Contraseña incorrecta");
+    if (!esCorrecta) {
+      return res.status(401).json("Contraseña incorrecta");
+    }
 
-    // Aquí se crea la sesión
+    // Crear sesión
     req.session.usuario = {
       id: user.id_empleado,
       username: user.username,
-      nombre: user.nombre_completo,
+      nombre: construirNombreCompleto(user),
       correo: user.correo,
       cargo: user.cargo,
-      puntoVentaAutenticado: false // aún no ha entrado al POS
+      puntoVentaAutenticado: false
     };
 
     res.json({
       mensaje: "Inicio de sesión exitoso",
       rol: user.cargo
     });
-  });
+
+  } catch (error) {
+    console.error("Error en login:", error);
+    res.status(500).json("Error de servidor");
+  }
 });
+
 
 app.post("/logout", (req, res) => {
   req.session.destroy((err) => {
@@ -1010,7 +982,7 @@ const handleValidationErrors = (req, res, next) => {
 // Rutas para Proveedores
 app.get('/api/proveedores', async (req, res) => {
     try {
-        const [rows] = await connection.query('SELECT * FROM Proveedores WHERE activo = 1');
+        const [rows] = await pool.query('SELECT * FROM Proveedores WHERE activo = 1');
         res.json(rows);
     } catch (error) {
         console.error('Error al obtener proveedores:', error);
@@ -1042,7 +1014,7 @@ app.post('/api/proveedores',
         try {
             const { nombre, correo, telefono, logo_url, productos_principales } = req.body;
 
-            const [result] = await connection.query(
+            const [result] = await pool.query(
                 'INSERT INTO Proveedores (nombre, correo, telefono, logo_url, productos_principales) VALUES (?, ?, ?, ?, ?)',
                 [nombre, correo, telefono, logo_url || null, productos_principales || null]
             );
@@ -1093,7 +1065,7 @@ app.put('/api/proveedores/:id',
             const { nombre, correo, telefono, logo_url, productos_principales } = req.body;
 
             // Verificar si el proveedor existe
-            const [proveedor] = await connection.query(
+            const [proveedor] = await pool.query(
                 'SELECT id_proveedor FROM Proveedores WHERE id_proveedor = ? AND activo = TRUE',
                 [id]
             );
@@ -1134,7 +1106,7 @@ app.delete('/api/proveedores/:id',
             const { id } = req.params;
 
             // Verificar si el proveedor existe
-            const [proveedor] = await connection.query(
+            const [proveedor] = await pool.query(
                 'SELECT id_proveedor FROM Proveedores WHERE id_proveedor = ? AND activo = TRUE',
                 [id]
             );
@@ -1164,7 +1136,7 @@ app.delete('/api/proveedores/:id',
 // Rutas para Visitas
 app.get('/api/visitas', async (req, res) => {
     try {
-        const [rows] = await connection.query(`
+        const [rows] = await pool.query(`
             SELECT v.*, p.nombre as nombre_proveedor 
             FROM Visitas_Proveedores v
             JOIN Proveedores p ON v.id_proveedor = p.id_proveedor
@@ -1205,7 +1177,7 @@ app.post('/api/visitas',
             const { id_proveedor, fecha_visita, hora_visita, motivo, id_empleado_responsable } = req.body;
 
             // Verificar si el proveedor existe
-            const [proveedor] = await connection.query(
+            const [proveedor] = await pool.query(
                 'SELECT id_proveedor FROM Proveedores WHERE id_proveedor = ? AND activo = TRUE',
                 [id_proveedor]
             );
@@ -1214,7 +1186,7 @@ app.post('/api/visitas',
                 return res.status(404).json({ error: 'Proveedor no encontrado' });
             }
 
-            const [result] = await connection.query(
+            const [result] = await pool.query(
                 'INSERT INTO Visitas_Proveedores (id_proveedor, fecha_visita, hora_visita, motivo, id_empleado_responsable) VALUES (?, ?, ?, ?, ?)',
                 [id_proveedor, fecha_visita, hora_visita, motivo, id_empleado_responsable || null]
             );
@@ -1241,7 +1213,7 @@ app.delete('/api/visitas/:id',
             const { id } = req.params;
 
             // Verificar si la visita existe y no está cancelada
-            const [visita] = await connection.query(
+            const [visita] = await pool.query(
                 'SELECT id_visita FROM Visitas_Proveedores WHERE id_visita = ? AND estado != "Cancelada"',
                 [id]
             );
@@ -1268,9 +1240,9 @@ app.delete('/api/visitas/:id',
 );
 
 // Rutas para Productos
-app.get('/api/productos/bajo-stock', async (req, res) => {
+app.get('/productos/bajo-stock', async (req, res) => {
     try {
-        const [rows] = await connection.query(`
+        const [rows] = await pool.query(`
             SELECT p.*, pr.nombre as nombre_proveedor 
             FROM Productos p
             JOIN Proveedores pr ON p.id_proveedor = pr.id_proveedor
@@ -1283,6 +1255,121 @@ app.get('/api/productos/bajo-stock', async (req, res) => {
         res.status(500).json({ error: 'Error al obtener productos bajo stock' });
     }
 });
+
+
+//Modificacion de empleados
+//Buscar empleado
+app.get('/api/empleados/:username', async (req, res) => {
+  const { username } = req.params;
+  const [rows] = await pool.execute(
+    'SELECT * FROM empleados WHERE username = ? AND activo = 1',
+    [username]
+  );
+  if (rows.length === 0) return res.status(404).json({ mensaje: 'Empleado no encontrado' });
+  res.json(rows[0]);
+});
+
+//Modificar empleado
+app.put('/api/empleados/:username', async (req, res) => {
+  const { username } = req.params;
+  const {
+    primer_nombre,
+    segundo_nombre,
+    primer_apellido,
+    segundo_apellido,
+    email,
+    telefono,
+    contrasena,
+    confirmar_contrasena,
+    contrasena_responsable,
+    contrasena_responsable_conf
+  } = req.body;
+
+  if (contrasena !== confirmar_contrasena) {
+    return res.status(400).json({ error: 'Las contraseñas del empleado no coinciden' });
+  }
+
+  if (contrasena_responsable !== contrasena_responsable_conf) {
+    return res.status(400).json({ error: 'Las contraseñas del gerente no coinciden' });
+  }
+
+  try {
+    const conn = await pool.getConnection();
+
+    // Verificar gerente
+    const [gerenteRows] = await conn.execute(
+      'SELECT * FROM empleados WHERE cargo = "Gerente" AND activo = 1 LIMIT 1'
+    );
+
+    if (gerenteRows.length === 0) {
+      conn.release();
+      return res.status(401).json({ error: 'No hay gerente activo en el sistema' });
+    }
+
+    const gerente = gerenteRows[0];
+    const validaGerente = await bcrypt.compare(contrasena_responsable, gerente.contrasena_hash);
+
+    if (!validaGerente) {
+      conn.release();
+      return res.status(401).json({ error: 'Contraseña del gerente incorrecta' });
+    }
+
+    const campos = [
+      'primer_nom = ?',
+      'segundo_nom = ?',
+      'primer_ap = ?',
+      'segundo_ap = ?',
+      'correo = ?',
+      'telefono = ?'
+    ];
+
+    const values = [
+      primer_nombre,
+      segundo_nombre,
+      primer_apellido,
+      segundo_apellido,
+      email,
+      telefono
+    ];
+
+    if (contrasena) {
+      const contrasenaHash = await bcrypt.hash(contrasena, 10);
+      campos.push('contrasena_hash = ?');
+      values.push(contrasenaHash);
+    }
+
+    values.push(username);
+
+    const query = `UPDATE empleados SET ${campos.join(', ')} WHERE username = ? AND activo = 1`;
+
+    const [result] = await conn.execute(query, values);
+    conn.release();
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ mensaje: 'Empleado no encontrado o inactivo' });
+    }
+
+    res.json({ mensaje: 'Empleado actualizado exitosamente' });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Error al actualizar el empleado' });
+  }
+});
+
+//Dar de baja empleado
+app.put('/api/empleados/:username/baja', async (req, res) => {
+  const { username } = req.params;
+  const [result] = await pool.execute(
+    'UPDATE empleados SET activo = 0 WHERE username = ?',
+    [username]
+  );
+
+  if (result.affectedRows === 0) return res.status(404).json({ mensaje: 'Empleado no encontrado' });
+  res.json({ mensaje: 'Empleado dado de baja' });
+});
+
+
 
 // Middleware para manejo de errores
 app.use((err, req, res, next) => {

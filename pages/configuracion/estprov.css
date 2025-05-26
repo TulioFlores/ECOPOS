@@ -1,21 +1,19 @@
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f8f9fa;
-    color: #333;
+.panel-proveedores {
+  z-index: 1050;
+  transition: transform 0.3s ease-in-out;
+  padding: 2rem;
 }
 
-.navbar {
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.panel-proveedores.visible {
+  display: flex;
+  flex-direction: column;
 }
 
-.navbar-brand {
-    font-weight: 600;
+.oculto {
+  display: none;
 }
 
-.navbar-brand .logo {
-    height: 30px;
-    margin-right: 10px;
-}
+
 
 section {
     background-color: white;
