@@ -183,7 +183,7 @@ botonConfirmar.addEventListener('click', async () => {
     const venta = {
       productos,
       total: importe,
-      cliente: parseInt(localStorage.getItem("id_cliente")),
+      cliente: parseInt(localStorage.getItem("id_cliente")) || 0,
       pagado,
       porPagar,
       cambio,

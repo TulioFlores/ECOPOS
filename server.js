@@ -15,6 +15,7 @@ import http from 'http';
 import { Server } from 'socket.io';
 import session from 'express-session';
 import { body, param, validationResult } from 'express-validator';
+import fileUpload from 'express-fileupload';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,6 +34,7 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(session({
   name: "sid",
   secret: "clave_secreta_segura",
@@ -43,6 +45,13 @@ app.use(session({
     secure: false,
     sameSite: "lax",
   }
+}));
+
+// Configurar express-fileupload
+app.use(fileUpload({
+  limits: { fileSize: 50 * 1024 * 1024 }, // 50MB max
+  useTempFiles: true,
+  tempFileDir: '/tmp/'
 }));
 
 // MySQL Pool
@@ -122,14 +131,22 @@ app.get('/', (req, res) => {
 app.get('/ayuda', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages','configuracion', 'ayuda.html'));
 });
-app.get('/pointofsale', (req, res) => {
+app.get('/pointofsale', verificarAutenticacion, (req, res) => {
   res.sendFile(path.join(__dirname, 'pages','punto-de-venta', 'pointofsale.html'));
 });
-app.get('/configuracion', verificarAutenticacion, (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages','configuracion', 'configuracion.html'));
-});
 app.get('/login', (req, res) => {
-    res.sendFile(path.join(__dirname, 'pages','inicio-de-sesion', 'login.html'));
+    // Verificar si existe una sesión activa
+    if (req.session.usuario) {
+        // Redirigir según el cargo
+        if (req.session.usuario.cargo === 'Gerente') {
+            res.redirect('/reportes');
+        } else {
+            res.redirect('/reportes-emp');
+        }
+    } else {
+        // Si no hay sesión, mostrar la página de login
+        res.sendFile(path.join(__dirname, 'pages','inicio-de-sesion', 'login.html'));
+    }
 });
 app.get('/register', (req, res) => {
     res.sendFile(path.join(__dirname, 'pages','inicio-de-sesion', 'register.html'));
@@ -349,6 +366,16 @@ app.post('/altaempleados', async (req, res) => {
     });
   } catch (error) {
     console.error(error);
+    // Manejo específico de duplicate entry
+    if (error.code === 'ER_DUP_ENTRY') {
+      if (error.sqlMessage && error.sqlMessage.includes('correo')) {
+        return res.status(409).json({ error: 'El correo ya está registrado.' });
+      } else if (error.sqlMessage && error.sqlMessage.includes('telefono')) {
+        return res.status(409).json({ error: 'El teléfono ya está registrado.' });
+      } else {
+        return res.status(409).json({ error: 'El dato ya está registrado.' });
+      }
+    }
     res.status(500).json({ error: 'Error en el proceso de alta de empleado' });
   } finally {
     conn.release();
@@ -422,10 +449,54 @@ app.post('/ventas', async (req, res) => {
     const doc = new PDFDocument({ margin: 20, size: [250, 600] });
     doc.pipe(fs.createWriteStream(pdfPath));
 
-    doc.fontSize(14).text('ECO POS', { align: 'center' });
-    doc.fontSize(10).text('RFC: ECO123456789', { align: 'center' });
-    doc.text('Calle Principal #123', { align: 'center' });
-    doc.text('Tel: 312-123-4567', { align: 'center' });
+    // Obtener la configuración de la tienda
+    let tienda = {
+      nombre: 'ECO POS',
+      rfc: 'ECO123456789',
+      direccion: 'Calle Principal #123',
+      telefono: '312-123-4567'
+    };
+
+    try {
+      const [configuracion] = await connection.query('SELECT * FROM configuracion_tienda LIMIT 1');
+      if (configuracion && configuracion.length > 0) {
+        tienda = {
+          ...tienda,
+          ...configuracion[0]
+        };
+      }
+    } catch (error) {
+      console.error('Error al obtener configuración de la tienda:', error);
+    }
+
+    // Encabezado del ticket
+    if (tienda.logo) {
+      try {
+        // Remover el slash inicial si existe
+        const logoPath = path.join(__dirname, 'public', tienda.logo.startsWith('/') ? tienda.logo.slice(1) : tienda.logo);
+        if (fs.existsSync(logoPath)) {
+          // Si es un SVG, usar un logo por defecto en PNG
+          if (logoPath.toLowerCase().endsWith('.svg')) {
+            const defaultLogoPath = path.join(__dirname, 'public', 'logos', 'logo-tienda.png');
+            if (fs.existsSync(defaultLogoPath)) {
+              doc.image(defaultLogoPath, { width: 100, align: 'center' });
+            }
+          } else {
+            doc.image(logoPath, { width: 100, align: 'center' });
+          }
+          doc.moveDown();
+        } else {
+          console.error('Logo no encontrado en:', logoPath);
+        }
+      } catch (error) {
+        console.error('Error al cargar el logo:', error);
+      }
+    }
+
+    doc.fontSize(14).text(tienda.nombre, { align: 'center' });
+    doc.fontSize(10).text(`RFC: ${tienda.rfc}`, { align: 'center' });
+    doc.text(tienda.direccion, { align: 'center' });
+    doc.text(`Tel: ${tienda.telefono}`, { align: 'center' });
     doc.moveDown();
 
     doc.text(`Fecha: ${new Date().toLocaleString('es-MX')}`);
@@ -507,11 +578,28 @@ app.post('/abrir-captura-venta', async (req, res) => {
       return res.status(401).json({ success: false, error: 'Contraseña incorrecta' });
     }
 
-    // Insertar movimiento de apertura de caja
-    await pool.query(
-      'INSERT INTO movimientos_caja (id_tipo_movimiento, fecha, id_empleado) VALUES (1, NOW(), ?)',
+    // Verificar si ya hay una apertura de caja sin corte para este empleado
+    const [aperturas] = await pool.query(
+      `SELECT id_tipo_movimiento FROM movimientos_caja 
+       WHERE id_empleado = ? 
+         AND id_tipo_movimiento = 1 
+         AND NOT EXISTS (
+           SELECT 1 FROM movimientos_caja mc2 
+           WHERE mc2.id_empleado = movimientos_caja.id_empleado 
+             AND mc2.id_tipo_movimiento = 2 
+             AND mc2.fecha > movimientos_caja.fecha
+         )
+       ORDER BY fecha DESC LIMIT 1`,
       [empleado.id_empleado]
     );
+
+    if (aperturas.length === 0) {
+      // No hay apertura sin corte, se puede insertar
+      await pool.query(
+        'INSERT INTO movimientos_caja (id_tipo_movimiento, fecha, id_empleado) VALUES (1, NOW(), ?)',
+        [empleado.id_empleado]
+      );
+    }
 
     // Actualizar la sesión para permitir acceso a /pointofsale
     req.session.usuario = {
@@ -549,6 +637,14 @@ app.post('/api/productos', async (req, res) => {
     res.status(201).json({ mensaje: 'Producto agregado', codigo_barras });
   } catch (err) {
     console.error('Error al agregar producto:', err);
+    // Manejo específico de duplicate entry
+    if (err.code === 'ER_DUP_ENTRY') {
+      if (err.sqlMessage && err.sqlMessage.includes('codigo_barras')) {
+        return res.status(409).json({ mensaje: 'El código de barras ya está registrado.' });
+      } else {
+        return res.status(409).json({ mensaje: 'El dato ya está registrado.' });
+      }
+    }
     res.status(500).json({ mensaje: 'Error al agregar producto' });
   }
 });
@@ -637,7 +733,7 @@ app.post('/mercadoqr', async (req, res) => {
         back_urls: {
           success: "http://localhost:3000/confirmacion",
         },
-        notification_url: "https://d85a-189-195-132-181.ngrok-free.app/webhook", // ✅ válida aquí
+        notification_url:  "https://cd9d-2806-102e-e-b399-f54c-2401-bbb9-afd4.ngrok-free.app/webhook" , // ✅ válida aquí
       });
       
       const qr_url = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${preference.body.init_point}`;
@@ -837,10 +933,31 @@ app.post('/api/aplicar-cierre', (req, res) => {
 
 // Ruta para manejar el registro de asistencia
 app.post('/registrar-asistencia', async (req, res) => {
-  const { id_empleado, tipo } = req.body;
-  if (!id_empleado || !tipo) return res.status(400).json({ error: 'Faltan datos requeridos' });
+  const { username, tipo } = req.body;
+  if (!username || !tipo) return res.status(400).json({ error: 'Faltan datos requeridos' });
 
   try {
+    // Buscar el id_empleado por username
+    const [rows] = await pool.query('SELECT id_empleado FROM empleados WHERE username = ? AND activo = 1', [username]);
+    if (rows.length === 0) return res.status(404).json({ error: 'Usuario no encontrado' });
+    const id_empleado = rows[0].id_empleado;
+
+    // Si es entrada o salida, verificar si ya existe una del mismo tipo hoy
+    if (tipo === 'Entrada' || tipo === 'Salida') {
+      const hoy = new Date();
+      const yyyy = hoy.getFullYear();
+      const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+      const dd = String(hoy.getDate()).padStart(2, '0');
+      const fechaHoy = `${yyyy}-${mm}-${dd}`;
+      const [asistencias] = await pool.query(
+        `SELECT id_asistencia FROM asistencia WHERE id_empleado = ? AND tipo = ? AND DATE(fecha_hora) = ?`,
+        [id_empleado, tipo, fechaHoy]
+      );
+      if (asistencias.length > 0) {
+        return res.status(400).json({ error: `Ya se registró una ${tipo.toLowerCase()} para este usuario hoy.` });
+      }
+    }
+
     await pool.query(
       'INSERT INTO asistencia (id_empleado, fecha_hora, tipo) VALUES (?, ?, ?)',
       [id_empleado, new Date(), tipo]
@@ -1262,7 +1379,7 @@ app.get('/productos/bajo-stock', async (req, res) => {
 app.get('/api/empleados/:username', async (req, res) => {
   const { username } = req.params;
   const [rows] = await pool.execute(
-    'SELECT * FROM empleados WHERE username = ? AND activo = 1',
+    'SELECT * FROM empleados WHERE username = ?',
     [username]
   );
   if (rows.length === 0) return res.status(404).json({ mensaje: 'Empleado no encontrado' });
@@ -1353,6 +1470,16 @@ app.put('/api/empleados/:username', async (req, res) => {
 
   } catch (err) {
     console.error(err);
+    // Manejo específico de duplicate entry
+    if (err.code === 'ER_DUP_ENTRY') {
+      if (err.sqlMessage && err.sqlMessage.includes('correo')) {
+        return res.status(409).json({ error: 'El correo ya está registrado.' });
+      } else if (err.sqlMessage && err.sqlMessage.includes('telefono')) {
+        return res.status(409).json({ error: 'El teléfono ya está registrado.' });
+      } else {
+        return res.status(409).json({ error: 'El dato ya está registrado.' });
+      }
+    }
     res.status(500).json({ error: 'Error al actualizar el empleado' });
   }
 });
@@ -1367,6 +1494,66 @@ app.put('/api/empleados/:username/baja', async (req, res) => {
 
   if (result.affectedRows === 0) return res.status(404).json({ mensaje: 'Empleado no encontrado' });
   res.json({ mensaje: 'Empleado dado de baja' });
+});
+
+//Dar de alta empleado (reactivar)
+app.put('/api/empleados/:username/alta', async (req, res) => {
+  const { username } = req.params;
+  const { contrasena_responsable, contrasena_responsable_conf } = req.body;
+
+  if (contrasena_responsable !== contrasena_responsable_conf) {
+    return res.status(400).json({ error: 'Las contraseñas del responsable no coinciden' });
+  }
+
+  const conn = await pool.getConnection();
+  try {
+    // Verificar gerente
+    const [gerenteRows] = await conn.execute(
+      'SELECT * FROM empleados WHERE cargo = "Gerente" AND activo = 1 LIMIT 1'
+    );
+
+    if (gerenteRows.length === 0) {
+      return res.status(401).json({ error: 'No hay gerente activo en el sistema' });
+    }
+
+    const gerente = gerenteRows[0];
+    const validaGerente = await bcrypt.compare(contrasena_responsable, gerente.contrasena_hash);
+
+    if (!validaGerente) {
+      return res.status(401).json({ error: 'Contraseña del gerente incorrecta' });
+    }
+
+    // Verificar si el empleado existe y está inactivo
+    const [empleadoRows] = await conn.execute(
+      'SELECT * FROM empleados WHERE username = ? AND activo = 0',
+      [username]
+    );
+
+    if (empleadoRows.length === 0) {
+      return res.status(404).json({ error: 'Empleado no encontrado o ya está activo' });
+    }
+
+    // Reactivar empleado
+    const [result] = await conn.execute(
+      'UPDATE empleados SET activo = 1 WHERE username = ?',
+      [username]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(500).json({ error: 'Error al reactivar el empleado' });
+    }
+
+    res.json({ 
+      mensaje: 'Empleado reactivado exitosamente',
+      success: true 
+    });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error en el proceso de reactivación' });
+  } finally {
+    conn.release();
+  }
 });
 
 
@@ -1388,3 +1575,126 @@ app.use((err, req, res, next) => {
 //     res.status(404).sendFile(path.join(__dirname, 'pages', 'configuracion', '404.html'));
 //   }
 // });
+
+app.get('/api/cajero-sesion', (req, res) => {
+  if (req.session.usuario) {
+    res.json({ success: true, empleado: req.session.usuario });
+  } else {
+    res.json({ success: false });
+  }
+});
+
+// Rutas para la configuración de la tienda
+app.get('/api/configuracion', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM configuracion_tienda LIMIT 1');
+    res.json(rows[0] || {});
+  } catch (error) {
+    console.error('Error al obtener configuración:', error);
+    res.status(500).json({ error: 'Error al obtener la configuración' });
+  }
+});
+
+app.post('/api/configuracion', async (req, res) => {
+  try {
+    console.log('Datos recibidos en el servidor:', req.body); // Debug
+    console.log('Archivos recibidos:', req.files); // Debug
+
+    const { nombre, direccion, telefono, rfc } = req.body;
+    
+    // Validar que los datos requeridos no sean nulos o vacíos
+    if (!nombre || !direccion || !telefono || !rfc) {
+      console.log('Datos faltantes:', { nombre, direccion, telefono, rfc }); // Debug
+      return res.status(400).json({ error: 'Todos los campos son requeridos' });
+    }
+
+    let logo = null;
+    // Manejar el logo si se envió un archivo
+    if (req.files && req.files.logo) {
+      const logoFile = req.files.logo;
+      const logoPath = `/logos/${Date.now()}-${logoFile.name}`;
+      await logoFile.mv(path.join(__dirname, 'public', logoPath));
+      logo = logoPath;
+    }
+
+    // Verificar si ya existe una configuración
+    const [existing] = await pool.query('SELECT * FROM configuracion_tienda LIMIT 1');
+
+    if (existing.length > 0) {
+      // Actualizar configuración existente
+      const updateQuery = `
+        UPDATE configuracion_tienda 
+        SET nombre = ?,
+            direccion = ?,
+            telefono = ?,
+            rfc = ?,
+            logo = COALESCE(?, logo),
+            updated_at = NOW()
+        WHERE id = ?
+      `;
+      const updateValues = [nombre, direccion, telefono, rfc, logo, existing[0].id];
+      console.log('Query de actualización:', updateQuery); // Debug
+      console.log('Valores de actualización:', updateValues); // Debug
+      
+      await pool.query(updateQuery, updateValues);
+    } else {
+      // Insertar nueva configuración
+      const insertQuery = `
+        INSERT INTO configuracion_tienda 
+        (nombre, direccion, telefono, rfc, logo, updated_at)
+        VALUES (?, ?, ?, ?, ?, NOW())
+      `;
+      const insertValues = [nombre, direccion, telefono, rfc, logo];
+      console.log('Query de inserción:', insertQuery); // Debug
+      console.log('Valores de inserción:', insertValues); // Debug
+      
+      await pool.query(insertQuery, insertValues);
+    }
+
+    // Obtener la configuración actualizada
+    const [configuracion] = await pool.query('SELECT * FROM configuracion_tienda LIMIT 1');
+    console.log('Configuración guardada:', configuracion[0]); // Debug
+    
+    res.json({ 
+      success: true,
+      message: 'Configuración guardada exitosamente',
+      configuracion: configuracion[0]
+    });
+  } catch (error) {
+    console.error('Error al guardar configuración:', error);
+    res.status(500).json({ error: 'Error al guardar la configuración' });
+  }
+});
+
+// Ruta para verificar la estructura de la tabla
+app.get('/api/verificar-configuracion', async (req, res) => {
+  try {
+    // Obtener la estructura de la tabla
+    const [estructura] = await pool.query('DESCRIBE configuracion_tienda');
+    console.log('Estructura de la tabla:', estructura);
+
+    // Obtener los datos actuales
+    const [datos] = await pool.query('SELECT * FROM configuracion_tienda');
+    console.log('Datos en la tabla:', datos);
+
+    res.json({
+      estructura: estructura,
+      datos: datos
+    });
+  } catch (error) {
+    console.error('Error al verificar la tabla:', error);
+    res.status(500).json({ error: 'Error al verificar la tabla' });
+  }
+});
+
+// Endpoint para obtener información del usuario actual
+app.get('/api/usuario-actual', (req, res) => {
+    if (req.session.usuario) {
+        res.json({
+            cargo: req.session.usuario.cargo,
+            nombre: req.session.usuario.nombre
+        });
+    } else {
+        res.status(401).json({ error: 'No hay sesión activa' });
+    }
+});

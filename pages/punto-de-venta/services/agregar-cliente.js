@@ -34,8 +34,9 @@ document.getElementById('cliente').addEventListener('keypress', async (event) =>
 });
 function mostrarCliente(cliente){
     const nombre = document.getElementById("nombre-cliente");
+    const telefono = document.getElementById("cliente");
     nombre.innerText = cliente.nombre;
-
+    telefono.value = cliente.telefono;
 }
 document.getElementById('cliente').addEventListener('input', () => {
     const telefono = document.getElementById("cliente").value.trim();

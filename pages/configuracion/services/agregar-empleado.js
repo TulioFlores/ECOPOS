@@ -13,28 +13,59 @@ document.getElementById('form-empleado').addEventListener('submit', async functi
   const contrasena_responsable = document.getElementById('contrasena-responsable').value;
   const contrasena_responsable_conf = document.getElementById('contrasena-responsable-conf').value;
 
-  // Validaciones básicas
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  const telRegex = /^[0-9]{10}$/;
+  // Verificar si estamos reactivando un empleado existente
+  const username = obtenerUsernameDesdeCookie();
+  const esReactivacion = !!username;
 
-  if (!primer_nombre || !primer_apellido || !correo || !telefono || !contrasena || !confirmar_contrasena || !contrasena_responsable || !contrasena_responsable_conf) {
-    mostrarModal('❌ Por favor, completa todos los campos obligatorios.');
+  // Validaciones básicas
+  const soloLetras = /^[A-Za-zÁÉÍÓÚáéíóúÑñüÜ\s]{2,50}$/;
+  const contieneNoLetras = /[^A-Za-zÁÉÍÓÚáéíóúÑñüÜ\s]/;
+  const emailRegex = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+  const telRegex = /^\d{10}$/;
+
+  if (contieneNoLetras.test(primer_nombre)) {
+    mostrarModal('❌ El primer nombre no puede contener números ni caracteres especiales.');
     return;
   }
-
+  if (!soloLetras.test(primer_nombre)) {
+    mostrarModal('❌ El primer nombre solo puede contener letras y debe tener al menos 2 caracteres.');
+    return;
+  }
+  if (segundo_nombre && contieneNoLetras.test(segundo_nombre)) {
+    mostrarModal('❌ El segundo nombre no puede contener números ni caracteres especiales.');
+    return;
+  }
+  if (primer_apellido && contieneNoLetras.test(primer_apellido)) {
+    mostrarModal('❌ El primer apellido no puede contener números ni caracteres especiales.');
+    return;
+  }
+  if (!soloLetras.test(primer_apellido)) {
+    mostrarModal('❌ El primer apellido solo puede contener letras y debe tener al menos 2 caracteres.');
+    return;
+  }
+  if (segundo_apellido && contieneNoLetras.test(segundo_apellido)) {
+    mostrarModal('❌ El segundo apellido no puede contener números ni caracteres especiales.');
+    return;
+  }
   if (!emailRegex.test(correo)) {
     mostrarModal('❌ El correo electrónico no es válido.');
     return;
   }
-
   if (!telRegex.test(telefono)) {
     mostrarModal('❌ El teléfono debe contener exactamente 10 dígitos.');
     return;
   }
 
-  if (contrasena !== confirmar_contrasena) {
-    mostrarModal('❌ Las contraseñas del empleado no coinciden.');
-    return;
+  // Solo validar contraseñas si no es una reactivación
+  if (!esReactivacion) {
+    if (contrasena.length < 6) {
+      mostrarModal('❌ La contraseña debe tener al menos 6 caracteres.');
+      return;
+    }
+    if (contrasena !== confirmar_contrasena) {
+      mostrarModal('❌ Las contraseñas del empleado no coinciden.');
+      return;
+    }
   }
 
   if (contrasena_responsable !== contrasena_responsable_conf) {
@@ -50,26 +81,60 @@ document.getElementById('form-empleado').addEventListener('submit', async functi
     correo,
     telefono,
     puesto,
-    contrasena,
     contrasena_responsable, 
     contrasena_responsable_conf, 
   };
 
+  // Solo incluir contraseña del empleado si no es reactivación
+  if (!esReactivacion) {
+    data.contrasena = contrasena;
+  }
+
   try {
-    const res = await fetch('http://localhost:3000/altaempleados', {
-      method: 'POST',
+    let endpoint = 'http://localhost:3000/altaempleados';
+    let method = 'POST';
+
+    if (esReactivacion) {
+      endpoint = `/api/empleados/${username}/alta`;
+      method = 'PUT';
+      data.username = username;
+    }
+
+    const res = await fetch(endpoint, {
+      method: method,
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
     });
 
     const result = await res.json();
 
-    if ( result.success) {
+    if (result.success || result.mensaje) {
       const nombre = `${primer_nombre} ${primer_apellido}`;
-      mostrarModal(`✅ Se agregó correctamente al empleado: <strong>${nombre} con el nombre de usuario ${result.username}</strong> `);
+      const mensaje = esReactivacion 
+        ? `✅ Se reactivó correctamente al empleado: <strong>${nombre}</strong>`
+        : `✅ Se agregó correctamente al empleado: <strong>${nombre} con el nombre de usuario ${result.username}</strong>`;
+      
+      mostrarModal(mensaje);
       document.getElementById('form-empleado').reset();
+      document.getElementById('btn-baja-empleado').classList.add('d-none');
+      document.cookie = 'empleado_username=; max-age=0; path=/';
     } else {
-      mostrarModal(`❌ ${result.error || 'Error al registrar al empleado.'}`);
+      // Manejo de errores de duplicate entry
+      if (result.error && result.error.includes('correo')) {
+        mostrarModal('❌ El correo ya está registrado.');
+      } else if (result.error && result.error.includes('telefono')) {
+        mostrarModal('❌ El teléfono ya está registrado.');
+      } else if (result.error && result.error.includes('ER_DUP_ENTRY')) {
+        if (result.error.includes('correo')) {
+          mostrarModal('❌ El correo ya está registrado.');
+        } else if (result.error.includes('telefono')) {
+          mostrarModal('❌ El teléfono ya está registrado.');
+        } else {
+          mostrarModal('❌ El dato ya está registrado.');
+        }
+      } else {
+        mostrarModal(`❌ ${result.error || 'Error al registrar al empleado.'}`);
+      }
     }
   } catch (error) {
     console.error(error);
@@ -93,14 +158,23 @@ document.getElementById('form-empleado').addEventListener('submit', async functi
 
   //Buscar empleado
 document.getElementById('btn-buscar-empleados').addEventListener('click', async () => {
-  const username = prompt('Ingrese el username del empleado:');
+  if (typeof mostrarPromptAsync !== 'function') {
+    mostrarModal('No se encontró la función mostrarPromptAsync.');
+    return;
+  }
+  const username = await mostrarPromptAsync({
+    titulo: 'Buscar empleado',
+    mensaje: 'Ingrese el username del empleado a buscar:',
+    tipo: 'text',
+    obligatorio: true
+  });
   if (!username) return;
 
   const res = await fetch(`/api/empleados/${username}`);
   const empleado = await res.json();
 
   if (!empleado || empleado.error) {
-    alert('Empleado no encontrado');
+    mostrarModal('❌ Empleado no encontrado');
     return;
   }
 
@@ -127,7 +201,7 @@ function obtenerUsernameDesdeCookie() {
 document.getElementById('btn-modificar-empleado').addEventListener('click', async () => {
   const username = obtenerUsernameDesdeCookie();
   if (!username) {
-    alert('Primero debe buscar un empleado para modificar');
+    mostrarModal('❌ Primero debe buscar un empleado para modificar');
     return;
   }
 
@@ -151,9 +225,16 @@ document.getElementById('btn-modificar-empleado').addEventListener('click', asyn
   });
 
   const resultado = await res.json();
-  alert(resultado.mensaje || resultado.error);
-  document.cookie = 'empleado_username=; max-age=0; path=/';
-
+  if (resultado.mensaje) {
+    mostrarModal('✅ ' + resultado.mensaje);
+    document.getElementById('form-empleado').reset();
+    document.cookie = 'empleado_username=; max-age=0; path=/';
+    document.getElementById('btn-baja-empleado').classList.add('d-none');
+  } else if (resultado.error) {
+    mostrarModal('❌ ' + resultado.error);
+  } else {
+    mostrarModal('❌ Error desconocido al modificar el empleado.');
+  }
 });
 
 
@@ -161,20 +242,34 @@ document.getElementById('btn-modificar-empleado').addEventListener('click', asyn
 //Dar de baja
 document.getElementById('btn-baja-empleado').addEventListener('click', async () => {
   const username = obtenerUsernameDesdeCookie();
-  if (!username) return alert('No se ha seleccionado un empleado');
+  if (!username) {
+    mostrarModal('❌ No se ha seleccionado un empleado');
+    return;
+  }
 
-  const confirmar = confirm(`¿Estás seguro de dar de baja al empleado ${username}?`);
-  if (!confirmar) return;
+  // Confirmación visual con modal tipo prompt
+  const confirmacion = await mostrarPromptAsync({
+    titulo: 'Confirmar baja',
+    mensaje: `¿Estás seguro de dar de baja al empleado ${username}? Escribe SI para confirmar.`,
+    tipo: 'text',
+    obligatorio: true
+  });
+  if (!confirmacion || confirmacion.toUpperCase() !== 'SI') {
+    mostrarModal('Operación cancelada.');
+    return;
+  }
 
   const res = await fetch(`/api/empleados/${username}/baja`, {
     method: 'PUT'
   });
 
   const resultado = await res.json();
-  alert(resultado.mensaje);
+  mostrarModal(resultado.mensaje || resultado.error || 'Operación realizada.');
 
-  // Limpiar formulario si quieres
+  // Limpiar formulario y cookie
   document.getElementById('form-empleado').reset();
   document.getElementById('btn-baja-empleado').classList.add('d-none');
+  document.cookie = 'empleado_username=; max-age=0; path=/';
 });
+
 

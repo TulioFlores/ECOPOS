@@ -1,37 +1,77 @@
-  import { BrowserMultiFormatReader } from 'https://cdn.jsdelivr.net/npm/@zxing/browser@0.0.10/+esm';
+let scanner;
+let scanning = false;
 
-  const modalElement = document.getElementById('scannerModal');
-  const container = document.getElementById('scanner-container');
-  const productoInput = document.getElementById('producto');
+document.addEventListener("DOMContentLoaded", () => {
+  const scanButton = document.getElementById("escanear");
+  const inputField = document.getElementById("producto");
+  const resultText = document.getElementById("result");
+  const readerOverlay = document.getElementById("reader-overlay");
+  const closeBtn = document.getElementById("close-scanner");
 
-  const codeReader = new BrowserMultiFormatReader();
-  let stream = null;
+  // Crear el escáner una sola vez
+  scanner = new Html5Qrcode("reader");
 
-  document.getElementById('escanear').addEventListener('click', async () => {
-    const modal = new bootstrap.Modal(modalElement);
-    modal.show();
-  });
-
-  modalElement.addEventListener('shown.bs.modal', async () => {
+  async function iniciarEscaneo() {
     try {
-      const result = await codeReader.decodeFromVideoDevice(null, container, (result, error, controls) => {
-        if (result) {
-          const codigo = result.getText();
-          productoInput.value = codigo;
+      // Evita múltiples inicios
+      if (scanning) return;
 
-          // Detener escaneo
-          controls.stop();
-          const modal = bootstrap.Modal.getInstance(modalElement);
-          modal.hide();
+      readerOverlay.style.display = "flex";
+      scanning = true;
+
+      const config = {
+        fps: 10,
+        qrbox: { width: 250, height: 100 },
+        formatsToSupport: [
+          Html5QrcodeSupportedFormats.EAN_13,
+          Html5QrcodeSupportedFormats.UPC_A,
+          Html5QrcodeSupportedFormats.CODE_128
+        ]
+      };
+
+      await scanner.start(
+        { facingMode: "environment" },
+        config,
+        async (decodedText) => {
+          if (!scanning) return;
+          scanning = false;
+
+          inputField.value = decodedText;
+          resultText.innerText = "¡Código detectado!";
+
+          if (navigator.vibrate) navigator.vibrate(100);
+
+          try {
+            await scanner.stop();
+            await scanner.clear(); // Limpia el div internamente
+          } catch (e) {
+            console.warn("Error al detener o limpiar el escáner:", e);
+          } finally {
+            readerOverlay.style.display = "none";
+          }
+        },
+        error => {
+          // Ignorar errores de escaneo individuales
         }
-      });
-
-      stream = result;
-    } catch (err) {
-      console.error("Error al iniciar ZXing:", err);
+      );
+    } catch (error) {
+      console.error("Error al iniciar el escáner:", error);
+      scanning = false;
     }
-  });
+  }
 
-  modalElement.addEventListener('hidden.bs.modal', () => {
-    codeReader.reset();
-  });
+  async function detenerEscaneo() {
+    scanning = false;
+    try {
+      await scanner.stop();
+      await scanner.clear();
+    } catch (e) {
+      console.warn("Error al detener escáner:", e);
+    } finally {
+      readerOverlay.style.display = "none";
+    }
+  }
+
+  scanButton.addEventListener("click", iniciarEscaneo);
+  closeBtn.addEventListener("click", detenerEscaneo);
+});

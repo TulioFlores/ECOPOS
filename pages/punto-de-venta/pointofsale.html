@@ -18,6 +18,8 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <script src="https://unpkg.com/html5-qrcode"></script>
 
     <title>Punto de Venta</title>
 </head>
@@ -29,11 +31,10 @@
                 <a href="/" ><img src="/logos/LogoBlanco.svg" alt="Logo Ecopos"  ></a>
             </div>
             <div class=" col-6 d-flex  justify-content-end">
-                <button class="hover" onclick="location.href='/configuracion'" >
+                <button class="hover" onclick="redirigirMiCuenta()">
                     <i class="bi bi-person "></i>
                     <a rel="noreferrer noopener">Mi cuenta</a>
                 </button>
-                
             </div>
         </div>
     </nav>
@@ -68,7 +69,7 @@
                 <div class="row gx-2 gy-1 align-items-center">
                 <label class="col-12 col-sm-3 col-form-label fs-5 fs-sm-6">Cliente:</label>
                 <div class="col-12 col-sm-6">
-                    <input type="text" class="form-control" id="cliente" name="cliente" placeholder="Teléfono" />
+                    <input type="number" class="form-control" id="cliente" name="cliente" placeholder="Teléfono" />
                 </div>
                 <div class="col-12 col-sm-2">
                     <button id="nuevocliente" type="button" class="btn btn-secondary w-100">Nuevo</button>
@@ -123,7 +124,15 @@
 
         </div>
 
-        
+        <!-- Escáner en overlay -->
+        <div id="reader-overlay">
+            <div id="reader-container">
+                <button id="close-scanner">✖ Cerrar</button>
+                <div id="reader"></div>
+                <div id="result"></div>
+            </div>
+        </div>
+
         <!-- Alerta flotante -->
         <div id="alerta" class="alerta-venta" style="display:none;">
             <span id="alerta-mensaje"></span>
@@ -576,6 +585,25 @@
     <script src="punto-de-venta/services/asistencia.js"></script>
     <script src="punto-de-venta/services/escaneo.js"></script>
     <script src="https://unpkg.com/@ericblade/quagga2@1.2.6/dist/quagga.js"></script>
+
+    <script>
+        function redirigirMiCuenta() {
+            // Obtener el cargo del usuario desde la sesión
+            fetch('/api/usuario-actual')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.cargo === 'Gerente') {
+                        window.location.href = '/reportes';
+                    } else {
+                        window.location.href = '/reportes-emp';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    window.location.href = '/login';
+                });
+        }
+    </script>
 
 
 

@@ -11,24 +11,33 @@ botonEnter.addEventListener('click', () => {
   
     // Validar que el ID del producto es un número válido
     if (isNaN(idProducto)) {
-        alert("Ingresa un ID de producto válido.");
+        mostrarAlerta("Ingresa un ID de producto válido.", 'error');
         return;
     }
   
     // Llamar al backend para obtener el producto
     obtenerProductoPorId(idProducto, (err, producto) => {
     if (err) {
-        console.log("Producto no encontrado.");
+        if (err.message === 'Sin stock disponible' || (err.error && err.error === 'Sin stock disponible')) {
+            mostrarAlerta('Este producto no tiene stock disponible.', 'error');
+        } else {
+            mostrarAlerta("Producto no encontrado.", 'error');
+        }
     } else {
         const cantidad = parseInt(cantidadInput.value) || 1;
 
         // Validación de stock antes de agregar
+        if (producto.stock === 0) {
+            mostrarAlerta('Este producto no tiene stock disponible.', 'error');
+            return;
+        }
         if (cantidad > producto.stock) {
-            alert(`Solo hay ${producto.stock} unidades disponibles de este producto.`);
+            mostrarAlerta(`Solo hay ${producto.stock} unidades disponibles de este producto.`, 'error');
             return;
         }
 
         agregarProductoATabla(producto, cantidad);
+        mostrarAlerta("Producto agregado correctamente", 'success');
         productoInput.value = '';
         cantidadInput.value = '1';
     }
@@ -42,9 +51,9 @@ function obtenerProductoPorId(idProducto, callback) {
             if (!response.ok) {
                 return response.json().then(errorData => {
                     if (errorData.error === 'Sin stock disponible') {
-                        alert('Este producto no tiene stock disponible.');
+                        mostrarAlerta('Este producto no tiene stock disponible.', 'error');
                     } else {
-                        alert(errorData.error || 'Error al obtener el producto.');
+                        mostrarAlerta(errorData.error || 'Error al obtener el producto.', 'error');
                     }
                     throw new Error(errorData.error);
                 });
@@ -61,7 +70,7 @@ function agregarProductoATabla(producto, cantidad) {
 
     // Validar stock al agregar
     if (cantidad > producto.stock) {
-        alert(`Solo hay ${producto.stock} unidades disponibles en stock.`);
+        mostrarAlerta(`Solo hay ${producto.stock} unidades disponibles en stock.`, 'error');
         return;
     }
 
@@ -103,7 +112,7 @@ function agregarProductoATabla(producto, cantidad) {
         if (isNaN(nuevaCantidad) || nuevaCantidad < 1) {
             nuevaCantidad = 1;
         } else if (nuevaCantidad > stockDisponible) {
-            alert(`Solo hay ${stockDisponible} unidades en stock.`);
+            mostrarAlerta(`Solo hay ${stockDisponible} unidades en stock.`, 'error');
             nuevaCantidad = stockDisponible;
         }
 
@@ -135,6 +144,7 @@ function agregarProductoATabla(producto, cantidad) {
 
             filaSeleccionada.remove();
             actualizarTotal(-monto);
+            mostrarAlerta("Producto eliminado de la lista", 'success');
         }
     });
 

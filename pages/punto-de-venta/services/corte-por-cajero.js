@@ -1,3 +1,27 @@
+// Función para mostrar mensajes dentro del modal de autenticación de corte
+function mostrarMensajeCorteCajero(mensaje, esError = true) {
+    let div = document.getElementById('mensajeCorteCajero');
+    if (!div) {
+        div = document.createElement('div');
+        div.id = 'mensajeCorteCajero';
+        div.style.fontWeight = 'bold';
+        div.style.textAlign = 'center';
+        div.style.marginTop = '10px';
+        div.style.color = esError ? 'red' : 'green';
+        const modalBody = document.querySelector('#modal-autenticacion-corte .modal-body');
+        if (modalBody) {
+            modalBody.appendChild(div);
+        }
+    }
+    div.textContent = mensaje;
+    div.style.color = esError ? 'red' : 'green';
+}
+
+function limpiarMensajeCorteCajero() {
+    const div = document.getElementById('mensajeCorteCajero');
+    if (div) div.textContent = '';
+}
+
 document.getElementById('form-autenticacion-corte').addEventListener('submit', async function (e) {
     e.preventDefault();
   
@@ -14,21 +38,21 @@ document.getElementById('form-autenticacion-corte').addEventListener('submit', a
       const data = await res.json();
   
       if (data.success) {
+        limpiarMensajeCorteCajero();
         // Cerrar el modal de autenticación si está abierto
-        
         const modalAutenticacion = bootstrap.Modal.getInstance(document.getElementById('modal-autenticacion-corte'));
         if (modalAutenticacion) modalAutenticacion.hide();
         // Abrir el modal de corte por cajero
         const modalCorte = new bootstrap.Modal(document.getElementById('modal-corte-cajero'));
         modalCorte.show();
       } else {
-        alert(data.error || 'Error al autenticar');
+        mostrarMensajeCorteCajero(data.error || 'Error al autenticar', true);
       }
   
   
     } catch (error) {
       console.error('Error en la autenticación', error);
-      alert('Error de conexión');
+      mostrarMensajeCorteCajero('Error de conexión', true);
     }
   });
 
@@ -166,8 +190,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const modalElement = document.getElementById('modal-corte-cajero');
         const modalCorte = bootstrap.Modal.getInstance(modalElement);
         modalCorte.hide();
-        localStorage.removeItem('cajero');
-        window.location.href= '/configuracion';
+        
+        // Redirección según el cargo en sesión
+        try {
+          const res = await fetch('http://localhost:3000/api/cajero-sesion', { credentials: 'include' });
+          const data = await res.json();
+          if (data.success && data.empleado && data.empleado.cargo === 'Gerente') {
+            window.location.href = '/reportes';
+          } else {
+            window.location.href = '/reportes-emp';
+          }
+        } catch (e) {
+          window.location.href = '/reportes-emp';
+        }
       } else {
         alert('Error al registrar el cierre.');
       }

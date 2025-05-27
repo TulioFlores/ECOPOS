@@ -18,6 +18,7 @@
      <link rel="icon" href="/logos/LogoBlanco.svg" type="image/svg+xml" sizes="any">
      <link rel="icon" type="image/png" href="/favicon-32x32.png">
      <title>Reportes - Ecopos</title>
+     <script src="https://unpkg.com/html5-qrcode"></script>
   </head>
   <body>
     <nav class="navbar navbar-dark bg-dark">
@@ -68,7 +69,7 @@
             </h6><br>
     
             <h6 class="sidebar-heading px-3 mb-1">
-              <a class="nav-link text-white" href="/reportes" id="linkConfig">
+              <a class="nav-link text-white"  id="linkConfig" >
                 <i class="bi bi-gear-fill"></i> Configuración
               </a>
             </h6><br>
@@ -115,7 +116,7 @@
                 <i class="bi bi-cloud-moon-fill"></i> Cierre del Día
               </a>
             </h6><br>
-    
+
             <div class="px-3 pt-3 text-muted small">Logged in as: Start Bootstrap</div>
           </div>
         </div>
@@ -123,7 +124,7 @@
         <main class="col-md-9 col-lg-10 ms-sm-auto  px-md-4 container-fluid">
     
           <!-- Ventana modal para ver venta por dia-->
-          <div id="venta-por-dia" class="container bg-light rounded shadow p-4 my-4">
+          <div id="venta-por-dia" class="container bg-light rounded shadow p-4 my-4" style="display: none;">
             <h3 class="mb-4 text-center">Venta por Día</h3>
     
             <div class="row mb-3">
@@ -219,7 +220,8 @@
               <div class="row">
                 <div class="col-md-6 mb-3">
                   <label for="codigo-barras" class="form-label">Código de barras</label>
-                  <input type="text" class="form-control" id="codigo-barras" name="codigo-barras" required>
+                  <input type="number" class="form-control" id="codigo-barras" name="codigo-barras" required>
+                  <i class="bi bi-camera " id="escanear"></i>
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="nombre-producto" class="form-label">Nombre del producto</label>
@@ -248,7 +250,7 @@
               </div>
 
               <div class="mb-3">
-                <label for="descripcion" class="form-label">Descripción</label>
+                <label type="text" for="descripcion" class="form-label">Descripción</label>
                 <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
               </div>
 
@@ -264,6 +266,14 @@
             </form>
           </div>
 
+          <!-- Overlay del escáner -->
+          <div id="reader-overlay">
+            <div id="reader-container">
+              <button id="close-scanner">✖ Cerrar</button>
+              <div id="reader"></div>
+              <div id="result"></div>
+            </div>
+          </div>
     
           <!--Ventana modal para agregar un empleado-->
           <div id="alta-empleado" class="">
@@ -306,19 +316,22 @@
               <div class="row">
                 <div class="col-6">
                   <label for="puesto" class="form-label">Puesto</label>
-                  <input type="text" class="form-control" id="puesto" name="puesto" placeholder="Empleado" readonly>
+                  <select class="form-control" id="puesto" name="puesto" required>
+                    <option value="Empleado">Empleado</option>
+                    <option value="Gerente">Gerente</option>
+                  </select>
                 </div>
               </div>
     
               <div class="row">
                 <div class="col-6">
                   <label for="contrasena" class="form-label">Contraseña</label>
-                  <input type="password" class="form-control" id="contrasena" name="contrasena" required>
+                  <input type="password" class="form-control" id="contrasena" name="contrasena" >
                 </div>
                 <div class="col-6">
                   <label for="confirmar-contrasena" class="form-label">Confirmar Contraseña</label>
                   <input type="password" class="form-control" id="confirmar-contrasena" name="confirmar_contrasena"
-                    required>
+                    >
                 </div>
               </div>
     
@@ -480,6 +493,7 @@
                 </div>
     
                 <div class="modal-body">
+                  <div id="mensajeAutenticacion" class="alert" style="display: none;"></div>
                   <form id="form-autenticacion-corte">
                     <div class="mb-3">
                       <label for="usuarioCorte" class="form-label">Usuario</label>
@@ -689,6 +703,48 @@
                 </div>
               </div>
             </div>
+
+          <!-- Panel de Configuración -->
+          <div id="modalConfiguracion" class="">
+            <h1 class="text-al">Configuración de la Tienda</h1><br>
+            <h2>Fecha</h2><br>
+            <form id="formConfiguracion">
+              <div class="row">
+                <div class="col-6">
+                  <label for="nombreTienda" class="form-label">Nombre de la Tienda</label>
+                  <input type="text" class="form-control" id="nombreTienda" required>
+                </div>
+                <div class="col-6">
+                  <label for="direccionTienda" class="form-label">Dirección</label>
+                  <input type="text" class="form-control" id="direccionTienda" required>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-6">
+                  <label for="telefonoTienda" class="form-label">Teléfono</label>
+                  <input type="tel" class="form-control" id="telefonoTienda" required>
+                </div>
+                <div class="col-6">
+                  <label for="rfcTienda" class="form-label">RFC</label>
+                  <input type="text" class="form-control" id="rfcTienda" required>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-12">
+                  <label for="logoTienda" class="form-label">Logo de la Tienda</label>
+                  <input type="file" class="form-control" id="logoTienda" accept="image/*">
+                  <div id="previewLogo" class="mt-2"></div>
+                </div>
+              </div>
+
+              <div class="row d-flex justify-content-end gap-2">
+                <button type="button" class="btn-base btn-cancelar" id="btn-cancelar-config">Cancelar</button>
+                <button type="button" class="btn-base btn-confirmar" id="btn-confirmar-config">Guardar Cambios</button>
+              </div>
+            </form>
+          </div>
         </main>
         <footer class="bg-dark text-white pt-5 pb-4">
           <div class="container text-md-left">
@@ -748,8 +804,26 @@
       </div>
     </div>
 
+    <!-- Modal de alerta -->
+    <div class="modal fade" id="modalAlerta" tabindex="-1" aria-labelledby="modalAlertaLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalAlertaLabel">Notificación</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body">
+            <p id="modalAlertaMensaje"></p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Aceptar</button>
+          </div>
+        </div>
+      </div>
+    </div>
 
     
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script  type="module" src="/configuracion/services/reportes.js"></script>
     <script src="/configuracion/services/agregar-empleado.js"></script>
@@ -757,6 +831,8 @@
     <script type="module"  src="/configuracion/services/cierre-del-dia.js"></script>
     <script src="../punto-de-venta/services/obtenerhora.js"></script>
     <script src="/configuracion/services/scriptguille.js"></script>
+    <script src="/configuracion/services/escaner.js"></script>
     <script src="/configuracion/services/scriptguille2.js"></script>
+    <script src="../punto-de-venta/services/asistencia.js"></script>
   </body>
 </html>

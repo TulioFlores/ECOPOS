@@ -4,6 +4,46 @@ document.querySelector('#form-producto').addEventListener('submit', async functi
 
   const producto = obtenerDatosDelFormulario();
 
+  // Validaciones
+  if (!producto.codigo_barras || producto.codigo_barras.trim().length === 0) {
+    mostrarModal('❌ El código de barras es obligatorio.');
+    return;
+  }
+  // Solo letras y números para nombre y descripción
+  const soloLetrasNumeros = /^[A-Za-zÁÉÍÓÚáéíóúÑñüÜ0-9\s]+$/;
+  if (!producto.nombre || producto.nombre.trim().length === 0) {
+    mostrarModal('❌ El nombre del producto es obligatorio.');
+    return;
+  }
+  if (!soloLetrasNumeros.test(producto.nombre)) {
+    mostrarModal('❌ El nombre solo puede contener letras y números.');
+    return;
+  }
+  if (producto.nombre.length > 100) {
+    mostrarModal('❌ El nombre del producto no puede exceder 100 caracteres.');
+    return;
+  }
+  if (producto.descripcion && !soloLetrasNumeros.test(producto.descripcion)) {
+    mostrarModal('❌ La descripción solo puede contener letras y números.');
+    return;
+  }
+  if (isNaN(producto.precio) || producto.precio <= 0) {
+    mostrarModal('❌ El precio debe ser un número mayor a 0.');
+    return;
+  }
+  if (!Number.isInteger(producto.stock) || producto.stock < 0) {
+    mostrarModal('❌ El stock debe ser un número entero mayor o igual a 0.');
+    return;
+  }
+  if (!Number.isInteger(producto.stock_minimo) || producto.stock_minimo < 0) {
+    mostrarModal('❌ El stock mínimo debe ser un número entero mayor o igual a 0.');
+    return;
+  }
+  if (producto.id_proveedor !== null && (isNaN(producto.id_proveedor) || producto.id_proveedor <= 0)) {
+    mostrarModal('❌ El ID del proveedor debe ser un número positivo.');
+    return;
+  }
+
   const response = await fetch('/api/productos', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -11,7 +51,7 @@ document.querySelector('#form-producto').addEventListener('submit', async functi
   });
 
   const data = await response.json();
-  mostrarModal(response.ok ? '✅ Producto agregado: Código ' + data.codigo_barras : '❌ ' + data.mensaje);
+  mostrarModal(response.ok ? '✅ Producto agregado: Código ' + data.codigo_barras : '❌ ' + (data.mensaje || data.error));
   if (response.ok) e.target.reset();
 });
 
@@ -47,9 +87,48 @@ document.getElementById('btn-buscar-producto').addEventListener('click', async (
 // Modificar producto por código de barras
 document.getElementById('btn-modificar-producto').addEventListener('click', async () => {
   const codigo = obtenerCodigoDeCookie();
-  if (!codigo) return alert('Primero busca un producto');
+  if (!codigo) return mostrarModal('❌ Primero busca un producto');
 
   const producto = obtenerDatosDelFormulario();
+
+  // Validaciones (idénticas a las de alta)
+  if (!producto.codigo_barras || producto.codigo_barras.trim().length === 0) {
+    mostrarModal('❌ El código de barras es obligatorio.');
+    return;
+  }
+  const soloLetrasNumeros = /^[A-Za-zÁÉÍÓÚáéíóúÑñüÜ0-9\s]+$/;
+  if (!producto.nombre || producto.nombre.trim().length === 0) {
+    mostrarModal('❌ El nombre del producto es obligatorio.');
+    return;
+  }
+  if (!soloLetrasNumeros.test(producto.nombre)) {
+    mostrarModal('❌ El nombre solo puede contener letras y números.');
+    return;
+  }
+  if (producto.nombre.length > 100) {
+    mostrarModal('❌ El nombre del producto no puede exceder 100 caracteres.');
+    return;
+  }
+  if (producto.descripcion && !soloLetrasNumeros.test(producto.descripcion)) {
+    mostrarModal('❌ La descripción solo puede contener letras y números.');
+    return;
+  }
+  if (isNaN(producto.precio) || producto.precio <= 0) {
+    mostrarModal('❌ El precio debe ser un número mayor a 0.');
+    return;
+  }
+  if (!Number.isInteger(producto.stock) || producto.stock < 0) {
+    mostrarModal('❌ El stock debe ser un número entero mayor o igual a 0.');
+    return;
+  }
+  if (!Number.isInteger(producto.stock_minimo) || producto.stock_minimo < 0) {
+    mostrarModal('❌ El stock mínimo debe ser un número entero mayor o igual a 0.');
+    return;
+  }
+  if (producto.id_proveedor !== null && (isNaN(producto.id_proveedor) || producto.id_proveedor <= 0)) {
+    mostrarModal('❌ El ID del proveedor debe ser un número positivo.');
+    return;
+  }
 
   const res = await fetch(`/api/productos/${codigo}`, {
     method: 'PUT',
@@ -60,34 +139,72 @@ document.getElementById('btn-modificar-producto').addEventListener('click', asyn
   const data = await res.json();
   if (res.ok) {
     mostrarModal(data.mensaje);
-    limpiarFormulario(); // ← aquí
+    limpiarFormulario();
+    document.cookie = 'producto_codigo=; max-age=0; path=/';
+  } else {
+    mostrarModal('❌ ' + (data.mensaje || data.error));
   }
-
 });
 
 // Dar de baja producto
 document.getElementById('btn-baja-producto').addEventListener('click', async () => {
   const codigo = obtenerCodigoDeCookie();
-  if (!codigo || !confirm('¿Confirmas dar de baja este producto?')) return;
+  if (!codigo) {
+    mostrarModal('❌ No se ha seleccionado un producto');
+    return;
+  }
+
+  const confirmacion = await mostrarPromptAsync({
+    titulo: 'Confirmar baja',
+    mensaje: '¿Estás seguro de dar de baja este producto? Escribe SI para confirmar.',
+    tipo: 'text',
+    obligatorio: true
+  });
+
+  if (!confirmacion || confirmacion.toUpperCase() !== 'SI') {
+    mostrarModal('Operación cancelada.');
+    return;
+  }
 
   const res = await fetch(`/api/productos/${codigo}/baja`, { method: 'PUT' });
   const data = await res.json();
   if (res.ok) {
     mostrarModal(data.mensaje);
-    limpiarFormulario(); // ← aquí
+    limpiarFormulario();
+    document.cookie = 'producto_codigo=; max-age=0; path=/';
+  } else {
+    mostrarModal('❌ ' + (data.mensaje || data.error));
   }
 });
 
 // Dar de alta producto
 document.getElementById('btn-alta-producto').addEventListener('click', async () => {
   const codigo = obtenerCodigoDeCookie();
-  if (!codigo || !confirm('¿Confirmas dar de alta este producto?')) return;
+  if (!codigo) {
+    mostrarModal('❌ No se ha seleccionado un producto');
+    return;
+  }
+
+  const confirmacion = await mostrarPromptAsync({
+    titulo: 'Confirmar alta',
+    mensaje: '¿Estás seguro de dar de alta este producto? Escribe SI para confirmar.',
+    tipo: 'text',
+    obligatorio: true
+  });
+
+  if (!confirmacion || confirmacion.toUpperCase() !== 'SI') {
+    mostrarModal('Operación cancelada.');
+    return;
+  }
 
   const res = await fetch(`/api/productos/${codigo}/alta`, { method: 'PUT' });
   const data = await res.json();
   if (res.ok) {
     mostrarModal(data.mensaje);
-    limpiarFormulario(); // ← aquí
+    limpiarFormulario();
+    document.cookie = 'producto_codigo=; max-age=0; path=/';
+  } else {
+    mostrarModal('❌ ' + (data.mensaje || data.error));
   }
 });
 
@@ -118,19 +235,19 @@ function obtenerCodigoDeCookie() {
   const match = document.cookie.match(/producto_codigo=([^;]+)/);
   return match ? match[1] : null;
 }
+
 function limpiarFormulario() {
   document.getElementById('form-producto').reset();
-
-  // También puedes limpiar manualmente los inputs si los manejas individualmente
-  document.cookie = 'producto_id=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  document.cookie = 'producto_codigo=; max-age=0; path=/';
 }
-  function mostrarModal(mensaje) {
-    const modalBody = document.getElementById('modalMensajeBody');
-    modalBody.innerHTML = mensaje;
-  
-    const modal = new bootstrap.Modal(document.getElementById('modalMensaje'));
-    modal.show();
-  }
+
+function mostrarModal(mensaje) {
+  const modalBody = document.getElementById('modalMensajeBody');
+  modalBody.innerHTML = mensaje;
+
+  const modal = new bootstrap.Modal(document.getElementById('modalMensaje'));
+  modal.show();
+}
 
 function mostrarPromptAsync({ 
   titulo = 'Ingrese un valor', 
@@ -183,6 +300,7 @@ function mostrarPromptAsync({
     setTimeout(() => input.focus(), 300);
   });
 }
+
 async function buscarProducto() {
   
 }
