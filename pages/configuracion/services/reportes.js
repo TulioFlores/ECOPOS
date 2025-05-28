@@ -344,13 +344,27 @@ function validarFormulario() {
     const telefono = document.getElementById("telefonoTienda").value.trim();
     const rfc = document.getElementById("rfcTienda").value.trim();
 
+    // Validación del nombre de la tienda
     if (!nombre) {
         mostrarError("nombreTienda", "El nombre de la tienda es requerido");
         esValido = false;
+    } else if (nombre.length < 3 || nombre.length > 50) {
+        mostrarError("nombreTienda", "El nombre debe tener entre 3 y 50 caracteres");
+        esValido = false;
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,&-]+$/.test(nombre)) {
+        mostrarError("nombreTienda", "El nombre solo puede contener letras, números, espacios y los caracteres .,&-");
+        esValido = false;
     }
 
+    // Validación de la dirección
     if (!direccion) {
         mostrarError("direccionTienda", "La dirección es requerida");
+        esValido = false;
+    } else if (direccion.length < 5 || direccion.length > 100) {
+        mostrarError("direccionTienda", "La dirección debe tener entre 5 y 100 caracteres");
+        esValido = false;
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,#-]+$/.test(direccion)) {
+        mostrarError("direccionTienda", "La dirección solo puede contener letras, números, espacios y los caracteres .,#-");
         esValido = false;
     }
 
@@ -452,6 +466,10 @@ document.getElementById("nombreTienda").addEventListener("input", () => {
     const nombre = document.getElementById("nombreTienda").value.trim();
     if (!nombre) {
         mostrarError("nombreTienda", "El nombre de la tienda es requerido");
+    } else if (nombre.length < 3 || nombre.length > 50) {
+        mostrarError("nombreTienda", "El nombre debe tener entre 3 y 50 caracteres");
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,&-]+$/.test(nombre)) {
+        mostrarError("nombreTienda", "El nombre solo puede contener letras, números, espacios y los caracteres .,&-");
     } else {
         limpiarErrores();
     }
@@ -461,6 +479,10 @@ document.getElementById("direccionTienda").addEventListener("input", () => {
     const direccion = document.getElementById("direccionTienda").value.trim();
     if (!direccion) {
         mostrarError("direccionTienda", "La dirección es requerida");
+    } else if (direccion.length < 5 || direccion.length > 100) {
+        mostrarError("direccionTienda", "La dirección debe tener entre 5 y 100 caracteres");
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s.,#-]+$/.test(direccion)) {
+        mostrarError("direccionTienda", "La dirección solo puede contener letras, números, espacios y los caracteres .,#-");
     } else {
         limpiarErrores();
     }
@@ -513,5 +535,27 @@ document.getElementById("logoTienda").addEventListener("change", (e) => {
         };
         reader.readAsDataURL(file);
     }
+});
+
+// Función para limpiar el formulario de empleado
+function limpiarFormularioEmpleado() {
+    document.getElementById("primer-nombre").value = "";
+    document.getElementById("segundo-nombre").value = "";
+    document.getElementById("primer-apellido").value = "";
+    document.getElementById("segundo-apellido").value = "";
+    document.getElementById("email").value = "";
+    document.getElementById("telefono").value = "";
+    document.getElementById("puesto").value = "Empleado";
+    document.getElementById("contrasena").value = "";
+    document.getElementById("confirmar-contrasena").value = "";
+    document.getElementById("contrasena-responsable").value = "";
+    document.getElementById("contrasena-responsable-conf").value = "";
+}
+
+// Evento para el botón cancelar empleado
+btnCancelarEmpleado.addEventListener("click", () => {
+    const modalEmpleado = document.getElementById("alta-empleado");
+    modalEmpleado.style.display = "none";
+    limpiarFormularioEmpleado();
 });
 

@@ -86,7 +86,14 @@ document.getElementById('aplicar-cierre').addEventListener('click', async () => 
     const sobrante = 0;
 
     const montoCorrecto = efectivo + tarjeta + mp; // o usa `total` directamente si ya está calculado
-    const id_empleado = localStorage.getItem('id_empleado') || 2; // Ajusta según cómo manejas al usuario logueado
+    
+    // Obtener el ID del empleado de la cookie
+    const id_empleado = obtenerIdEmpleado();
+    if (!id_empleado) {
+      showAlert('Error: No se encontró la sesión del empleado', 'error');
+      return;
+    }
+
     try {
       const response = await fetch('http://localhost:3000/api/aplicar-cierre', {
         method: 'POST',
@@ -110,6 +117,8 @@ document.getElementById('aplicar-cierre').addEventListener('click', async () => 
         document.getElementById('tarjeta-cierre').value = null;
         document.getElementById('mp-cierre').value = null;
         document.getElementById('monto-cierre').value = null;
+        // Eliminar la cookie después del cierre exitoso
+        eliminarCookieEmpleado();
       } else {
         showAlert(data.error || 'No se pudo registrar el cierre', 'error');
       }
@@ -136,6 +145,9 @@ document.getElementById('form-autenticacion-corte').addEventListener('submit', a
     const data = await res.json();
 
     if (data.success) {
+      // Guardar el ID del empleado en una cookie
+      document.cookie = `id_empleado=${data.empleado.id}; path=/; max-age=86400`; // Expira en 24 horas
+      
       // Clear the form
       document.getElementById('form-autenticacion-corte').reset();
       // Cerrar el modal de autenticación si está abierto
@@ -165,4 +177,21 @@ function mostrarMensajeAutenticacion(mensaje, esError = true) {
     setTimeout(() => {
         mensajeDiv.style.display = 'none';
     }, 3000);
+}
+
+// Función para obtener el ID del empleado de la cookie
+function obtenerIdEmpleado() {
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'id_empleado') {
+      return value;
+    }
+  }
+  return null;
+}
+
+// Función para eliminar la cookie del empleado
+function eliminarCookieEmpleado() {
+  document.cookie = 'id_empleado=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
 }

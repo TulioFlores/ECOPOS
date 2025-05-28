@@ -858,9 +858,19 @@ app.post('/resumen-turno', async (req, res) => {
   if (!username) return res.status(400).json({ error: 'Usuario requerido' });
 
   try {
+    // Primero obtener el ID del empleado
+    const [empleado] = await pool.query('SELECT id_empleado FROM empleados WHERE username = ? AND activo = 1', [username]);
+    if (empleado.length === 0) {
+      return res.status(404).json({ error: 'Empleado no encontrado' });
+    }
+    const id_empleado = empleado[0].id_empleado;
+
+    // Obtener el resumen del turno
     const [results] = await pool.query('CALL sp_resumen_turno_usuario(?)', [username]);
     const resumen = results[0][0] || {};
+    
     res.json({
+      id_empleado,
       efectivo: resumen.total_efectivo || 0,
       tarjeta: resumen.total_tarjeta || 0,
       mercado_pago: resumen.total_mercado_pago || 0,
@@ -868,6 +878,7 @@ app.post('/resumen-turno', async (req, res) => {
       total_venta: resumen.total || 0
     });
   } catch (err) {
+    console.error('Error en resumen-turno:', err);
     res.status(500).json({ error: 'Error al ejecutar SP' });
   }
 });
@@ -882,7 +893,7 @@ app.post('/api/aplicar-cierre', async (req, res) => {
   try {
     await pool.query(
       `INSERT INTO movimientos_caja (id_tipo_movimiento, fecha, id_empleado, Faltante, Sobrante, MontoCorrecto)
-       VALUES (2, NOW(), ?, ?, ?, ?)`,
+       VALUES (3, NOW(), ?, ?, ?, ?)`,
       [id_empleado, faltante || 0, sobrante || 0, montoCorrecto]
     );
     res.json({ success: true, message: 'Cierre de caja registrado correctamente.' });
@@ -909,27 +920,7 @@ app.post('/resumen-dia', async (req, res) => {
 
 
 
-app.post('/api/aplicar-cierre', (req, res) => {
-  const { faltante, sobrante, montoCorrecto, id_empleado } = req.body;
 
-  if (montoCorrecto === undefined) {
-    return res.status(400).json({ success: false, error: 'Monto requerido' });
-  }
-
-  connection.query(
-    `INSERT INTO movimientos_caja (id_tipo_movimiento, fecha, Faltante, Sobrante, MontoCorrecto, id_empleado)
-     VALUES (3, NOW(), ?, ?, ?, ?)`,
-    [faltante || 0, sobrante || 0, montoCorrecto, id_empleado],
-    (err, result) => {
-      if (err) {
-        console.error('Error al insertar cierre en movimientos_caja:', err);
-        return res.status(500).json({ success: false, error: 'Error al guardar cierre de caja' });
-      }
-
-      return res.json({ success: true, message: 'Cierre de caja registrado correctamente.' });
-    }
-  );
-});
 
 // Ruta para manejar el registro de asistencia
 app.post('/registrar-asistencia', async (req, res) => {
@@ -1696,5 +1687,35 @@ app.get('/api/usuario-actual', (req, res) => {
         });
     } else {
         res.status(401).json({ error: 'No hay sesión activa' });
+    }
+});
+
+// Ruta para verificar si existe entrada registrada
+app.get('/api/verificar-entrada/:username', async (req, res) => {
+    const { username } = req.params;
+    if (!username) return res.status(400).json({ error: 'Username es requerido' });
+
+    try {
+        // Buscar el id_empleado por username
+        const [rows] = await pool.query('SELECT id_empleado FROM empleados WHERE username = ? AND activo = 1', [username]);
+        if (rows.length === 0) return res.status(404).json({ error: 'Usuario no encontrado' });
+        const id_empleado = rows[0].id_empleado;
+
+        // Verificar si existe una entrada registrada hoy
+        const hoy = new Date();
+        const yyyy = hoy.getFullYear();
+        const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+        const dd = String(hoy.getDate()).padStart(2, '0');
+        const fechaHoy = `${yyyy}-${mm}-${dd}`;
+
+        const [asistencias] = await pool.query(
+            `SELECT id_asistencia FROM asistencia WHERE id_empleado = ? AND tipo = 'Entrada' AND DATE(fecha_hora) = ?`,
+            [id_empleado, fechaHoy]
+        );
+
+        res.json({ tieneEntrada: asistencias.length > 0 });
+    } catch (err) {
+        console.error('Error al verificar entrada:', err);
+        res.status(500).json({ error: 'Error en el servidor' });
     }
 });

@@ -218,10 +218,14 @@
             <h3 class="mb-4">Gestión de Productos</h3>
             <form id="form-producto">
               <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="col-md-6 mb-3 position-relative">
                   <label for="codigo-barras" class="form-label">Código de barras</label>
-                  <input type="number" class="form-control" id="codigo-barras" name="codigo-barras" required>
-                  <i class="bi bi-camera " id="escanear"></i>
+                  <div class="input-group">
+                    <input type="number" class="form-control" id="codigo-barras" name="codigo-barras" required>
+                    <button class="btn btn-outline-secondary" type="button" id="escanear">
+                      <i class="bi bi-camera"></i>
+                    </button>
+                  </div>
                 </div>
                 <div class="col-md-6 mb-3">
                   <label for="nombre-producto" class="form-label">Nombre del producto</label>
@@ -515,9 +519,9 @@
             </div>
           </div>
           <!--Modal para el checador-->
-          <div class="modal fade " id="modalAsistencia" tabindex="-1" aria-labelledby="modalAsistenciaLabel"
+          <div class="modal fade" id="modalAsistencia" tabindex="-1" aria-labelledby="modalAsistenciaLabel"
             aria-hidden="true">
-            <div class="modal-dialog modal-lg "> <!-- Puedes ajustar el tamaño con modal-sm, modal-lg, etc. -->
+            <div class="modal-dialog modal-lg modal-dialog-centered" style="margin-top: 100px;"> <!-- Ajustado el margen superior -->
               <div class="modal-content bg-success bg-primary">
                 <div class="modal-header">
                   <h1 class="modal-title fs-5" id="modalAsistenciaLabel">Registro De Asistencia</h1>

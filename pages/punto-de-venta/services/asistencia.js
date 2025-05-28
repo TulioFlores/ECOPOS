@@ -60,7 +60,46 @@ function definirMensajeAsistencia() {
     }
 }
 
-document.getElementById('registrar').addEventListener('click', () => {
+// Función para limpiar el formulario
+function limpiarFormularioAsistencia() {
+    document.getElementById('numEmpleado').value = '';
+    document.getElementById('nombreEmpleado').value = '';
+    document.getElementById('apellidoP').value = '';
+    document.getElementById('apellidoM').value = '';
+    document.getElementById('tipoAsistencia').value = 'Entrada';
+    limpiarMensajeAsistencia();
+}
+
+// Función para verificar si existe entrada registrada
+async function verificarEntradaRegistrada(username) {
+    try {
+        const response = await fetch(`/api/verificar-entrada/${username}`);
+        const data = await response.json();
+        return data.tieneEntrada;
+    } catch (error) {
+        console.error('Error al verificar entrada:', error);
+        return false;
+    }
+}
+
+// Función para validar el tipo de asistencia
+async function validarTipoAsistencia(username, tipo) {
+    if (tipo === 'Salida') {
+        const tieneEntrada = await verificarEntradaRegistrada(username);
+        if (!tieneEntrada) {
+            mostrarMensajeAsistencia('No se puede registrar salida sin haber registrado entrada previamente', true);
+            return false;
+        }
+    }
+    return true;
+}
+
+// Agregar evento para limpiar el formulario cuando se cierra el modal
+document.getElementById('modalAsistencia').addEventListener('hidden.bs.modal', function () {
+    limpiarFormularioAsistencia();
+});
+
+document.getElementById('registrar').addEventListener('click', async () => {
     const username = document.getElementById('numEmpleado').value.trim();
     const nombre = document.getElementById('nombreEmpleado').value.trim();
     const apellidoP = document.getElementById('apellidoP').value.trim();
@@ -78,24 +117,55 @@ document.getElementById('registrar').addEventListener('click', () => {
         return;
     }
 
+    // Validar tipo de asistencia
+    const esValido = await validarTipoAsistencia(username, tipo);
+    if (!esValido) return;
+
     // Envío al servidor
-    fetch('http://localhost:3000/registrar-asistencia', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, tipo })
-    })
-    .then(res => res.json())
-    .then(data => {
+    try {
+        const response = await fetch('http://localhost:3000/registrar-asistencia', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ username, tipo })
+        });
+
+        const data = await response.json();
+        
         if (data.error) {
             mostrarMensajeAsistencia(data.error, true);
         } else {
             mostrarMensajeAsistencia(data.mensaje || 'Asistencia registrada', false);
+            // Cerrar el modal después de registro exitoso
+            const modal = bootstrap.Modal.getInstance(document.getElementById('modalAsistencia'));
+            if (modal) {
+                modal.hide();
+            }
         }
-    })
-    .catch(err => {
+    } catch (err) {
         console.error('Error al registrar:', err);
         mostrarMensajeAsistencia('Error al registrar la asistencia', true);
-    });
+    }
+});
+
+// Actualizar el select de tipo de asistencia cuando cambia el usuario
+document.getElementById('numEmpleado').addEventListener('input', async function() {
+    const username = this.value.trim();
+    if (username) {
+        const tieneEntrada = await verificarEntradaRegistrada(username);
+        const selectTipo = document.getElementById('tipoAsistencia');
+        
+        // Si no tiene entrada, deshabilitar la opción de salida
+        if (!tieneEntrada) {
+            selectTipo.value = 'Entrada';
+            selectTipo.querySelector('option[value="Salida"]').disabled = true;
+        } else {
+            selectTipo.querySelector('option[value="Salida"]').disabled = false;
+        }
+    } else {
+        // Si el campo está vacío, habilitar ambas opciones
+        const selectTipo = document.getElementById('tipoAsistencia');
+        selectTipo.querySelector('option[value="Salida"]').disabled = false;
+    }
 });

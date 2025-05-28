@@ -82,6 +82,9 @@ document.getElementById('form-autenticacion-corte').addEventListener('submit', a
           alert(data.error);
           return;
         }
+
+        // Guardar el ID del empleado en una cookie
+        document.cookie = `id_empleado=${data.id_empleado}; path=/; max-age=86400`; // Expira en 24 horas
   
         // Asegura que los valores sean números antes de usar toFixed
         const efectivo = Number(data.efectivo) || 0;
@@ -174,8 +177,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const sobrante = diferencia < 0 ? Math.abs(diferencia).toFixed(2) : 0;
     const montoCorrecto = totalSistema;
   
-    const id_empleado = localStorage.getItem('id_empleado') || 2; // Ajusta según cómo manejas al usuario logueado
-    console.log(id_empleado, faltante, sobrante, montoCorrecto);
+    // Obtener el ID del empleado de la cookie
+    const id_empleado = obtenerIdEmpleado();
+    if (!id_empleado) {
+      alert('Error: No se encontró la sesión del empleado');
+      return;
+    }
+
     try {
       const res = await fetch('/api/aplicar-cierre', {
         method: 'POST',
@@ -190,6 +198,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const modalElement = document.getElementById('modal-corte-cajero');
         const modalCorte = bootstrap.Modal.getInstance(modalElement);
         modalCorte.hide();
+        
+        // Eliminar la cookie después del cierre exitoso
+        eliminarCookieEmpleado();
         
         // Redirección según el cargo en sesión
         try {
@@ -212,3 +223,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+// Función para obtener el ID del empleado de la cookie
+function obtenerIdEmpleado() {
+  const cookies = document.cookie.split(';');
+  for (let cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'id_empleado') {
+      return value;
+    }
+  }
+  return null;
+}
+
+// Función para eliminar la cookie del empleado
+function eliminarCookieEmpleado() {
+  document.cookie = 'id_empleado=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+}
