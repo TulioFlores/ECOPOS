@@ -11,7 +11,7 @@ document.getElementById("boton-existencias").addEventListener("click", () => {
             const fila = document.createElement('tr');
             fila.classList.add('row');
             fila.innerHTML = `
-                <td class="col-3 text-center">${producto.id_producto}</td>
+                <td class="col-3 text-center">${producto.codigo_barras}</td>
                 <td class="col-3 text-center col-nombre">${producto.nombre}</td>
                 <td class="col-3 text-center col-cantidad">${producto.stock}</td>
                 <td class="col-3 text-center col-total">$${producto.precio}</td>

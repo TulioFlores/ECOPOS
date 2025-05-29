@@ -207,7 +207,7 @@ app.get('/buscar/:nombre', async (req, res) => {
     const [results] = await pool.execute('CALL sp_buscarProductos(?)', [nombreBuscado]);
     if (results[0].length > 0) {
       const productos = results[0].map(producto => ({
-        id: producto.id_producto,
+        id: producto.codigo_barras,
         descripcion: producto.nombre,
         stock: producto.stock,
         precio: producto.precio

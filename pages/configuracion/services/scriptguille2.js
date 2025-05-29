@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Validación en tiempo real para el teléfono (solo números)
-        document.getElementById('telefono').addEventListener('input', function(e) {
+        document.getElementById('telefono-proveedor').addEventListener('input', function(e) {
             this.value = this.value.replace(/\D/g, '');
         });
 
@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const proveedorData = {
             nombre: document.getElementById('nombre').value.trim(),
             correo: document.getElementById('correo').value.trim(),
-            telefono: document.getElementById('telefono').value.trim(),
+            telefono: document.getElementById('telefono-proveedor').value.trim(),
             productos_principales: document.getElementById('productos').value.trim(),
             logo_url: logoUrl.trim() || null  // Guardar null si no hay URL
         };
@@ -416,7 +416,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('proveedor-id').value = proveedor.id_proveedor;
         document.getElementById('nombre').value = proveedor.nombre;
         document.getElementById('correo').value = proveedor.correo;
-        document.getElementById('telefono').value = proveedor.telefono;
+        document.getElementById('telefono-proveedor').value = proveedor.telefono;
         document.getElementById('productos').value = proveedor.productos_principales || '';
         document.getElementById('logo-url').value = proveedor.logo_url || '';
         
