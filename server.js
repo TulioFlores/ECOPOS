@@ -715,7 +715,7 @@ app.put('/api/productos/:codigo/alta', async (req, res) => {
 
   ///Pago con mercado pago
 mercadopago.configure({
-    access_token:'TEST-4621541618541712-042220-4dcfeeb53d968a34c84e411bad744900-1462138141'
+    access_token:''
 });
 app.post('/mercadoqr', async (req, res) => {
     const { monto } = req.body;
@@ -733,7 +733,7 @@ app.post('/mercadoqr', async (req, res) => {
         back_urls: {
           success: "http://localhost:3000/confirmacion",
         },
-        notification_url:  "https://cd9d-2806-102e-e-b399-f54c-2401-bbb9-afd4.ngrok-free.app/webhook" , // ✅ válida aquí
+        notification_url:  "/webhook" , // ✅ válida aquí
       });
       
       const qr_url = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${preference.body.init_point}`;
